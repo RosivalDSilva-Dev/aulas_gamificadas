@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SO Aula 03 — Treino antes da prova</title>
+<meta name="description" content="Treino interativo de Sistemas Operacionais: área de trabalho, arquivos, janelas, configurações e atalhos.">
+<style>
+:root{
+  --bg:#e7edf2; --surface:#ffffff; --surface-2:#f3f7fa;
+  --ink:#0f2230; --ink-2:#4a6478; --line:#c6d4de;
+  --primary:#15697f; --primary-d:#0e4c5d; --primary-l:#d8ecf1;
+  --ok:#1f8a4c; --ok-d:#166b3a; --ok-l:#dcf3e5;
+  --bad:#c23b4d; --bad-d:#982b3b; --bad-l:#fae1e4;
+  --gold:#e0900a; --gold-l:#fdf0d4;
+  --r:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1820; --surface:#132633; --surface-2:#0f202b; --ink:#e8f1f6; --ink-2:#9fb6c4;
+    --line:#26404f; --primary:#3aa8c4; --primary-d:#2b8299; --primary-l:#123542;
+    --ok:#3fbf75; --ok-d:#2c8f56; --ok-l:#102e20; --bad:#f0697c; --bad-d:#b84656; --bad-l:#33161c;
+    --gold:#f4b73f; --gold-l:#332611;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI Variable Text","Segoe UI",Roboto,Ubuntu,system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.shell{max-width:560px;margin:0 auto;min-height:100%;padding:0 14px 40px}
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -14px 14px;
+  padding:10px 14px;background:var(--surface);border-bottom:2px solid var(--line);
+  display:flex;align-items:center;gap:10px;
+}
+.topbar .grow{flex:1;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;
+  padding:4px 9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.xp{color:var(--gold);border-color:var(--gold)}
+.pill.hp{color:var(--bad);border-color:var(--bad)}
+.bar{height:12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+.iconbtn{background:none;border:0;padding:6px;border-radius:9px;cursor:pointer;color:var(--ink-2);font-size:20px;line-height:1}
+.iconbtn:hover{background:var(--surface-2)}
+.cfgrow{display:flex;align-items:center;gap:14px;cursor:pointer}
+.cfgrow .grow{flex:1}
+.sw{appearance:none;-webkit-appearance:none;flex:none;width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;margin:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s}
+.sw:checked{background:var(--primary)}
+.sw:checked::after{left:23px}
+.sw:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+
+h1{font-size:27px;line-height:1.15;letter-spacing:-.02em;margin:.2em 0 .3em;font-weight:700}
+h2{font-size:21px;line-height:1.2;letter-spacing:-.01em;margin:0 0 .4em;font-weight:700}
+h3{font-size:16px;margin:0 0 6px;font-weight:700}
+p{margin:0 0 .8em}
+.sub{color:var(--ink-2);font-size:15px}
+
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.btn{
+  display:block;width:100%;padding:14px 16px;border-radius:var(--r);border:0;
+  background:var(--primary);color:#fff;font-weight:700;font-size:17px;cursor:pointer;
+  box-shadow:0 4px 0 var(--primary-d);margin-bottom:12px;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--primary-d)}
+.btn[disabled]{background:var(--line);color:var(--ink-2);box-shadow:0 4px 0 var(--line);cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--primary);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.ok{background:var(--ok);box-shadow:0 4px 0 var(--ok-d)}
+.btn.small{padding:10px 12px;font-size:15px}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+input[type=text]{
+  width:100%;padding:13px 14px;border-radius:var(--r);border:2px solid var(--line);
+  background:var(--surface-2);color:var(--ink);font-size:17px;font-family:inherit;
+}
+input[type=text]:focus{border-color:var(--primary);outline:none}
+label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
+
+/* ---------- boot / start ---------- */
+.boot{border:2px solid var(--line);border-radius:var(--r);overflow:hidden;background:#0a1620;margin-bottom:16px}
+.boot .screen{aspect-ratio:16/10;position:relative;background:
+  radial-gradient(120% 90% at 70% 20%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
+.boot .bootline{position:absolute;left:14px;top:14px;color:#8fd4e8;font-size:12px;opacity:0}
+.boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0}
+.boot .lg b{color:#eaf6fb;font-size:clamp(20px,6vw,30px);letter-spacing:-.02em}
+.boot .tb{position:absolute;left:0;right:0;bottom:0;height:26px;background:#061019;display:flex;
+  align-items:center;gap:6px;padding:0 8px;transform:translateY(100%)}
+.boot .tb span{width:14px;height:14px;border-radius:4px;background:#2a5f75}
+.boot .tb .clk{margin-left:auto;color:#8fd4e8;font-size:11px;background:none;width:auto;height:auto}
+@keyframes fadein{to{opacity:1}}
+@keyframes slideup{to{transform:translateY(0)}}
+.boot .bootline{animation:fadein .01s .2s forwards}
+.boot .lg{animation:fadein .7s .6s forwards}
+.boot .tb{animation:slideup .5s 1.3s forwards}
+
+/* ---------- mapa de níveis ---------- */
+.trail{display:flex;flex-direction:column;gap:10px}
+.node{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;
+  box-shadow:0 3px 0 var(--line);
+}
+.node:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.node[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.node .glyph{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:var(--primary-l);
+  display:grid;place-items:center;font-size:23px;border:2px solid var(--line)}
+.node.done .glyph{background:var(--ok-l);border-color:var(--ok)}
+.node.boss .glyph{background:var(--gold-l);border-color:var(--gold)}
+.node .t{flex:1;min-width:0}
+.node .t b{display:block;font-size:16px}
+.node .t span{font-size:13px;color:var(--ink-2)}
+.stars{letter-spacing:1px;font-size:14px;color:var(--gold)}
+.stars .off{color:var(--line)}
+
+/* ---------- cenas (mock de tela) ---------- */
+.scene{user-select:none;-webkit-user-select:none;border-radius:10px;overflow:hidden;border:2px solid var(--line);margin-bottom:12px}
+.scene [data-zone]{cursor:pointer}
+.desktop{position:relative;aspect-ratio:16/10;background:linear-gradient(140deg,#20566b,#0e2a38 60%,#0a1f2b);padding:10px}
+.desktop .icons{display:flex;flex-direction:column;gap:8px;width:74px}
+.desktop .ic{display:flex;flex-direction:column;align-items:center;gap:2px;color:#e6f2f7;font-size:10px}
+.desktop .icbox{width:26px;height:22px;border-radius:4px;background:#f0c368;border:1px solid #b98b2c}
+.desktop .ic:nth-child(2) .icbox{background:#9ec6d8;border-color:#5b91a8}
+.desktop .ic:nth-child(3) .icbox{background:#b6d8b0;border-color:#6ea467}
+.desktop .ic:nth-child(4) .icbox{background:#cfcfcf;border-color:#8d8d8d}
+.taskbar{position:absolute;left:0;right:0;bottom:0;height:34px;background:#08161e;display:flex;align-items:center;gap:8px;padding:0 7px}
+.tb-start{background:var(--primary);color:#fff;border:0;border-radius:6px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.tb-apps{display:flex;gap:5px;padding:4px}
+.tb-apps i{display:block;width:17px;height:17px;border-radius:4px;background:#2f6a82}
+.tb-tray{margin-left:auto;color:#cfe8f1;font-size:11px;padding:6px;display:flex;gap:6px;align-items:center}
+.taskbar.solo{position:static;height:44px;border-radius:8px}
+
+.screen4{position:relative;aspect-ratio:16/10;background:#123243;padding:26px}
+.screen4 .edge{position:absolute;background:rgba(255,255,255,.10);border:1px dashed rgba(255,255,255,.35);display:grid;place-items:center;color:#d5eaf2;font-size:11px}
+.screen4 .e-top{top:0;left:0;right:0;height:24px}
+.screen4 .e-bottom{bottom:0;left:0;right:0;height:24px}
+.screen4 .e-left{top:24px;bottom:24px;left:0;width:26px}
+.screen4 .e-right{top:24px;bottom:24px;right:0;width:26px}
+.screen4 .mid{position:absolute;inset:24px 26px;display:grid;place-items:center;color:#7fa9bd;font-size:12px;text-align:center}
+
+.win{background:var(--surface-2)}
+.win .titlebar{background:var(--primary);color:#fff;display:flex;align-items:center;gap:6px;padding:7px 8px;font-size:13px;font-weight:600}
+.win .titlebar .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.win .wbtn{width:24px;height:22px;border-radius:5px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:12px}
+.win .address{padding:7px 9px;background:var(--surface);border-bottom:1px solid var(--line);font-size:12px}
+.win .body{display:flex;min-height:104px}
+.win .side{width:104px;flex:0 0 104px;background:var(--surface);border-right:1px solid var(--line);padding:7px;font-size:11px;color:var(--ink-2);line-height:1.7}
+.win .content{flex:1;padding:9px;display:flex;gap:9px;flex-wrap:wrap;align-content:flex-start}
+.win .file{width:58px;text-align:center;font-size:10px;color:var(--ink-2)}
+.win .file b{display:block;height:34px;border-radius:5px;background:var(--primary-l);border:1px solid var(--line);margin-bottom:3px}
+.win .status{padding:5px 9px;border-top:1px solid var(--line);background:var(--surface);font-size:11px;color:var(--ink-2)}
+
+.tree{background:var(--surface-2);padding:12px 8px}
+.tree .lvl{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.tree .fold{background:var(--surface);border:2px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;font-weight:600}
+.tree .fold.root{background:var(--primary-l);border-color:var(--primary)}
+.tree .link{height:12px;border-left:2px solid var(--line);width:0;margin:0 auto}
+
+.zone-hit{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ---------- respostas ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{
+  background:var(--surface);border:2px solid var(--line);border-radius:11px;padding:10px 13px;
+  font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 3px 0 var(--line);
+}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.chip.sel{background:var(--primary-l);border-color:var(--primary);color:var(--primary-d)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.key{min-width:52px;text-align:center;font-family:ui-monospace,Consolas,monospace}
+.tray{min-height:54px;border:2px dashed var(--line);border-radius:11px;padding:8px;display:flex;
+  flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;background:var(--surface-2)}
+.tray:empty::after{content:"Toque nas peças abaixo para montar a resposta";color:var(--ink-2);font-size:13px}
+.opt{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;margin-bottom:10px;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:13px;
+  box-shadow:0 3px 0 var(--line);font-size:16px;
+}
+.opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.opt.sel{background:var(--primary-l);border-color:var(--primary)}
+.opt .mark{width:22px;height:22px;flex:0 0 22px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.sel .mark{background:var(--primary);border-color:var(--primary);color:#fff}
+.slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.slotrow{display:flex;align-items:center;gap:9px}
+.slotrow .nm{flex:0 0 40%;font-weight:700;font-size:14px}
+.slot{flex:1;min-height:46px;border:2px dashed var(--line);border-radius:11px;background:var(--surface-2);
+  display:flex;align-items:center;padding:6px 9px;font-size:14px;font-weight:600;cursor:pointer}
+.slot.full{border-style:solid;background:var(--primary-l);border-color:var(--primary)}
+
+/* ---------- feedback ---------- */
+.feed{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  border-top:3px solid;background:var(--surface)}
+.feed.good{background:var(--ok-l);border-color:var(--ok)}
+.feed.bad{background:var(--bad-l);border-color:var(--bad)}
+.feed .inner{max-width:560px;margin:0 auto}
+.feed b{display:block;font-size:17px;margin-bottom:3px}
+.feed.good b{color:var(--ok-d)}.feed.bad b{color:var(--bad-d)}
+.feed p{font-size:15px;margin:0 0 10px}
+.feed .btn{margin:0}
+.spacer{height:150px}
+
+/* ---------- relatório ---------- */
+.skill{margin-bottom:12px}
+.skill .hd{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-bottom:4px}
+.skill .hd i{font-style:normal;color:var(--ink-2)}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:20px;letter-spacing:.14em;font-weight:700;color:var(--primary)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.kv:last-child{border:0}
+.kv b{font-weight:700}
+.medal{display:flex;align-items:center;gap:12px;background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:12px;margin-bottom:14px}
+.medal .m{font-size:34px}
+.warn{background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:11px;font-size:14px;margin-bottom:14px}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:11px;font-size:14px;color:var(--ink-2)}
+.theory li{margin-bottom:7px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+.timer.low{color:var(--bad)}
+canvas{max-width:100%;height:auto;border:2px solid var(--line);border-radius:var(--r)}
+
+.travado #app{pointer-events:none}
+.pwrow{display:flex;gap:10px;margin-top:10px}
+.pwrow input{flex:1}
+.pwerr{color:var(--bad-d,#b3261e);font-size:14px;min-height:20px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   SO — Aula 03: Área de Trabalho e Aplicativos
+   Treino gamificado. Prof. Rosival D. Silva.
+   ============================================================ */
+
+var STORE = "so_a03_v1";
+var HAB = {
+  H1:"Reconhecer a área de trabalho e a barra de tarefas",
+  H2:"Organizar arquivos, pastas e caminhos",
+  H3:"Identificar as partes de uma janela",
+  H4:"Usar as configurações do sistema",
+  H5:"Instalar e remover programas com segurança",
+  H6:"Usar os acessórios do sistema",
+  H7:"Aplicar atalhos de teclado"
+};
+
+/* ---------- cenas ---------- */
+function sDesktop(){return '<div class="scene desktop" data-zone="wallpaper">'+
+ '<div class="icons" data-zone="icons">'+
+   ['Este PC','Docs','Fotos','Lixeira'].map(function(n){return '<div class="ic"><span class="icbox"></span>'+n+'</div>';}).join('')+
+ '</div>'+
+ '<div class="taskbar" data-zone="taskbar">'+
+   '<button class="tb-start" data-zone="start">Iniciar</button>'+
+   '<div class="tb-apps" data-zone="apps"><i></i><i></i><i></i></div>'+
+   '<div class="tb-tray" data-zone="tray">WiFi · vol · 14:35</div>'+
+ '</div></div>';}
+
+function sTaskbar(){return '<div class="scene"><div class="taskbar solo" data-zone="taskbar">'+
+   '<button class="tb-start" data-zone="start">Iniciar</button>'+
+   '<div class="tb-apps" data-zone="apps"><i></i><i></i><i></i></div>'+
+   '<div class="tb-tray" data-zone="tray">WiFi · vol · 14:35</div>'+
+ '</div></div>';}
+
+function sScreen4(){return '<div class="scene screen4">'+
+ '<div class="edge e-top" data-zone="top">borda de cima</div>'+
+ '<div class="edge e-bottom" data-zone="bottom">borda de baixo</div>'+
+ '<div class="edge e-left" data-zone="left"></div>'+
+ '<div class="edge e-right" data-zone="right"></div>'+
+ '<div class="mid" data-zone="meio">tela sem a barra de tarefas</div></div>';}
+
+function sWindow(){return '<div class="scene win">'+
+ '<div class="titlebar" data-zone="titulo"><span class="nm">prova.docx — Bloco de Notas</span>'+
+   '<span class="wbtn" data-zone="min">–</span><span class="wbtn" data-zone="max">□</span><span class="wbtn" data-zone="fechar">✕</span></div>'+
+ '<div class="address" data-zone="endereco">C:\\Users\\Aluno\\Documentos</div>'+
+ '<div class="body"><div class="side" data-zone="lateral">Acesso rápido<br>Este PC<br>Documentos<br>Downloads</div>'+
+ '<div class="content" data-zone="conteudo">'+
+   ['trabalho.docx','foto.jpg','lista.txt'].map(function(f){return '<div class="file"><b></b>'+f+'</div>';}).join('')+
+ '</div></div>'+
+ '<div class="status" data-zone="status">3 arquivos · 245 KB</div></div>';}
+
+function sTree(){return '<div class="scene tree">'+
+ '<div class="lvl"><div class="fold root" data-zone="pc">Este PC</div></div><div class="link"></div>'+
+ '<div class="lvl"><div class="fold" data-zone="c">C: (Local)</div><div class="fold" data-zone="documentos">Documentos</div><div class="fold" data-zone="downloads">Downloads</div></div>'+
+ '<div class="link"></div>'+
+ '<div class="lvl"><div class="fold" data-zone="trabalhos">Trabalhos</div><div class="fold" data-zone="escola">Escola</div><div class="fold" data-zone="fotos">Fotos 2025</div><div class="fold" data-zone="musicas">Músicas</div><div class="fold" data-zone="provas">Provas</div></div>'+
+ '</div>';}
+
+var SCENES={desktop:sDesktop,taskbar:sTaskbar,screen4:sScreen4,win:sWindow,tree:sTree};
+
+/* ---------- banco de questões ----------
+ t: hot | pick | multi | type | keys | order | slots
+------------------------------------------------- */
+var LEVELS=[
+{id:1,nome:"Área de trabalho",glyph:"🖥️",skill:"H1",
+ teoria:["A área de trabalho (desktop) é a tela principal que aparece depois que você entra com a sua senha.",
+   "Nela ficam os <b>ícones de atalho</b>, a <b>área livre</b> para criar pastas e a <b>barra de tarefas</b>, sempre embaixo.",
+   "O papel de parede é só decoração: mudar a imagem não muda nada no funcionamento do PC."],
+ qs:[
+  {t:"hot",scene:"desktop",p:"Toque nos ícones de atalho.",ok:["icons"],e:"Ícones de atalho abrem programas e pastas com dois cliques."},
+  {t:"hot",scene:"desktop",p:"Toque na barra de tarefas.",ok:["taskbar","start","apps","tray"],e:"A barra de tarefas é a faixa de baixo, com Iniciar, programas abertos e relógio."},
+  {t:"type",p:"Maria ligou o PC e digitou a senha. Apareceu a tela com papel de parede, ícones e a barra embaixo. Como se chama essa tela?",
+   ac:["area de trabalho","desktop","a area de trabalho","área de trabalho"],dica:"Duas palavras… ou o nome em inglês.",
+   e:"É a área de trabalho, também chamada de desktop."},
+  {t:"multi",p:"O que faz parte da área de trabalho? Marque as 3 certas.",
+   opts:["Ícones de atalho","Papel de parede","Barra de tarefas","Placa-mãe","Fonte de energia","Cabo de rede"],ok:[0,1,2],
+   e:"Placa-mãe, fonte e cabo são peças físicas (hardware). A área de trabalho é o que você vê na tela."},
+  {t:"hot",scene:"desktop",p:"Toque na área livre onde você pode criar uma pasta nova.",ok:["wallpaper"],
+   e:"O espaço vazio do papel de parede aceita clique direito > Novo > Pasta."},
+  {t:"slots",p:"Ligue cada parte à sua função.",
+   pairs:[["Ícone de atalho","abre um programa"],["Papel de parede","só decoração"],["Barra de tarefas","mostra o relógio"]],
+   e:"Cada parte tem um papel: atalho abre, papel de parede enfeita, barra de tarefas informa."}
+]},
+
+{id:2,nome:"Barra de tarefas e menu Iniciar",glyph:"🧭",skill:"H1",
+ teoria:["A barra de tarefas tem três regiões: o <b>botão Iniciar</b>, os <b>ícones dos programas abertos</b> e a <b>bandeja do sistema</b> (hora, data, WiFi, volume).",
+  "Para fixar um favorito: clique direito no ícone &gt; Fixar na barra de tarefas.",
+  "O menu Iniciar abre com a tecla <b>Win</b> e traz a lista de programas, a caixa de pesquisa e os botões de Configurações, conta e Desligar.",
+  "Se a barra sumir, leve o mouse até a borda de baixo da tela."],
+ qs:[
+  {t:"hot",scene:"taskbar",p:"Toque no botão que abre o menu Iniciar.",ok:["start"],e:"O botão Iniciar fica na ponta esquerda da barra."},
+  {t:"hot",scene:"taskbar",p:"Toque na bandeja do sistema (relógio, WiFi e volume).",ok:["tray"],e:"A bandeja fica na ponta direita e mostra o estado do computador."},
+  {t:"hot",scene:"taskbar",p:"Toque na área que mostra os programas que estão abertos agora.",ok:["apps"],e:"Os ícones do meio são os programas em uso neste momento."},
+  {t:"keys",p:"Sem usar o mouse: qual tecla abre o menu Iniciar?",combo:["Win"],e:"A tecla Win (com o logotipo do Windows) abre o menu Iniciar sozinha."},
+  {t:"order",p:"Coloque na ordem certa para fixar o Chrome na barra de tarefas.",
+   items:["Encontrar o ícone do Chrome","Clicar com o botão direito no ícone","Escolher \"Fixar na barra de tarefas\"","O ícone continua lá mesmo com o programa fechado"],
+   e:"Clique direito no ícone > Fixar na barra de tarefas."},
+  {t:"multi",p:"O que aparece quando você abre o menu Iniciar? Marque as 3 certas.",
+   opts:["Lista de programas instalados","Caixa de pesquisa","Botão Desligar","A BIOS do computador","A tela de login","O painel traseiro do gabinete"],ok:[0,1,2],
+   e:"Programas, pesquisa e os botões de conta, Configurações e Desligar."},
+  {t:"hot",scene:"screen4",p:"A barra de tarefas sumiu. Para qual borda você leva o mouse?",ok:["bottom"],
+   e:"A barra fica escondida na borda de baixo e reaparece quando o mouse chega lá."},
+  {t:"order",p:"Lucas quer desligar o PC do jeito certo. Ordene os passos.",
+   items:["Salvar e fechar os trabalhos abertos","Clicar no botão Iniciar","Clicar no ícone de energia","Escolher Desligar"],
+   e:"Desligar pelo menu Iniciar evita perder arquivos e corromper o sistema."}
+]},
+
+{id:3,nome:"Arquivos, pastas e caminhos",glyph:"🗂️",skill:"H2",
+ teoria:["O gerenciador de arquivos (Explorador de Arquivos, no Windows) organiza documentos, fotos, músicas e pastas. Abre com <b>Win + E</b>.",
+  "<b>Pasta</b> é a gaveta que guarda arquivos. <b>Caminho</b> é o endereço completo, como C:\\Users\\Aluno\\prova.docx",
+  "Nunca apague as pastas do sistema: Windows, Program Files e System32."],
+ qs:[
+  {t:"keys",p:"Monte o atalho que abre o Explorador de Arquivos.",combo:["Win","E"],e:"Win + E — o E vem de Explorer."},
+  {t:"hot",scene:"tree",p:"Toque na pasta onde ficaria o arquivo prova.docx da escola.",ok:["escola"],
+   e:"Documentos > Escola: é lá que ficam os arquivos das aulas."},
+  {t:"hot",scene:"tree",p:"Toque no disco local, onde o Windows está instalado.",ok:["c"],e:"C: é a unidade principal do computador."},
+  {t:"order",p:"Monte o caminho completo até o arquivo da prova. Toque na ordem certa.",
+   items:["C:","Users","Aluno","Documentos","Escola","prova.docx"],
+   extra:["Downloads","Fotos 2025","Program Files"],mono:true,
+   e:"C:\\Users\\Aluno\\Documentos\\Escola\\prova.docx — do disco até o arquivo."},
+  {t:"type",p:"No caminho C:\\Users\\aluno\\Documentos\\Escola\\prova.docx, qual é o nome do arquivo?",
+   ac:["prova.docx","prova docx","prova"],dica:"É o último pedaço do caminho.",
+   e:"prova.docx — o que vem antes são pastas; .docx é a extensão."},
+  {t:"multi",p:"Quais pastas você NUNCA deve apagar? Marque as 3.",
+   opts:["Windows","Program Files","System32","Downloads","Fotos 2025","Trabalhos"],ok:[0,1,2],
+   e:"Sem essas pastas o computador pode parar de funcionar."},
+  {t:"slots",p:"Ligue cada palavra ao seu significado.",
+   pairs:[["Pasta","gaveta que guarda arquivos"],["Caminho","endereço completo"],["Explorador","programa que organiza tudo"]],
+   e:"Pasta guarda, caminho localiza, explorador mostra."},
+  {t:"pick",p:"Por que guardar em pastas é melhor do que deixar tudo espalhado na área de trabalho?",
+   opts:["Você acha o arquivo em segundos e não perde trabalho","Deixa o computador mais rápido para jogos","Aumenta a memória RAM do PC","Apaga vírus automaticamente"],ok:0,
+   e:"Organização economiza tempo e evita perder arquivos."}
+]},
+
+{id:4,nome:"A janela e suas partes",glyph:"🪟",skill:"H3",
+ teoria:["Quase toda janela tem as mesmas partes: <b>barra de título</b> (com minimizar, maximizar e fechar), <b>barra de endereço</b>, <b>menu lateral</b>, <b>área de conteúdo</b> e <b>barra de status</b>.",
+  "Aprender isso serve para qualquer programa, no Windows ou no Linux.",
+  "<b>Alt + F4</b> fecha a janela da frente. <b>Ctrl + C</b> copia e <b>Ctrl + V</b> cola."],
+ qs:[
+  {t:"hot",scene:"win",p:"Toque na barra de título.",ok:["titulo"],e:"A barra de título mostra o nome do arquivo e do programa."},
+  {t:"hot",scene:"win",p:"João quer fechar sem salvar. Toque no botão certo.",ok:["fechar"],e:"O X fecha a janela; o programa pergunta se você quer salvar."},
+  {t:"hot",scene:"win",p:"Toque na barra de endereço, que mostra onde você está.",ok:["endereco"],e:"O endereço é o caminho da pasta aberta."},
+  {t:"hot",scene:"win",p:"Toque na área de conteúdo, onde aparecem os arquivos.",ok:["conteudo"],e:"É o miolo da janela: arquivos, texto ou imagens."},
+  {t:"hot",scene:"win",p:"Toque na barra de status, que mostra quantos arquivos e o tamanho.",ok:["status"],e:"A barra de status fica embaixo e resume o que está na janela."},
+  {t:"keys",p:"Monte o atalho de teclado que fecha a janela da frente.",combo:["Alt","F4"],e:"Alt + F4 fecha o programa que está em uso."},
+  {t:"keys",p:"João escreveu um texto e quer copiar. Monte o atalho.",combo:["Ctrl","C"],e:"Ctrl + C copia a seleção para a memória."},
+  {t:"keys",p:"Agora ele quer colar em outro lugar. Monte o atalho.",combo:["Ctrl","V"],e:"Ctrl + V cola o que foi copiado."}
+]},
+
+{id:5,nome:"Configurações do sistema",glyph:"⚙️",skill:"H4",
+ teoria:["Para mudar como o computador funciona, use as <b>Configurações</b> (novo) ou o <b>Painel de Controle</b> (antigo).",
+  "Caminho rápido: clique direito no botão Iniciar &gt; Configurações — ou <b>Win + I</b>.",
+  "Categorias: Sistema, Dispositivos, Rede e Internet, Personalização, Contas e Aplicativos.",
+  "No Linux é parecido: Configurações do Sistema (System Settings)."],
+ qs:[
+  {t:"keys",p:"Monte o atalho que abre as Configurações.",combo:["Win","I"],e:"Win + I abre direto as Configurações."},
+  {t:"pick",p:"Qual é o caminho rápido pelo mouse para abrir as Configurações?",
+   opts:["Clique direito no botão Iniciar > Configurações","Clique duplo no papel de parede","Apertar o botão de ligar duas vezes","Abrir o navegador e pesquisar"],ok:0,
+   e:"Clique direito no Iniciar mostra um menu com Configurações."},
+  {t:"slots",p:"Em qual categoria você resolve cada coisa?",
+   pairs:[["Personalização","papel de parede e cores"],["Dispositivos","mouse e impressora"],["Contas","foto e senha"],["Aplicativos","instalar e remover"]],
+   e:"Cada categoria junta ajustes parecidos."},
+  {t:"pick",p:"A tela está escura demais e o som muito baixo. Qual categoria você abre?",
+   opts:["Sistema","Contas","Rede e Internet","Aplicativos"],ok:0,
+   e:"Sistema cuida de tela, som e energia."},
+  {t:"type",p:"No Linux, o lugar equivalente às Configurações se chama Configurações do ______.",
+   ac:["sistema","system","configuracoes do sistema","system settings"],dica:"É o mesmo nome do que está na capa da nossa apostila.",
+   e:"Configurações do Sistema (System Settings)."},
+  {t:"pick",p:"O WiFi da escola não conecta. Onde você procura primeiro?",
+   opts:["Rede e Internet","Personalização","Contas","Sistema"],ok:0,
+   e:"Rede e Internet reúne WiFi, cabo e conexões."}
+]},
+
+{id:6,nome:"Instalar e remover programas",glyph:"📦",skill:"H5",
+ teoria:["Instalar: baixe o instalador no <b>site oficial</b>, clique duplo no arquivo <b>.exe</b> ou <b>.msi</b> e siga Aceitar &gt; Próximo &gt; Instalar.",
+  "Remover: Configurações &gt; Aplicativos &gt; escolher o programa &gt; Desinstalar.",
+  "Nunca apague a pasta do programa na mão: sobram arquivos soltos e o PC fica bagunçado.",
+  "Desconfie de pop-up que diz que o seu PC está infectado."],
+ qs:[
+  {t:"order",p:"Ordene a instalação de um programa.",
+   items:["Baixar o instalador no site oficial","Clicar duas vezes no arquivo .exe","Seguir Aceitar > Próximo > Instalar","Abrir pelo ícone no menu Iniciar"],
+   e:"Site oficial primeiro; o ícone só aparece no fim."},
+  {t:"order",p:"Monte o caminho para desinstalar um programa.",
+   items:["Configurações","Aplicativos","Escolher o programa","Desinstalar"],extra:["Personalização","Lixeira"],
+   e:"Configurações > Aplicativos > programa > Desinstalar."},
+  {t:"pick",p:"Seguro ou arriscado? — Baixar o Chrome em google.com/chrome.",
+   opts:["Seguro","Arriscado"],ok:0,e:"Site oficial é o caminho seguro."},
+  {t:"pick",p:"Seguro ou arriscado? — Clicar num pop-up que diz \"seu PC está infectado, baixe agora\".",
+   opts:["Seguro","Arriscado"],ok:1,e:"Pop-up assim quase sempre instala vírus."},
+  {t:"pick",p:"Seguro ou arriscado? — Apagar a pasta do programa dentro de Program Files para removê-lo.",
+   opts:["Seguro","Arriscado"],ok:1,e:"Use sempre o desinstalador oficial."},
+  {t:"type",p:"Qual é a extensão mais comum do arquivo instalador no Windows?",
+   ac:[".exe","exe","exe ou msi",".msi","msi"],dica:"Três letras depois do ponto.",
+   e:".exe (e também .msi)."},
+  {t:"pick",p:"Por que não vale baixar o instalador de qualquer site?",
+   opts:["O arquivo pode vir alterado, com vírus junto","Fica mais lento para baixar","O Windows cobra uma taxa","O programa vem em outro idioma"],ok:0,
+   e:"Sites não oficiais costumam empacotar vírus e propaganda no instalador."}
+]},
+
+{id:7,nome:"Acessórios do dia a dia",glyph:"🧰",skill:"H6",
+ teoria:["Acessório é um programa pequeno que já vem instalado, para tarefas rápidas. Não precisa baixar nada.",
+  "Calculadora (digite <b>calc</b>), Bloco de Notas (<b>notepad</b>), navegador, Paint, Ferramenta de Captura e o Explorador de Arquivos."],
+ qs:[
+  {t:"slots",p:"Ligue cada acessório ao que ele faz.",
+   pairs:[["Calculadora","fazer contas"],["Bloco de Notas","texto simples"],["Paint","desenhar e editar imagem"],["Navegador","abrir sites"]],
+   e:"Todos já vêm prontos no sistema."},
+  {t:"type",p:"O que você digita na pesquisa do menu Iniciar para abrir a calculadora?",
+   ac:["calc","calculadora"],dica:"Quatro letras.",e:"calc abre a Calculadora."},
+  {t:"type",p:"E para abrir o Bloco de Notas?",
+   ac:["notepad","bloco de notas"],dica:"É o nome dele em inglês.",e:"notepad abre o Bloco de Notas."},
+  {t:"pick",p:"Você precisa anotar uma lista rápida, sem se preocupar com formatação. Qual acessório?",
+   opts:["Bloco de Notas","Paint","Calculadora","Gerenciador de Tarefas"],ok:0,
+   e:"Bloco de Notas guarda texto simples, sem negrito nem cor."},
+  {t:"keys",p:"Qual tecla tira uma foto da tela inteira?",combo:["PrtSc"],e:"Print Screen (PrtSc) copia a tela toda."},
+  {t:"pick",p:"O que é um acessório?",
+   opts:["Programa pequeno que já vem com o sistema","Peça física que se liga na USB","Jogo que precisa ser comprado","Vírus que vem junto do instalador"],ok:0,
+   e:"Acessório vem pronto, para tarefas rápidas do dia a dia."}
+]},
+
+{id:8,nome:"Atalhos de teclado",glyph:"⌨️",skill:"H7",timer:25,
+ teoria:["Atalhos economizam tempo em tarefas repetidas. Os principais:",
+  "Win · Win+D · Win+E · Win+I · Alt+Tab · Ctrl+C · Ctrl+V · Ctrl+X · Ctrl+Z · Ctrl+A · Ctrl+Shift+Esc · PrtSc",
+  "Neste nível cada atalho tem tempo. Responda pelo teclado da tela."],
+ qs:[
+  {t:"keys",p:"Mostrar a área de trabalho, minimizando tudo.",combo:["Win","D"],e:"Win + D — D de Desktop."},
+  {t:"keys",p:"Trocar entre os programas abertos.",combo:["Alt","Tab"],e:"Alt + Tab alterna as janelas."},
+  {t:"keys",p:"Desfazer a última ação.",combo:["Ctrl","Z"],e:"Ctrl + Z volta atrás."},
+  {t:"keys",p:"Recortar (mover) o texto ou arquivo selecionado.",combo:["Ctrl","X"],e:"Ctrl + X recorta; Ctrl + V solta no destino."},
+  {t:"keys",p:"O PC travou. Abrir o Gerenciador de Tarefas.",combo:["Ctrl","Shift","Esc"],e:"Ctrl + Shift + Esc abre direto o Gerenciador de Tarefas."},
+  {t:"keys",p:"Selecionar tudo o que está na janela.",combo:["Ctrl","A"],e:"Ctrl + A seleciona tudo."},
+  {t:"keys",p:"Abrir as Configurações.",combo:["Win","I"],e:"Win + I."},
+  {t:"keys",p:"Abrir o Explorador de Arquivos.",combo:["Win","E"],e:"Win + E."}
+]},
+
+{id:9,nome:"Desafio final",glyph:"🏆",skill:"MIX",boss:true,timer:35,
+ teoria:["Vale tudo o que você treinou. Cada questão tem 35 segundos e só 3 vidas.",
+  "Terminando aqui, o relatório com as suas habilidades fica pronto para enviar ao professor."],
+ hearts:3,
+ qs:[
+  {t:"type",skill:"H1",p:"Maria entrou com a senha e viu a tela com ícones, papel de parede e a barra embaixo. Nome dessa tela?",
+   ac:["area de trabalho","desktop","área de trabalho"],e:"Área de trabalho (desktop)."},
+  {t:"hot",skill:"H1",scene:"desktop",p:"Toque na parte da tela que mostra a hora e o WiFi.",ok:["tray"],e:"Bandeja do sistema, na direita da barra de tarefas."},
+  {t:"keys",skill:"H1",p:"Abrir o menu Iniciar sem o mouse.",combo:["Win"],e:"Tecla Win."},
+  {t:"order",skill:"H2",p:"Monte o caminho até a foto guardada em Documentos.",
+   items:["C:","Users","Aluno","Documentos","Fotos 2025","festa.jpg"],extra:["Escola","System32"],mono:true,
+   e:"Do disco até o arquivo, pasta por pasta."},
+  {t:"hot",skill:"H3",scene:"win",p:"Toque na parte que mostra o nome do arquivo aberto.",ok:["titulo"],e:"Barra de título."},
+  {t:"keys",skill:"H3",p:"Copiar o texto selecionado.",combo:["Ctrl","C"],e:"Ctrl + C."},
+  {t:"pick",skill:"H5",p:"A professora pediu para remover o Edge. Qual caminho está certo?",
+   opts:["Configurações > Aplicativos > Desinstalar","Apagar a pasta dele em Program Files","Arrastar o ícone para a Lixeira","Desligar o PC e ligar de novo"],ok:0,
+   e:"Só o desinstalador oficial remove tudo direito."},
+  {t:"keys",skill:"H7",p:"O programa travou. Abrir o Gerenciador de Tarefas.",combo:["Ctrl","Shift","Esc"],e:"Ctrl + Shift + Esc."},
+  {t:"keys",skill:"H7",p:"Ver a área de trabalho num instante.",combo:["Win","D"],e:"Win + D."},
+  {t:"multi",skill:"H2",p:"Marque as 3 pastas que não podem ser apagadas.",
+   opts:["System32","Windows","Program Files","Downloads","Trabalhos","Músicas"],ok:[0,1,2],
+   e:"São as pastas do próprio sistema."}
+]}
+];
+
+var KEYS=["Ctrl","Win","Alt","Shift","Tab","Esc","PrtSc","F4","A","C","D","E","I","V","X","Z"];
+
+/* ---------- estado ---------- */
+var S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};
+function load(){
+  try{var r=localStorage.getItem(STORE);if(r){var d=JSON.parse(r);for(var k in d)S[k]=d[k];}}catch(e){}
+}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){}}
+
+/* ---------- utilidades ---------- */
+function $(s,c){return (c||document).querySelector(s);}
+function el(h){var d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9. ]/g," ").replace(/\s+/g," ").trim();}
+function limpaResp(v){
+  v=norm(v);var r=/^(aparece|apareceria|imprime|imprimiria|imprimiu|mostra|escreve|sera|seria|resulta em|resultado|o resultado e|o resultado seria|a resposta e|resposta|e|eh|fica|vai imprimir|vai aparecer|o|a|um|uma)\s+/;
+  var ant;do{ant=v;v=v.replace(r,"");}while(v!==ant&&v.length>1);
+  return v;
+}
+function totalEstrelas(){var t=0;for(var k in S.niveis)t+=S.niveis[k].estrelas||0;return t;}
+function concluidos(){var n=0;for(var k in S.niveis)if(S.niveis[k].estrelas>0)n++;return n;}
+function desbloqueado(i){
+  if(i===0||S.liberarTudo)return true;
+  var lv=LEVELS[i];
+  if(lv.boss)return concluidos()>=8;
+  return !!(S.niveis[LEVELS[i-1].id]&&S.niveis[LEVELS[i-1].id].estrelas>0);
+}
+function fmtTempo(ms){var s=Math.round(ms/1000);var m=Math.floor(s/60);return m+" min "+(s%60)+"s";}
+
+/* tempo de estudo e saídas da página */
+var tick=null;
+function iniciarRelogio(){
+  if(tick)return;
+  tick=setInterval(function(){ if(!document.hidden){S.tempo=(S.tempo||0)+1000;} },1000);
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden&&jogo){S.saidas=(S.saidas||0)+1;save();}
+});
+
+/* ============================================================
+   TELAS
+   ============================================================ */
+var app=document.getElementById("app");
+var jogo=null;
+
+function topo(extra){
+  var e=extra||"";
+  return '<div class="topbar">'+e+'</div>';
+}
+
+/* --- início --- */
+function telaInicio(){
+  jogo=null;
+  var temProg=!!S.nome;
+  app.innerHTML=
+   '<div style="height:14px"></div>'+
+   '<div class="boot"><div class="screen">'+
+     '<div class="bootline mono">carregando o sistema…</div>'+
+     '<div class="lg"><b>SO · Aula 03</b></div>'+
+     '<div class="tb"><span></span><span></span><span></span><span class="clk mono">14:35</span></div>'+
+   '</div></div>'+
+   '<h1>Área de trabalho e aplicativos</h1>'+
+   '<p class="sub">Nove níveis de treino antes da atividade avaliativa. Dá para parar no meio e continuar depois — o progresso fica salvo neste aparelho.</p>'+
+   (temProg?
+     '<div class="card"><h3>Continuar como '+esc(S.nome)+'</h3>'+
+      '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de 9 níveis · '+S.xp+' XP</p>'+
+      '<button class="btn" id="go">Continuar</button>'+
+      '<button class="btn ghost small" id="trocar">Trocar de aluno</button></div>'
+     :
+     '<div class="card">'+
+      '<label class="f" for="nm">Seu nome completo</label>'+
+      '<input type="text" id="nm" autocomplete="name" placeholder="Nome e sobrenome">'+
+      '<div style="height:10px"></div>'+
+      '<label class="f" for="tm">Turma</label>'+
+      '<input type="text" id="tm" placeholder="Ex.: 2º ano — Informática">'+
+      '<div style="height:14px"></div>'+
+      '<button class="btn" id="start">Começar</button></div>')+
+   '<div class="note">O relatório final registra o seu nome, o tempo de estudo e quantas vezes a página foi deixada de lado durante as questões. Resolva sozinho: o objetivo é chegar na prova sabendo.</div>';
+
+  if(temProg){
+    $("#go").onclick=function(){S.sessoes=(S.sessoes||0)+1;save();telaMapa();};
+    $("#trocar").onclick=function(){
+      if(confirm("Isto apaga o progresso salvo neste aparelho. Continuar?")){
+        S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};save();telaInicio();
+      }};
+  }else{
+    $("#start").onclick=function(){
+      var n=$("#nm").value.trim(),t=$("#tm").value.trim();
+      if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}
+      S.nome=n;S.turma=t;S.inicio=Date.now();S.sessoes=1;save();telaMapa();
+    };
+  }
+}
+
+/* --- mapa --- */
+function telaMapa(){
+  jogo=null;iniciarRelogio();
+  var feitos=concluidos();
+  var h=topo(
+    '<div class="grow"><b style="font-size:15px">'+esc(S.nome.split(" ")[0])+'</b>'+
+    '<div class="bar" style="margin-top:5px"><i style="width:'+Math.round(feitos/9*100)+'%"></i></div></div>'+
+    '<span class="pill xp">★ '+S.xp+' XP</span>'+
+    '<button class="iconbtn" id="rep" title="Relatório">📋</button>'+
+    '<button class="iconbtn" id="cfg" title="Área do professor">⚙️</button>')+
+   '<h2>Trilha da Aula 03</h2>'+
+   '<p class="sub" style="margin-bottom:14px">'+feitos+' de 9 níveis concluídos · '+totalEstrelas()+' de 27 estrelas</p>'+
+   '<div class="trail">';
+
+  LEVELS.forEach(function(lv,i){
+    var st=S.niveis[lv.id],ok=desbloqueado(i),e=st?st.estrelas:0;
+    var estrelas="";for(var k=1;k<=3;k++)estrelas+= (k<=e?'<span>★</span>':'<span class="off">★</span>');
+    h+='<button class="node'+(e?" done":"")+(lv.boss?" boss":"")+'" data-i="'+i+'"'+(ok?"":" disabled")+'>'+
+       '<span class="glyph">'+(ok?lv.glyph:"🔒")+'</span>'+
+       '<span class="t"><b>'+esc(lv.nome)+'</b><span>'+
+         (ok?(st?("melhor: "+st.pct+"% · "+lv.qs.length+" questões"):(lv.qs.length+" questões")):(lv.boss?"conclua os 8 níveis":"conclua o nível anterior"))+
+       '</span></span>'+
+       '<span class="stars">'+estrelas+'</span></button>';
+  });
+  h+='</div><div style="height:16px"></div>'+
+     '<button class="btn ghost" id="rep2">Ver meu relatório</button>';
+  app.innerHTML=h;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".node"),function(b){
+    b.onclick=function(){telaTeoria(LEVELS[+b.dataset.i]);};
+  });
+  $("#rep").onclick=$("#rep2").onclick=function(){telaRelatorio();};
+  $("#cfg").onclick=telaConfig;
+  window.scrollTo(0,0);
+}
+
+
+/* --- area do professor (senha) --- */
+function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+var SENHA_PROF="8570079599154905";
+function telaConfig(){
+  jogo=null;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Área do professor</b></div>');
+  if(S.liberarTudo){
+    h+='<div class="card"><h3>🔓 Todas as fases liberadas</h3>'+
+       '<p class="sub">Neste aparelho, todos os níveis da trilha (inclusive o desafio final) estão abertos.</p>'+
+       '<button class="btn ghost small" id="trancar">Bloquear de novo</button></div>';
+  }else{
+    h+='<div class="card"><h3>🔒 Liberar todas as fases</h3>'+
+       '<p class="sub">Uso do professor: libera todos os níveis desta trilha neste aparelho, sem precisar concluir os anteriores.</p>'+
+       '<div class="pwrow"><input type="password" id="pw" autocomplete="off" placeholder="Senha do professor">'+
+       '<button class="btn" id="lib" style="width:auto;margin:0">Liberar</button></div>'+
+       '<div class="pwerr" id="pwerr"></div></div>';
+  }
+  h+='<button class="btn ghost" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  if(S.liberarTudo){
+    $("#trancar").onclick=function(){S.liberarTudo=false;save();telaMapa();};
+  }else{
+    var pw=$("#pw");
+    var tenta=function(){
+      if(String(h53(pw.value))===SENHA_PROF){S.liberarTudo=true;save();telaMapa();}
+      else{$("#pwerr").textContent="Senha incorreta.";pw.value="";pw.focus();}
+    };
+    $("#lib").onclick=tenta;
+    pw.addEventListener("keydown",function(e){if(e.key==="Enter")tenta();});
+    setTimeout(function(){pw.focus();},100);
+  }
+  window.scrollTo(0,0);
+}
+
+/* --- teoria rápida --- */
+function telaTeoria(lv){
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+   '<div class="card"><h2>'+lv.glyph+' Antes de jogar</h2><ul class="theory" style="padding-left:20px;margin:0">'+
+   lv.teoria.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul></div>'+
+   '<button class="btn" id="ir">Começar o nível</button>'+
+   '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#ir").onclick=function(){iniciarNivel(lv);};
+  window.scrollTo(0,0);
+}
+
+/* ============================================================
+   MOTOR DO NÍVEL
+   ============================================================ */
+function iniciarNivel(lv){
+  limparVistos(lv);
+  jogo={lv:lv,fila:shuffle(lv.qs),idx:0,vidas:(lv.hearts||5),total:lv.qs.length,
+        acertosPrimeira:0,respondidas:0,hab:{},tempoIni:Date.now()};
+  proxima();
+}
+function regHab(q,acertou){
+  var s=q.skill||jogo.lv.skill;
+  if(!jogo.hab[s])jogo.hab[s]={c:0,t:0};
+  jogo.hab[s].t++;if(acertou)jogo.hab[s].c++;
+}
+
+function proxima(){
+  if(jogo.idx>=jogo.fila.length){fimNivel(true);return;}
+  render(jogo.fila[jogo.idx]);
+}
+
+var cron=null;
+function render(q){
+  if(cron){clearInterval(cron);cron=null;}
+  var lv=jogo.lv;
+  jogo.travado=false;document.body.classList.remove("travado");
+  var velho=document.querySelector(".feed");if(velho)velho.remove();
+  var prog=Math.round(jogo.respondidas/jogo.total*100);
+  var vidas="";for(var i=0;i<jogo.vidas;i++)vidas+="♥";
+  var h=topo('<button class="iconbtn" id="sair">✕</button>'+
+     '<div class="grow"><div class="bar"><i style="width:'+Math.min(100,prog)+'%"></i></div></div>'+
+     (lv.timer?'<span class="pill timer" id="cron">'+lv.timer+'s</span>':'')+
+     '<span class="pill hp">'+vidas+'</span>');
+
+  h+='<h2 style="margin-bottom:12px">'+esc(q.p)+'</h2>';
+  h+='<div id="area"></div>';
+  h+='<div id="acao"></div><div class="spacer"></div>';
+  app.innerHTML=h;
+  $("#sair").onclick=function(){ if(confirm("Sair do nível? O que você fez agora não conta.")){ if(cron)clearInterval(cron); telaMapa(); } };
+
+  var area=$("#area"),acao=$("#acao");
+  RENDER[q.t](q,area,acao);
+
+  if(lv.timer){
+    var t=lv.timer,c=$("#cron");
+    cron=setInterval(function(){
+      t--;if(c){c.textContent=t+"s";if(t<=7)c.classList.add("low");}
+      if(t<=0){clearInterval(cron);cron=null;julgar(q,false,"Tempo esgotado.");}
+    },1000);
+  }
+  window.scrollTo(0,0);
+}
+
+function botaoConferir(acao,fn){
+  var b=el('<button class="btn" disabled id="conf">Conferir</button>');
+  acao.appendChild(b);b.onclick=fn;return b;
+}
+function ligarConferir(on){var b=$("#conf");if(b)b.disabled=!on;}
+
+var RENDER={
+  hot:function(q,area){
+    area.innerHTML=SCENES[q.scene]();
+    area.insertBefore(el('<p class="sub">Toque direto na tela abaixo.</p>'),area.firstChild);
+    area.addEventListener("click",function(ev){
+      var z=ev.target.closest("[data-zone]");if(!z)return;
+      var ok=q.ok.indexOf(z.dataset.zone)>=0;
+      if(!ok){z.classList.add("zone-hit");setTimeout(function(){z.classList.remove("zone-hit");},320);}
+      julgar(q,ok);
+    });
+  },
+  pick:function(q,area){
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark"></span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){julgar(q,i===q.ok);};
+      area.appendChild(b);
+    });
+  },
+  multi:function(q,area,acao){
+    var sel=[];
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark">✓</span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){
+        var p=sel.indexOf(i);
+        if(p>=0){sel.splice(p,1);b.classList.remove("sel");}else{sel.push(i);b.classList.add("sel");}
+        ligarConferir(sel.length===q.ok.length);
+      };
+      area.appendChild(b);
+    });
+    botaoConferir(acao,function(){
+      var ok=sel.length===q.ok.length&&sel.every(function(i){return q.ok.indexOf(i)>=0;});
+      julgar(q,ok);
+    });
+  },
+  type:function(q,area,acao){
+    area.appendChild(el('<input type="text" id="resp" autocomplete="off" autocapitalize="none" placeholder="Escreva a resposta">'));
+    if(q.dica)area.appendChild(el('<p class="sub" style="margin-top:8px">Dica: '+esc(q.dica)+'</p>'));
+    var inp=$("#resp");
+    inp.addEventListener("input",function(){ligarConferir(inp.value.trim().length>0);});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&inp.value.trim()){var b=$("#conf");if(b)b.click();}});
+    botaoConferir(acao,function(){
+      var v=norm(inp.value);
+      var ok=q.ac.some(function(a){return norm(a)===v||norm(a)===limpaResp(v)||limpaResp(a)===limpaResp(v);});
+      julgar(q,ok,ok?null:"Resposta esperada: "+q.ac[0]);
+    });
+    setTimeout(function(){inp.focus();},120);
+  },
+  keys:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque nas teclas para montar o atalho.</p>'));
+    var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
+    var bank=el('<div class="chips"></div>');area.appendChild(bank);
+    var esc2=el('<button class="btn ghost small" style="margin-bottom:10px">Limpar</button>');
+    var atual=[];
+    function pintar(){
+      tray.innerHTML=atual.map(function(k){return '<span class="chip key sel">'+k+'</span>';}).join('<span style="align-self:center">+</span>');
+      ligarConferir(atual.length>0);
+    }
+    shuffle(KEYS).forEach(function(k){
+      var b=el('<button class="chip key">'+k+'</button>');
+      b.onclick=function(){ if(atual.indexOf(k)<0){atual.push(k);pintar();} };
+      bank.appendChild(b);
+    });
+    esc2.onclick=function(){atual=[];pintar();};
+    area.appendChild(esc2);
+    botaoConferir(acao,function(){
+      var a=atual.slice().sort().join("+"),b=q.combo.slice().sort().join("+");
+      julgar(q,a===b,a===b?null:"O certo é "+q.combo.join(" + ")+".");
+    });
+  },
+  order:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque na ordem certa. Toque de novo em cima para tirar.</p>'));
+    var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
+    var bank=el('<div class="chips"></div>');area.appendChild(bank);
+    var todos=q.items.concat(q.extra||[]);
+    var montado=[],bots={};
+    function pintar(){
+      tray.innerHTML="";
+      montado.forEach(function(it,pos){
+        var c=el('<button class="chip sel'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
+        c.onclick=function(){montado.splice(pos,1);bots[it].classList.remove("used");pintar();};
+        tray.appendChild(c);
+      });
+      ligarConferir(montado.length===q.items.length);
+    }
+    shuffle(todos).forEach(function(it){
+      var b=el('<button class="chip'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
+      bots[it]=b;
+      b.onclick=function(){ if(montado.length>=q.items.length)return; montado.push(it);b.classList.add("used");pintar(); };
+      bank.appendChild(b);
+    });
+    pintar();
+    botaoConferir(acao,function(){
+      var ok=montado.length===q.items.length&&montado.every(function(v,i){return v===q.items[i];});
+      julgar(q,ok,ok?null:"A ordem certa é: "+q.items.join(q.mono?" \\ ":" → "));
+    });
+  },
+  slots:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque numa resposta e depois no espaço certo.</p>'));
+    var wrap=el('<div class="slots"></div>');
+    var bank=el('<div class="chips"></div>');
+    var sel=null,posto={};
+    q.pairs.forEach(function(pr,i){
+      var row=el('<div class="slotrow"><span class="nm">'+esc(pr[0])+'</span><span class="slot" data-i="'+i+'"></span></div>');
+      wrap.appendChild(row);
+    });
+    area.appendChild(wrap);area.appendChild(bank);
+    var bots={};
+    shuffle(q.pairs.map(function(p){return p[1];})).forEach(function(v){
+      var b=el('<button class="chip">'+esc(v)+'</button>');
+      bots[v]=b;
+      b.onclick=function(){
+        if(sel===v){sel=null;b.classList.remove("sel");return;}
+        Object.keys(bots).forEach(function(k){bots[k].classList.remove("sel");});
+        sel=v;b.classList.add("sel");
+      };
+      bank.appendChild(b);
+    });
+    Array.prototype.forEach.call(wrap.querySelectorAll(".slot"),function(sl){
+      sl.onclick=function(){
+        var i=sl.dataset.i;
+        if(posto[i]){ bots[posto[i]].classList.remove("used"); delete posto[i]; sl.textContent="";sl.classList.remove("full"); }
+        if(sel){ posto[i]=sel; sl.textContent=sel; sl.classList.add("full"); bots[sel].classList.add("used"); bots[sel].classList.remove("sel"); sel=null; }
+        ligarConferir(Object.keys(posto).length===q.pairs.length);
+      };
+    });
+    botaoConferir(acao,function(){
+      var ok=q.pairs.every(function(pr,i){return posto[i]===pr[1];});
+      julgar(q,ok,ok?null:"Confira as ligações na teoria do nível.");
+    });
+  }
+};
+function shuffleIdx(q){var a=[];for(var i=0;i<q.opts.length;i++)a.push(i);return shuffle(a);}
+
+/* --- julgamento e feedback --- */
+function julgar(q,ok,msg){
+  if(!jogo||jogo.travado)return;          /* uma resposta por questão: ignora toques extras */
+  jogo.travado=true;document.body.classList.add("travado");
+  if(cron){clearInterval(cron);cron=null;}
+  if(q._vista!==true){ q._vista=true; regHab(q,ok); if(ok)jogo.acertosPrimeira++; }
+  if(ok){ jogo.respondidas++; S.xp+=q._rep?4:10; }
+  else{ jogo.vidas--; }
+  save();
+
+  var f=el('<div class="feed '+(ok?"good":"bad")+'"><div class="inner">'+
+    '<b>'+(ok?"Isso mesmo":"Ainda não")+'</b>'+
+    '<p>'+esc(msg?msg+" ":"")+esc(q.e)+'</p>'+
+    '<button class="btn '+(ok?"ok":"")+'" id="cont">Continuar</button></div></div>');
+  document.body.appendChild(f);
+  var bc=f.querySelector("#cont");
+  bc.onclick=function(){
+    if(bc._ok)return;bc._ok=true;
+    f.remove();document.body.classList.remove("travado");
+    if(!ok){
+      if(jogo.vidas<=0){fimNivel(false);return;}
+      var copia={};for(var k in q)copia[k]=q[k];copia._rep=true;copia._vista=true;
+      jogo.fila.push(copia);           // repete a questão errada no fim
+    }
+    jogo.idx++;proxima();
+  };
+  bc.focus();
+}
+
+/* --- fim do nível --- */
+function fimNivel(venceu){
+  var lv=jogo.lv;
+  var pct=Math.round(jogo.acertosPrimeira/jogo.total*100);
+  var estrelas=0;
+  if(venceu)estrelas = pct>=100?3 : pct>=75?2 : 1;
+
+  if(venceu){
+    var ant=S.niveis[lv.id];
+    if(!ant||pct>=ant.pct){
+      S.niveis[lv.id]={estrelas:Math.max(estrelas,ant?ant.estrelas:0),pct:pct,hab:jogo.hab,
+                       quando:new Date().toISOString().slice(0,10)};
+    }else{
+      ant.estrelas=Math.max(ant.estrelas,estrelas);
+    }
+    if(estrelas===3)S.xp+=20;
+    save();
+  }
+  var st="";for(var k=1;k<=3;k++)st+=(k<=estrelas?"★":"☆");
+  app.innerHTML=topo('<div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+    '<div class="card" style="text-align:center">'+
+      '<div style="font-size:46px;line-height:1">'+(venceu?lv.glyph:"💤")+'</div>'+
+      '<h2 style="margin-top:8px">'+(venceu?"Nível concluído":"Vidas acabaram")+'</h2>'+
+      '<div class="stars" style="font-size:30px;margin:6px 0">'+st+'</div>'+
+      '<p class="sub">'+(venceu
+         ? "Acertos de primeira: "+pct+"% · "+jogo.acertosPrimeira+" de "+jogo.total
+         : "Revise a teoria e volte. O melhor resultado anterior continua salvo.")+'</p>'+
+    '</div>'+
+    (venceu&&pct<100?'<div class="warn">Refaça o nível para tentar as 3 estrelas: as questões vêm embaralhadas.</div>':'')+
+    '<button class="btn" id="mapa">Voltar para a trilha</button>'+
+    '<button class="btn ghost small" id="denovo">'+(venceu?"Jogar de novo":"Tentar de novo")+'</button>';
+  $("#mapa").onclick=telaMapa;
+  $("#denovo").onclick=function(){ limparVistos(lv); iniciarNivel(lv); };
+  window.scrollTo(0,0);
+}
+function limparVistos(lv){lv.qs.forEach(function(q){delete q._vista;});}
+
+/* ============================================================
+   RELATÓRIO
+   ============================================================ */
+function agregarHab(){
+  var r={};
+  Object.keys(HAB).forEach(function(h){r[h]={c:0,t:0};});
+  LEVELS.forEach(function(lv){
+    var st=S.niveis[lv.id];if(!st||!st.hab)return;
+    for(var h in st.hab){ if(!r[h])r[h]={c:0,t:0}; r[h].c+=st.hab[h].c; r[h].t+=st.hab[h].t; }
+  });
+  return r;
+}
+function codigo(){
+  var base=S.nome+"|"+S.xp+"|"+concluidos()+"|"+totalEstrelas()+"|"+(new Date().toISOString().slice(0,10));
+  var h=5381;for(var i=0;i<base.length;i++){h=((h<<5)+h+base.charCodeAt(i))>>>0;}
+  return h.toString(36).toUpperCase().slice(0,6).padStart(6,"X");
+}
+function medalha(){
+  var f=concluidos(),e=totalEstrelas();
+  if(f>=9&&e>=25)return ["🏆","Administrador do sistema"];
+  if(f>=9)return ["🥇","Técnico em treinamento"];
+  if(f>=6)return ["🥈","Usuário avançado"];
+  if(f>=3)return ["🥉","Usuário em formação"];
+  return ["🧩","Começando agora"];
+}
+
+function telaRelatorio(){
+  if(!S.nome){telaInicio();return;}
+  var hab=agregarHab(),med=medalha(),fim=concluidos()>=9;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Relatório</b></div>');
+  h+='<div class="medal"><span class="m">'+med[0]+'</span><div><b>'+med[1]+'</b><div class="sub">'+esc(S.nome)+(S.turma?' · '+esc(S.turma):'')+'</div></div></div>';
+  if(!fim)h+='<div class="warn">Relatório parcial: faltam '+(9-concluidos())+' nível(is). Dá para continuar em casa e gerar de novo.</div>';
+
+  h+='<div class="card"><h3>Resumo</h3>'+
+     kv("Níveis concluídos",concluidos()+" de 9")+
+     kv("Estrelas",totalEstrelas()+" de 27")+
+     kv("XP",S.xp)+
+     kv("Tempo de estudo",fmtTempo(S.tempo||0))+
+     kv("Sessões",(S.sessoes||1))+
+     kv("Saídas da página durante o jogo",(S.saidas||0))+
+     (S.liberarTudo?kv("Fases liberadas pelo professor","sim"):"")+
+     kv("Data",new Date().toLocaleDateString("pt-BR"))+
+     '</div>';
+
+  h+='<div class="card"><h3>Habilidades avaliadas</h3>';
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    var cor=!d.t?"var(--line)":p>=75?"var(--ok)":p>=50?"var(--gold)":"var(--bad)";
+    h+='<div class="skill"><div class="hd"><span>'+k+" · "+HAB[k]+'</span><i>'+(d.t?p+"%":"—")+'</i></div>'+
+       '<div class="bar"><i style="width:'+p+'%;background:'+cor+'"></i></div></div>';
+  });
+  h+='</div>';
+
+  var fracos=Object.keys(HAB).filter(function(k){var d=hab[k];return d.t&&d.c/d.t<0.75;});
+  h+='<div class="card"><h3>O que revisar antes da prova</h3>'+
+      (fracos.length? '<ul style="padding-left:20px;margin:0">'+fracos.map(function(k){return "<li>"+HAB[k]+"</li>";}).join("")+'</ul>'
+       : '<p class="sub" style="margin:0">'+(concluidos()?"Nada pendente até aqui. Refaça os níveis de menos estrelas para fixar.":"Jogue pelo menos um nível para o relatório mostrar as habilidades.")+'</p>')+
+     '</div>';
+
+  h+='<div class="card" style="text-align:center"><h3>Código de verificação</h3>'+
+     '<div class="code">'+codigo()+'</div>'+
+     '<p class="sub" style="margin:6px 0 0">Mostre este código junto com o print.</p></div>';
+
+  h+='<button class="btn" id="png">Baixar relatório em imagem</button>'+
+     '<button class="btn ghost small" id="print">Imprimir ou salvar em PDF</button>'+
+     '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>'+
+     '<div class="note">Envie a imagem (ou o print desta tela) no Google Classroom.</div>'+
+     '<div id="saida"></div>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#print").onclick=function(){window.print();};
+  $("#png").onclick=function(){gerarPNG(hab,med);};
+  window.scrollTo(0,0);
+}
+function kv(a,b){return '<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';}
+
+/* --- relatório em PNG --- */
+function gerarPNG(hab,med){
+  var W=900,H=1240,c=document.createElement("canvas");c.width=W;c.height=H;
+  var x=c.getContext("2d");
+  var F='"Segoe UI",Roboto,system-ui,sans-serif';
+  x.fillStyle="#ffffff";x.fillRect(0,0,W,H);
+  x.fillStyle="#15697f";x.fillRect(0,0,W,120);
+  x.fillStyle="#ffffff";x.font="700 34px "+F;x.fillText("Sistemas Operacionais — Aula 03",48,60);
+  x.font="400 20px "+F;x.fillText("Área de trabalho e aplicativos · relatório de treino",48,94);
+
+  var y=170;
+  x.fillStyle="#0f2230";x.font="700 30px "+F;x.fillText(S.nome,48,y);y+=34;
+  x.fillStyle="#4a6478";x.font="400 20px "+F;
+  x.fillText((S.turma||"Turma não informada")+"  ·  "+new Date().toLocaleDateString("pt-BR"),48,y);y+=46;
+
+  x.fillStyle="#fdf0d4";x.fillRect(48,y-28,W-96,64);
+  x.fillStyle="#e0900a";x.fillRect(48,y-28,6,64);
+  x.fillStyle="#0f2230";x.font="700 24px "+F;x.fillText(med[0]+"  "+med[1],70,y+10);y+=88;
+
+  function linha(a,b){
+    x.fillStyle="#4a6478";x.font="400 20px "+F;x.fillText(a,48,y);
+    x.fillStyle="#0f2230";x.font="700 20px "+F;x.textAlign="right";x.fillText(String(b),W-48,y);x.textAlign="left";
+    x.strokeStyle="#e2eaf0";x.beginPath();x.moveTo(48,y+12);x.lineTo(W-48,y+12);x.stroke();y+=42;
+  }
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Resumo",48,y);y+=34;
+  linha("Níveis concluídos",concluidos()+" de 9");
+  linha("Estrelas",totalEstrelas()+" de 27");
+  linha("XP acumulado",S.xp);
+  linha("Tempo de estudo",fmtTempo(S.tempo||0));
+  linha("Sessões",(S.sessoes||1));
+  linha("Saídas da página durante o jogo",(S.saidas||0));
+  y+=22;
+
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Habilidades avaliadas",48,y);y+=34;
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    x.fillStyle="#0f2230";x.font="400 17px "+F;
+    var txt=k+" · "+HAB[k];
+    x.fillText(txt.length>62?txt.slice(0,60)+"…":txt,48,y);
+    x.textAlign="right";x.font="700 17px "+F;x.fillText(d.t?p+"%":"—",W-48,y);x.textAlign="left";
+    y+=12;
+    x.fillStyle="#e2eaf0";x.fillRect(48,y,W-96,12);
+    x.fillStyle=!d.t?"#c6d4de":p>=75?"#1f8a4c":p>=50?"#e0900a":"#c23b4d";
+    x.fillRect(48,y,(W-96)*p/100,12);
+    y+=40;
+  });
+
+  y+=10;
+  x.fillStyle="#f3f7fa";x.fillRect(48,y,W-96,74);
+  x.fillStyle="#4a6478";x.font="400 18px "+F;x.fillText("Código de verificação",70,y+30);
+  x.fillStyle="#15697f";x.font="700 30px ui-monospace,Consolas,monospace";x.fillText(codigo(),70,y+62);
+  x.fillStyle="#4a6478";x.font="400 16px "+F;x.textAlign="right";
+  x.fillText("Prof. Rosival D. Silva",W-70,y+62);x.textAlign="left";
+
+  var saida=$("#saida");saida.innerHTML="";
+  try{
+    c.toBlob(function(b){
+      if(!b){saida.appendChild(c);return;}
+      var u=URL.createObjectURL(b),a=document.createElement("a");
+      a.href=u;a.download="relatorio-SO-aula03-"+norm(S.nome).replace(/ /g,"-")+".png";
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(u);},4000);
+      saida.appendChild(el('<div class="note" style="margin-top:12px">Se o download não abrir, use a imagem abaixo: segure o dedo sobre ela para salvar.</div>'));
+      saida.appendChild(c);
+    },"image/png");
+  }catch(e){
+    saida.appendChild(el('<div class="note" style="margin-top:12px">Segure o dedo sobre a imagem para salvar.</div>'));
+    saida.appendChild(c);
+  }
+  setTimeout(function(){saida.scrollIntoView({behavior:"smooth",block:"start"});},300);
+}
+
+/* ---------- start ---------- */
+load();
+setInterval(save,15000);
+window.addEventListener("beforeunload",save);
+telaInicio();
+</script>
+</body>
+</html>

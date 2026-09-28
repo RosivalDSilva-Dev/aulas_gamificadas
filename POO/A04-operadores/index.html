@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operadores e Expressões</title>
+<meta name="description" content="Treino interativo de operadores em Java: aritméticos, módulo, atribuição composta, incremento, relacionais, lógicos, ternário e precedência.">
+<style>
+:root{
+  --bg:#e7edf2; --surface:#ffffff; --surface-2:#f3f7fa;
+  --ink:#0f2230; --ink-2:#4a6478; --line:#c6d4de;
+  --primary:#15697f; --primary-d:#0e4c5d; --primary-l:#d8ecf1;
+  --ok:#1f8a4c; --ok-d:#166b3a; --ok-l:#dcf3e5;
+  --bad:#c23b4d; --bad-d:#982b3b; --bad-l:#fae1e4;
+  --gold:#e0900a; --gold-l:#fdf0d4;
+  --r:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1820; --surface:#132633; --surface-2:#0f202b; --ink:#e8f1f6; --ink-2:#9fb6c4;
+    --line:#26404f; --primary:#3aa8c4; --primary-d:#2b8299; --primary-l:#123542;
+    --ok:#3fbf75; --ok-d:#2c8f56; --ok-l:#102e20; --bad:#f0697c; --bad-d:#b84656; --bad-l:#33161c;
+    --gold:#f4b73f; --gold-l:#332611;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI Variable Text","Segoe UI",Roboto,Ubuntu,system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.shell{max-width:560px;margin:0 auto;min-height:100%;padding:0 14px 40px}
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -14px 14px;
+  padding:10px 14px;background:var(--surface);border-bottom:2px solid var(--line);
+  display:flex;align-items:center;gap:10px;
+}
+.topbar .grow{flex:1;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;
+  padding:4px 9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.xp{color:var(--gold);border-color:var(--gold)}
+.pill.hp{color:var(--bad);border-color:var(--bad)}
+.bar{height:12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+.iconbtn{background:none;border:0;padding:6px;border-radius:9px;cursor:pointer;color:var(--ink-2);font-size:20px;line-height:1}
+.iconbtn:hover{background:var(--surface-2)}
+
+h1{font-size:26px;line-height:1.15;letter-spacing:-.02em;margin:.2em 0 .3em;font-weight:700}
+h2{font-size:21px;line-height:1.2;letter-spacing:-.01em;margin:0 0 .4em;font-weight:700}
+h3{font-size:16px;margin:0 0 6px;font-weight:700}
+p{margin:0 0 .8em}
+.sub{color:var(--ink-2);font-size:15px}
+
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.btn{
+  display:block;width:100%;padding:14px 16px;border-radius:var(--r);border:0;
+  background:var(--primary);color:#fff;font-weight:700;font-size:17px;cursor:pointer;
+  box-shadow:0 4px 0 var(--primary-d);margin-bottom:12px;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--primary-d)}
+.btn[disabled]{background:var(--line);color:var(--ink-2);box-shadow:0 4px 0 var(--line);cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--primary);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.ok{background:var(--ok);box-shadow:0 4px 0 var(--ok-d)}
+.btn.small{padding:10px 12px;font-size:15px}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+input[type=text]{
+  width:100%;padding:13px 14px;border-radius:var(--r);border:2px solid var(--line);
+  background:var(--surface-2);color:var(--ink);font-size:17px;font-family:inherit;
+}
+input[type=text]:focus{border-color:var(--primary);outline:none}
+label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
+
+/* ---------- boot ---------- */
+.boot{border:2px solid var(--line);border-radius:var(--r);overflow:hidden;background:#0a1620;margin-bottom:16px}
+.boot .screen{aspect-ratio:16/9;position:relative;background:
+  radial-gradient(120% 90% at 70% 15%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
+.boot .bootline{position:absolute;left:16px;top:16px;color:#8fd4e8;font-size:12px;opacity:0}
+.boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0;padding:0 20px;text-align:center}
+.boot .lg b{color:#eaf6fb;font-size:clamp(18px,5.6vw,27px);letter-spacing:-.02em;line-height:1.25}
+.boot .cursor{display:inline-block;width:9px;height:1.1em;background:#8fd4e8;vertical-align:-2px;margin-left:2px;
+  animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+@keyframes fadein{to{opacity:1}}
+.boot .bootline{animation:fadein .01s .15s forwards}
+.boot .lg{animation:fadein .7s .5s forwards}
+
+/* ---------- mapa de níveis ---------- */
+.trail{display:flex;flex-direction:column;gap:10px}
+.node{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;
+  box-shadow:0 3px 0 var(--line);
+}
+.node:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.node[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.node .glyph{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:var(--primary-l);
+  display:grid;place-items:center;font-size:23px;border:2px solid var(--line)}
+.node.done .glyph{background:var(--ok-l);border-color:var(--ok)}
+.node.boss .glyph{background:var(--gold-l);border-color:var(--gold)}
+.node .t{flex:1;min-width:0}
+.node .t b{display:block;font-size:16px}
+.node .t span{font-size:13px;color:var(--ink-2)}
+.stars{letter-spacing:1px;font-size:14px;color:var(--gold)}
+.stars .off{color:var(--line)}
+
+/* ---------- cena de código ---------- */
+.scene{user-select:none;-webkit-user-select:none;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.scene.code{background:#0d1b24;color:#d7e6ee;font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace;
+  padding:14px 10px;line-height:1.85;font-size:13.5px;border:2px solid var(--line);overflow-x:auto}
+.scene.code .cline{display:flex;gap:10px;white-space:pre;padding:1px 4px;border-radius:6px}
+.scene.code .cno{width:18px;flex:0 0 18px;text-align:right;color:#4f7186;user-select:none}
+.scene.code .ccode{white-space:pre-wrap;word-break:break-word}
+.scene.code .cplain{color:#c7dbe6}
+.scene.code .ctok{cursor:pointer;border-radius:4px;padding:1px 2px;border-bottom:2px dotted #3aa8c4}
+.scene.code .ctok:hover,.scene.code .ctok:active{background:rgba(58,168,196,.22)}
+.zone-hit{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ---------- respostas ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{
+  background:var(--surface);border:2px solid var(--line);border-radius:11px;padding:10px 13px;
+  font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 3px 0 var(--line);
+}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.chip.sel{background:var(--primary-l);border-color:var(--primary);color:var(--primary-d)}
+.chip.used{opacity:.25;pointer-events:none}
+.tray{min-height:54px;border:2px dashed var(--line);border-radius:11px;padding:8px;display:flex;
+  flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;background:var(--surface-2)}
+.tray:empty::after{content:"Toque nas peças abaixo para montar a resposta";color:var(--ink-2);font-size:13px}
+.opt{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;margin-bottom:10px;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:13px;
+  box-shadow:0 3px 0 var(--line);font-size:16px;
+}
+.opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.opt.sel{background:var(--primary-l);border-color:var(--primary)}
+.opt .mark{width:22px;height:22px;flex:0 0 22px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.sel .mark{background:var(--primary);border-color:var(--primary);color:#fff}
+.slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.slotrow{display:flex;align-items:center;gap:9px}
+.slotrow .nm{flex:0 0 42%;font-weight:700;font-size:13.5px}
+.slot{flex:1;min-height:46px;border:2px dashed var(--line);border-radius:11px;background:var(--surface-2);
+  display:flex;align-items:center;padding:6px 9px;font-size:14px;font-weight:600;cursor:pointer}
+.slot.full{border-style:solid;background:var(--primary-l);border-color:var(--primary)}
+
+/* ---------- feedback ---------- */
+.feed{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  border-top:3px solid;background:var(--surface)}
+.feed.good{background:var(--ok-l);border-color:var(--ok)}
+.feed.bad{background:var(--bad-l);border-color:var(--bad)}
+.feed .inner{max-width:560px;margin:0 auto}
+.feed b{display:block;font-size:17px;margin-bottom:3px}
+.feed.good b{color:var(--ok-d)}.feed.bad b{color:var(--bad-d)}
+.feed p{font-size:15px;margin:0 0 10px}
+.feed .btn{margin:0}
+.spacer{height:150px}
+
+/* ---------- relatório ---------- */
+.skill{margin-bottom:12px}
+.skill .hd{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:4px}
+.skill .hd i{font-style:normal;color:var(--ink-2)}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:20px;letter-spacing:.14em;font-weight:700;color:var(--primary)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.kv:last-child{border:0}
+.kv b{font-weight:700}
+.medal{display:flex;align-items:center;gap:12px;background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:12px;margin-bottom:14px}
+.medal .m{font-size:34px}
+.warn{background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:11px;font-size:14px;margin-bottom:14px}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:11px;font-size:14px;color:var(--ink-2)}
+.theory li{margin-bottom:7px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+.timer.low{color:var(--bad)}
+canvas{max-width:100%;height:auto;border:2px solid var(--line);border-radius:var(--r)}
+
+.travado #app{pointer-events:none}
+.pwrow{display:flex;gap:10px;margin-top:10px}
+.pwrow input{flex:1}
+.pwerr{color:var(--bad-d,#b3261e);font-size:14px;min-height:20px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   POO/Java — Aula 04: Operadores e Expressões
+   Treino gamificado. Prof. Rosival D. Silva.
+   ============================================================ */
+
+var STORE = "poo_a04_v1";
+var GAME = {
+  eyebrow: "POO/Java · Aula 04",
+  titulo: "Operadores e Expressões",
+  sub: "Oito níveis de treino sobre operadores em Java, antes da atividade avaliativa.",
+  boot: "compilando operadores...",
+  bossUnlock: 8
+};
+var HAB = {"H1": "Operadores aritméticos e divisão int vs double", "H2": "Operador módulo (%) e seus usos", "H3": "Atribuição composta (+= -= *= /= %=)", "H4": "Incremento e decremento (++ --, pré vs pós)", "H5": "Operadores relacionais (== != > < >= <=)", "H6": "Operadores lógicos (&& || !)", "H7": "Operador ternário (?:)", "H8": "Precedência de operadores"};
+var LEVELS = [{"id": 1, "nome": "Aritméticos e divisão", "glyph": "🧮", "skill": "H1", "teoria": ["Os operadores aritméticos fazem cálculos: <b>+</b> soma, <b>-</b> subtrai, <b>*</b> multiplica, <b>/</b> divide e <b>%</b> devolve o resto.", "Atenção: quando os dois operandos são <b>int</b>, a divisão descarta a parte decimal. 7 / 2 dá 3, não 3.5.", "Para obter resultado real, pelo menos um operando precisa ser <b>double</b>: 7.0 / 2 = 3.5.", "Cuidado: double r = 7 / 2; ainda dá 3.0, porque a divisão inteira acontece ANTES de guardar no double."], "qs": [{"t": "type", "p": "Os dois operandos são int: 8 / 3 = ?", "ac": ["2"], "e": "Divisão entre inteiros descarta a parte decimal: 8/3 = 2 (o resto 2 é jogado fora)."}, {"t": "type", "p": "Os dois operandos são int: 7 / 2 = ?", "ac": ["3"], "e": "7 dividido por 2 dá 3,5, mas com int a parte decimal some: sobra 3."}, {"t": "pick", "p": "Qual expressão garante um resultado real (com decimais) para 7 dividido por 2?", "opts": ["(double) 7 / 2", "7 / 2", "(int) 7.0 / 2", "7 % 2"], "ok": 0, "e": "Converter um dos operandos para double antes da divisão preserva as casas decimais: (double) 7 / 2 = 3.5."}, {"t": "type", "p": "double r = 7 / 2; Qual é o valor de r?", "ac": ["3.0", "3"], "dica": "A divisão inteira acontece antes de guardar no double.", "e": "7/2 (int/int) já vale 3 antes de ser guardado; o double só acrescenta a casa decimal: 3.0."}, {"t": "hot", "skill": "H1", "rows": ["double r1 = 7.0 / 2;   // 3.5, correto", "double r2 = (double) 7 / 2;   // 3.5, correto", "double r3 = [[bug|7 / 2]];   // gera 3.0, nao 3.5"], "p": "Toque na divisão que NÃO dá o resultado real esperado, porque os dois operandos ainda são int.", "ok": ["bug"], "e": "Sem o (double) ou o .0, a divisão inteira já aconteceu antes de guardar em r3 — o resultado é 3.0, não 3.5."}, {"t": "multi", "p": "Quais destes são operadores aritméticos em Java? Marque os 5 certos.", "opts": ["+", "-", "*", "/", "%", "=", "==", "&&"], "ok": [0, 1, 2, 3, 4], "e": "=, == e && não fazem cálculo: são atribuição, comparação e operador lógico."}, {"t": "slots", "p": "Ligue cada operador ao seu nome.", "pairs": [["+", "Adição"], ["-", "Subtração"], ["*", "Multiplicação"], ["/", "Divisão"], ["%", "Módulo (resto)"]], "e": "Cinco operadores, cinco operações básicas."}, {"t": "type", "p": "9.0 / 2 = ? (um dos operandos já é double)", "ac": ["4.5"], "e": "Com um operando double, o resultado mantém as casas decimais: 4.5."}]}, {"id": 2, "nome": "Módulo (%)", "glyph": "🔢", "skill": "H2", "teoria": ["O operador <b>%</b> devolve o resto da divisão inteira.", "É muito usado para: verificar se um número é par (n % 2 == 0), limitar valores a um intervalo (relógio circular) e extrair o último dígito (n % 10)."], "qs": [{"t": "type", "p": "10 % 3 = ?", "ac": ["1"], "e": "10 dividido por 3 dá 3, resto 1."}, {"t": "type", "p": "8 % 3 = ?", "ac": ["2"], "e": "8 dividido por 3 dá 2, resto 2."}, {"t": "pick", "p": "Para saber se um número n é PAR, qual expressão é verdadeira?", "opts": ["n % 2 == 0", "n / 2 == 0", "n * 2 == 0", "n - 2 == 0"], "ok": 0, "e": "Um número par sempre deixa resto 0 quando dividido por 2."}, {"t": "type", "p": "Para extrair o último dígito de um número n, a expressão é n % ___ ?", "ac": ["10"], "e": "n % 10 sempre devolve o dígito das unidades."}, {"t": "hot", "skill": "H2", "rows": ["int hora = 23;", "hora = (hora + 1) [[m|% 24]];   // volta pra 0 depois de 23"], "p": "Num relógio de 24 horas, toque na parte do código que faz o valor voltar a 0 depois de passar de 23.", "ok": ["m"], "e": "% 24 limita o resultado ao intervalo de 0 a 23: quando passa de 23, o resto reinicia em 0."}, {"t": "multi", "p": "Para que serve o operador % (módulo)? Marque os 3 usos certos.", "opts": ["Descobrir se um número é par ou ímpar", "Calcular a média de notas", "Limitar um valor a um intervalo circular", "Extrair o último dígito de um número", "Concatenar dois textos", "Comparar dois valores"], "ok": [0, 2, 3], "e": "% serve para restos: par/ímpar, intervalos circulares e último dígito. Média, texto e comparação usam outros operadores."}, {"t": "type", "p": "15 % 4 = ?", "ac": ["3"], "e": "15 dividido por 4 dá 3, resto 3."}, {"t": "pick", "p": "n % 2 == 1 é verdadeiro quando n é...", "opts": ["Ímpar", "Par", "Negativo", "Zero"], "ok": 0, "e": "Número ímpar sempre deixa resto 1 na divisão por 2."}]}, {"id": 3, "nome": "Atribuição composta", "glyph": "➕", "skill": "H3", "teoria": ["Os operadores de atribuição composta são atalhos que juntam uma conta com a atribuição: x += 5 equivale a x = x + 5.", "Também existem -=, *=, /= e %=, sempre seguindo a mesma lógica."], "qs": [{"t": "type", "p": "int x = 10; x += 5; Qual o valor de x depois?", "ac": ["15"], "e": "x += 5 equivale a x = x + 5 → 10 + 5 = 15."}, {"t": "type", "p": "int x = 10; x -= 3; Valor de x depois?", "ac": ["7"], "e": "x -= 3 equivale a x = x - 3 → 10 - 3 = 7."}, {"t": "type", "p": "int x = 4; x *= 3; Valor de x depois?", "ac": ["12"], "e": "x *= 3 equivale a x = x * 3 → 4 * 3 = 12."}, {"t": "type", "p": "int x = 20; x /= 4; Valor de x depois?", "ac": ["5"], "e": "x /= 4 equivale a x = x / 4 → 20 / 4 = 5."}, {"t": "type", "p": "int x = 10; x %= 3; Valor de x depois?", "ac": ["1"], "e": "x %= 3 equivale a x = x % 3 → resto de 10 por 3 = 1."}, {"t": "slots", "p": "Ligue cada atalho à conta que ele equivale.", "pairs": [["x += 5", "x = x + 5"], ["x -= 3", "x = x - 3"], ["x *= 2", "x = x * 2"], ["x /= 4", "x = x / 4"]], "e": "O atalho sempre repete a variável, o operador e o valor, e reatribui o resultado."}, {"t": "pick", "p": "Qual é a forma equivalente e correta de \"saldo = saldo - valor;\" usando atribuição composta?", "opts": ["saldo -= valor;", "saldo =- valor;", "saldo -- valor;", "saldo /= valor;"], "ok": 0, "e": "saldo -= valor é o atalho correto. saldo =- valor parece parecido mas é outra coisa (veja a próxima questão)."}, {"t": "hot", "skill": "H3", "rows": ["int saldo = 100;", "saldo [[bug|=- ]]30;   // nao e a mesma coisa que -="], "p": "Este código tenta descontar 30 do saldo, mas tem uma armadilha clássica. Toque na parte errada.", "ok": ["bug"], "e": "=- não existe como atalho de subtração. O Java lê como saldo = -30, apagando o valor antigo em vez de descontar dele."}]}, {"id": 4, "nome": "Incremento e decremento", "glyph": "🔁", "skill": "H4", "teoria": ["Os operadores ++ e -- somam ou subtraem 1 da variável.", "A posição importa: x++ (pós-fixo) usa o valor ANTES de somar 1; ++x (pré-fixo) soma 1 ANTES de usar o valor.", "Em linha isolada (x++; ou ++x;) o efeito final é idêntico — a diferença só aparece dentro de uma expressão maior."], "qs": [{"t": "type", "p": "int x = 5; System.out.println(x++); // o que aparece no console?", "ac": ["5"], "e": "x++ é pós-fixo: primeiro imprime o valor atual (5), só depois soma 1."}, {"t": "type", "p": "Depois do x++ da questão anterior, qual é o valor de x agora?", "ac": ["6"], "e": "O incremento já aconteceu por trás dos panos: x agora vale 6."}, {"t": "type", "p": "int y = 5; System.out.println(++y); // o que aparece?", "ac": ["6"], "e": "++y é pré-fixo: soma 1 primeiro (y vira 6), depois imprime o valor novo."}, {"t": "pick", "p": "Qual a diferença entre x++; e ++x; quando usados sozinhos, em uma linha isolada?", "opts": ["Nenhuma: o efeito final sobre x é idêntico", "x++ soma 2 em vez de 1", "++x não é permitido em Java", "x++ é mais rápido de executar"], "ok": 0, "e": "Sozinhos numa linha, os dois apenas somam 1 a x. A diferença só aparece dentro de uma expressão maior."}, {"t": "hot", "skill": "H4", "rows": ["int x = 5;", "int r = [[pos|x++]] + 1;", "System.out.println(r);"], "p": "Toque na parte que usa o valor de x ANTES de somar 1 (o pós-incremento).", "ok": ["pos"], "e": "x++ devolve o valor atual de x (5) para a soma, e só depois incrementa x internamente."}, {"t": "multi", "p": "Sobre x++ e ++x, marque as afirmações certas.", "opts": ["Os dois somam 1 a x", "x++ devolve o valor antigo e depois incrementa", "++x incrementa primeiro e depois devolve o valor novo", "Os dois subtraem 1 de x", "A diferença só aparece dentro de uma expressão maior"], "ok": [0, 1, 2, 4], "e": "++ soma (não subtrai). Pós-fixo devolve o valor antigo; pré-fixo devolve o valor já atualizado."}, {"t": "type", "p": "int a = 3; a--; Valor de a depois?", "ac": ["2"], "e": "a-- subtrai 1 de a: 3 - 1 = 2."}, {"t": "type", "p": "int b = 3; System.out.println(--b); // o que aparece?", "ac": ["2"], "e": "--b é pré-fixo: subtrai 1 primeiro (b vira 2), depois imprime o valor novo."}]}, {"id": 5, "nome": "Relacionais", "glyph": "⚖️", "skill": "H5", "teoria": ["Os operadores relacionais comparam dois valores e sempre devolvem boolean (true ou false): == != > < >= <=", "Não confunda = (atribuição) com == (comparação de igualdade)!"], "qs": [{"t": "type", "p": "a = 5, b = 3. A expressão a == b resulta em?", "ac": ["false"], "e": "5 não é igual a 3, então == devolve false."}, {"t": "type", "p": "a = 5, b = 3. A expressão a != b resulta em?", "ac": ["true"], "e": "5 é diferente de 3, então != devolve true."}, {"t": "type", "p": "a = 5, b = 3. A expressão a >= 5 resulta em?", "ac": ["true"], "e": "5 é maior ou igual a 5, então >= devolve true."}, {"t": "pick", "p": "Qual símbolo COMPARA igualdade (e não atribui um valor)?", "opts": ["==", "=", "+=", "!"], "ok": 0, "e": "== compara dois valores; = apenas guarda um valor na variável."}, {"t": "hot", "skill": "H5", "rows": ["int x = 10;", "if [[bug|(x = 10)]] {", "  System.out.println(\"dez!\");", "}"], "p": "Este código não compila. Toque no trecho com o erro clássico de = no lugar de ==.", "ok": ["bug"], "e": "x = 10 é uma atribuição (tipo int), e o if exige uma expressão boolean — por isso não compila."}, {"t": "multi", "p": "Quais são operadores relacionais? Marque os 4 certos.", "opts": ["==", "!=", ">=", "<=", "&&", "+="], "ok": [0, 1, 2, 3], "e": "&& é lógico e += é de atribuição composta — não comparam, então não entram aqui."}, {"t": "type", "p": "a = 5, b = 3. A expressão b <= 4 resulta em?", "ac": ["true"], "e": "3 é menor ou igual a 4, então <= devolve true."}, {"t": "type", "p": "a = 5, b = 3. A expressão a < b resulta em?", "ac": ["false"], "e": "5 não é menor que 3, então < devolve false."}]}, {"id": 6, "nome": "Lógicos", "glyph": "🔗", "skill": "H6", "teoria": ["Os operadores lógicos combinam expressões booleanas: <b>&&</b> (AND/E) só é true se as duas forem true; <b>||</b> (OR/OU) basta uma ser true; <b>!</b> (NOT/NÃO) inverte o resultado."], "qs": [{"t": "type", "p": "true && false resulta em?", "ac": ["false"], "e": "&& exige que os dois lados sejam true. Como um é false, o resultado é false."}, {"t": "type", "p": "true || false resulta em?", "ac": ["true"], "e": "|| basta um lado ser true. Como um é true, o resultado é true."}, {"t": "type", "p": "!true resulta em?", "ac": ["false"], "e": "! inverte o valor: !true vira false."}, {"t": "pick", "p": "Qual operador exige que AMBAS as condições sejam verdadeiras?", "opts": ["&&", "||", "!", "=="], "ok": 0, "e": "&& (E) só resulta true quando os dois lados são true."}, {"t": "hot", "skill": "H6", "rows": ["int idade = 16;", "boolean temAutorizacao = true;", "if [[or|(idade >= 18 || temAutorizacao)]] {", "  System.out.println(\"Entrada liberada.\");", "}"], "p": "Toque na condição composta que libera a entrada mesmo com idade menor que 18.", "ok": ["or"], "e": "Com ||, basta uma condição ser true. Mesmo com idade < 18, temAutorizacao == true já libera a entrada."}, {"t": "multi", "p": "false || true || false. Quais afirmações são verdadeiras sobre esse resultado?", "opts": ["O resultado é true", "Basta uma condição ser true para o || valer true", "O resultado é false", "O || precisa que todas sejam true"], "ok": [0, 1], "e": "Com ||, uma única condição true já basta para o resultado ser true."}, {"t": "type", "p": "idade = 20. A expressão !(idade >= 18) resulta em?", "ac": ["false"], "e": "idade >= 18 é true; o ! inverte para false."}, {"t": "pick", "p": "x = 5. Qual expressão abaixo é true?", "opts": ["x > 0 && x < 10", "x > 0 && x > 10", "x < 0 || x == 10", "!(x == 5)"], "ok": 0, "e": "5 > 0 é true e 5 < 10 é true, então x > 0 && x < 10 é true."}]}, {"id": 7, "nome": "Operador ternário", "glyph": "❓", "skill": "H7", "teoria": ["O operador ternário escreve uma decisão simples em uma linha: resultado = (condição) ? valor_se_true : valor_se_false;", "Exemplo: int maior = (a > b) ? a : b;"], "qs": [{"t": "type", "p": "int a = 8, b = 3; int maior = (a > b) ? a : b; Valor de maior?", "ac": ["8"], "e": "a > b é true (8 > 3), então maior recebe o valor de a, que é 8."}, {"t": "type", "p": "double nota = 5.0; String status = (nota >= 6.0) ? \"Aprovado\" : \"Reprovado\"; Valor de status?", "ac": ["reprovado"], "e": "nota >= 6.0 é false (5.0 < 6.0), então status recebe \"Reprovado\"."}, {"t": "order", "mono": true, "p": "Monte a expressão ternária na ordem certa.", "items": ["resultado =", "(idade >= 18)", "?", "\"Maior\"", ":", "\"Menor\";"], "e": "condição ? valor_se_true : valor_se_false — sempre nessa ordem."}, {"t": "hot", "skill": "H7", "rows": ["String msg = [[cond|(nota >= 6.0)]] ? \"Passou\" : \"Nao passou\";"], "p": "Toque na parte que é a CONDIÇÃO testada pelo ternário.", "ok": ["cond"], "e": "A condição fica entre parênteses, logo depois do sinal de igual, antes do ?."}, {"t": "pick", "p": "O operador ternário substitui, em uma única linha, qual estrutura mais simples?", "opts": ["if / else simples", "for", "switch", "while"], "ok": 0, "e": "O ternário é um atalho para um if/else de dois caminhos, quando cada caminho é só um valor."}, {"t": "type", "p": "int x = 10; String par = (x % 2 == 0) ? \"par\" : \"impar\"; Valor de par?", "ac": ["par"], "e": "10 % 2 == 0 é true, então par recebe \"par\"."}, {"t": "multi", "p": "Sobre o operador ternário, marque as afirmações certas.", "opts": ["Tem três partes: condição, valor se true, valor se false", "Só funciona com números", "É escrito com ? e :", "Substitui um if/else de uma linha", "Sempre precisa de chaves { }"], "ok": [0, 2, 3], "e": "O ternário não usa chaves e funciona com qualquer tipo, não só números."}]}, {"id": 8, "nome": "Precedência de operadores", "glyph": "🥇", "skill": "H8", "timer": 25, "teoria": ["Precedência é a ordem em que os operadores são avaliados numa expressão.", "Do mais prioritário para o menos: () parênteses → ++/--/! → * / % → + - → relacionais → == != → && → || → atribuição.", "Na dúvida, use parênteses: além de garantir a ordem certa, deixa o código mais legível."], "qs": [{"t": "type", "p": "2 + 3 * 4 = ?", "ac": ["14"], "e": "* tem prioridade sobre +: primeiro 3*4=12, depois 2+12=14."}, {"t": "type", "p": "(2 + 3) * 4 = ?", "ac": ["20"], "e": "Os parênteses forçam a soma primeiro: 2+3=5, depois 5*4=20."}, {"t": "hot", "skill": "H8", "rows": ["int r = [[first|3 * 4]] + 2;   // 3*4 primeiro, depois +2"], "p": "Toque na parte da expressão que é calculada primeiro.", "ok": ["first"], "e": "* tem prioridade maior que +, então 3*4 (=12) é calculado antes da soma."}, {"t": "pick", "p": "Em 10 - 4 / 2, o que é calculado primeiro?", "opts": ["4 / 2", "10 - 4", "Da esquerda para a direita, sem prioridade", "Não é possível saber"], "ok": 0, "e": "/ tem prioridade sobre -, então 4/2 (=2) é calculado antes da subtração."}, {"t": "type", "p": "10 - 4 / 2 = ?", "ac": ["8"], "e": "Primeiro 4/2=2, depois 10-2=8."}, {"t": "multi", "p": "Marque o que tem prioridade MAIOR que + e - na tabela de precedência.", "opts": ["* / %", "parênteses ()", "&&", "== !=", "++ -- (pré e pós-fixos)"], "ok": [0, 1, 4], "e": "Parênteses, incremento/decremento e * / % vêm antes de + e -. && e == vêm depois."}, {"t": "order", "p": "Ordene da MAIOR para a MENOR prioridade.", "items": ["() parênteses", "* / %", "+ -", "== !="], "e": "Parênteses primeiro, depois multiplicação/divisão/módulo, depois soma/subtração, e só então as comparações de igualdade."}, {"t": "type", "p": "5 > 3 && 2 < 1 resulta em?", "ac": ["false"], "e": "5>3 é true, 2<1 é false; true && false = false."}]}, {"id": 9, "nome": "Desafio final", "glyph": "🏆", "skill": "MIX", "boss": true, "timer": 30, "hearts": 3, "teoria": ["Vale tudo o que você treinou nos 8 níveis. Cada questão tem 30 segundos e você só tem 3 vidas.", "Terminando aqui, o relatório com as suas habilidades fica pronto para enviar ao professor."], "qs": [{"t": "type", "skill": "H1", "p": "Os dois operandos são int: 9 / 2 = ?", "ac": ["4"], "e": "Divisão inteira: 9/2 dá 4 (a parte decimal some)."}, {"t": "type", "skill": "H2", "p": "17 % 5 = ?", "ac": ["2"], "e": "17 dividido por 5 dá 3, resto 2."}, {"t": "type", "skill": "H3", "p": "int x = 8; x *= 2; Valor de x depois?", "ac": ["16"], "e": "x *= 2 equivale a x = x * 2 → 8*2 = 16."}, {"t": "hot", "skill": "H4", "rows": ["int x = 4;", "int r = [[pre|++x]] + 1;"], "p": "Toque na parte que incrementa x ANTES de usar o valor (pré-incremento).", "ok": ["pre"], "e": "++x soma 1 primeiro (x vira 5), e só depois esse valor novo entra na soma."}, {"t": "type", "skill": "H5", "p": "a = 4, b = 4. A expressão a == b resulta em?", "ac": ["true"], "e": "4 é igual a 4, então == devolve true."}, {"t": "pick", "skill": "H6", "p": "Qual expressão resulta em true?", "opts": ["true && true", "true && false", "false || false", "!true"], "ok": 0, "e": "true && true é o único caso onde os dois lados são true."}, {"t": "order", "skill": "H7", "mono": true, "p": "Monte a expressão ternária que classifica a nota.", "items": ["media >= 6.0", "?", "\"Aprovado\"", ":", "\"Reprovado\""], "e": "condição ? valor_se_true : valor_se_false."}, {"t": "multi", "skill": "H8", "p": "Marque o que é avaliado ANTES de + e - na precedência.", "opts": ["* / %", "() parênteses", "&&", "++ -- pré-fixos"], "ok": [0, 1, 3], "e": "* / %, parênteses e ++/-- pré-fixos vêm antes de + e -. && vem bem depois, só após as comparações."}, {"t": "type", "skill": "H1", "p": "double d = 7 / 2; Valor de d?", "ac": ["3.0", "3"], "e": "7/2 (int/int) já vale 3 antes de virar double: o resultado é 3.0."}]}];
+
+/* ---------- cena de código ---------- */
+function codeRow(n, raw){
+  var re=/\[\[([^|]+)\|([^\]]+)\]\]/g;
+  var out="",last=0,m;
+  while((m=re.exec(raw))){
+    out+= raw.slice(last,m.index).length? '<span class="cplain">'+esc(raw.slice(last,m.index))+'</span>':'';
+    out+= '<span class="ctok" data-zone="'+m[1]+'">'+esc(m[2])+'</span>';
+    last=re.lastIndex;
+  }
+  var rest=raw.slice(last);
+  if(rest.length)out+= '<span class="cplain">'+esc(rest)+'</span>';
+  return '<div class="cline"><span class="cno">'+(n!=null?n:'')+'</span><span class="ccode">'+out+'</span></div>';
+}
+function sCode(rows){
+  return '<div class="scene code">'+rows.map(function(l,i){
+    if(Array.isArray(l))return codeRow(l[0],l[1]);
+    return codeRow(i+1,l);
+  }).join('')+'</div>';
+}
+
+/* ---------- estado ---------- */
+var S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};
+function load(){
+  try{var r=localStorage.getItem(STORE);if(r){var d=JSON.parse(r);for(var k in d)S[k]=d[k];}}catch(e){}
+}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){}}
+
+/* ---------- utilidades ---------- */
+function $(s,c){return (c||document).querySelector(s);}
+function el(h){var d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function norm(s){return String(s).toLowerCase().replace(/,/g,".").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9. ]/g," ").replace(/\s+/g," ").trim();}
+function limpaResp(v){
+  v=norm(v);var r=/^(aparece|apareceria|imprime|imprimiria|imprimiu|mostra|escreve|sera|seria|resulta em|resultado|o resultado e|o resultado seria|a resposta e|resposta|e|eh|fica|vai imprimir|vai aparecer|o|a|um|uma)\s+/;
+  var ant;do{ant=v;v=v.replace(r,"");}while(v!==ant&&v.length>1);
+  return v;
+}
+function totalEstrelas(){var t=0;for(var k in S.niveis)t+=S.niveis[k].estrelas||0;return t;}
+function concluidos(){var n=0;for(var k in S.niveis)if(S.niveis[k].estrelas>0)n++;return n;}
+function nRegulares(){return LEVELS.filter(function(l){return !l.boss;}).length;}
+function desbloqueado(i){
+  if(i===0||S.liberarTudo)return true;
+  var lv=LEVELS[i];
+  if(lv.boss)return concluidos()>=GAME.bossUnlock;
+  return !!(S.niveis[LEVELS[i-1].id]&&S.niveis[LEVELS[i-1].id].estrelas>0);
+}
+function fmtTempo(ms){var s=Math.round(ms/1000);var m=Math.floor(s/60);return m+" min "+(s%60)+"s";}
+
+var tick=null;
+function iniciarRelogio(){
+  if(tick)return;
+  tick=setInterval(function(){ if(!document.hidden){S.tempo=(S.tempo||0)+1000;} },1000);
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden&&jogo){S.saidas=(S.saidas||0)+1;save();}
+});
+
+/* ============================================================ TELAS ============================================================ */
+var app=document.getElementById("app");
+var jogo=null;
+
+function topo(extra){return '<div class="topbar">'+(extra||"")+'</div>';}
+
+function telaInicio(){
+  jogo=null;
+  var temProg=!!S.nome;
+  var totalNv=LEVELS.length;
+  app.innerHTML=
+   '<div style="height:14px"></div>'+
+   '<div class="boot"><div class="screen">'+
+     '<div class="bootline mono">'+esc(GAME.boot)+'<span class="cursor"></span></div>'+
+     '<div class="lg"><b>'+GAME.eyebrow+'</b></div>'+
+   '</div></div>'+
+   '<h1>'+GAME.titulo+'</h1>'+
+   '<p class="sub">'+GAME.sub+' Dá para parar no meio e continuar depois — o progresso fica salvo neste aparelho.</p>'+
+   (temProg?
+     '<div class="card"><h3>Continuar como '+esc(S.nome)+'</h3>'+
+      '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de '+totalNv+' níveis · '+S.xp+' XP</p>'+
+      '<button class="btn" id="go">Continuar</button>'+
+      '<button class="btn ghost small" id="trocar">Trocar de aluno</button></div>'
+     :
+     '<div class="card">'+
+      '<label class="f" for="nm">Seu nome completo</label>'+
+      '<input type="text" id="nm" autocomplete="name" placeholder="Nome e sobrenome">'+
+      '<div style="height:10px"></div>'+
+      '<label class="f" for="tm">Turma</label>'+
+      '<input type="text" id="tm" placeholder="Ex.: 2º ano — Informática">'+
+      '<div style="height:14px"></div>'+
+      '<button class="btn" id="start">Começar</button></div>')+
+   '<div class="note">O relatório final registra o seu nome, o tempo de estudo e quantas vezes a página foi deixada de lado durante as questões. Resolva sozinho: o objetivo é chegar na prova sabendo.</div>';
+
+  if(temProg){
+    $("#go").onclick=function(){S.sessoes=(S.sessoes||0)+1;save();telaMapa();};
+    $("#trocar").onclick=function(){
+      if(confirm("Isto apaga o progresso salvo neste aparelho. Continuar?")){
+        S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};save();telaInicio();
+      }};
+  }else{
+    $("#start").onclick=function(){
+      var n=$("#nm").value.trim(),t=$("#tm").value.trim();
+      if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}
+      S.nome=n;S.turma=t;S.inicio=Date.now();S.sessoes=1;save();telaMapa();
+    };
+  }
+}
+
+function telaMapa(){
+  jogo=null;iniciarRelogio();
+  var feitos=concluidos(),totalNv=LEVELS.length,totalEst=totalNv*3;
+  var h=topo(
+    '<div class="grow"><b style="font-size:15px">'+esc(S.nome.split(" ")[0])+'</b>'+
+    '<div class="bar" style="margin-top:5px"><i style="width:'+Math.round(feitos/totalNv*100)+'%"></i></div></div>'+
+    '<span class="pill xp">★ '+S.xp+' XP</span>'+
+    '<button class="iconbtn" id="rep" title="Relatório">📋</button>'+
+    '<button class="iconbtn" id="cfg" title="Área do professor">⚙️</button>')+
+   '<h2>'+GAME.titulo+'</h2>'+
+   '<p class="sub" style="margin-bottom:14px">'+feitos+' de '+totalNv+' níveis concluídos · '+totalEstrelas()+' de '+totalEst+' estrelas</p>'+
+   '<div class="trail">';
+
+  LEVELS.forEach(function(lv,i){
+    var st=S.niveis[lv.id],ok=desbloqueado(i),e=st?st.estrelas:0;
+    var estrelas="";for(var k=1;k<=3;k++)estrelas+= (k<=e?'<span>★</span>':'<span class="off">★</span>');
+    h+='<button class="node'+(e?" done":"")+(lv.boss?" boss":"")+'" data-i="'+i+'"'+(ok?"":" disabled")+'>'+
+       '<span class="glyph">'+(ok?lv.glyph:"🔒")+'</span>'+
+       '<span class="t"><b>'+esc(lv.nome)+'</b><span>'+
+         (ok?(st?("melhor: "+st.pct+"% · "+lv.qs.length+" questões"):(lv.qs.length+" questões")):(lv.boss?("conclua os "+GAME.bossUnlock+" níveis"):"conclua o nível anterior"))+
+       '</span></span>'+
+       '<span class="stars">'+estrelas+'</span></button>';
+  });
+  h+='</div><div style="height:16px"></div>'+
+     '<button class="btn ghost" id="rep2">Ver meu relatório</button>';
+  app.innerHTML=h;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".node"),function(b){
+    b.onclick=function(){telaTeoria(LEVELS[+b.dataset.i]);};
+  });
+  $("#rep").onclick=$("#rep2").onclick=function(){telaRelatorio();};
+  $("#cfg").onclick=telaConfig;
+  window.scrollTo(0,0);
+}
+
+/* --- area do professor (senha) --- */
+function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+var SENHA_PROF="8570079599154905";
+function telaConfig(){
+  jogo=null;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Área do professor</b></div>');
+  if(S.liberarTudo){
+    h+='<div class="card"><h3>🔓 Todas as fases liberadas</h3>'+
+       '<p class="sub">Neste aparelho, todos os níveis da trilha (inclusive o desafio final) estão abertos.</p>'+
+       '<button class="btn ghost small" id="trancar">Bloquear de novo</button></div>';
+  }else{
+    h+='<div class="card"><h3>🔒 Liberar todas as fases</h3>'+
+       '<p class="sub">Uso do professor: libera todos os níveis desta trilha neste aparelho, sem precisar concluir os anteriores.</p>'+
+       '<div class="pwrow"><input type="password" id="pw" autocomplete="off" placeholder="Senha do professor">'+
+       '<button class="btn" id="lib" style="width:auto;margin:0">Liberar</button></div>'+
+       '<div class="pwerr" id="pwerr"></div></div>';
+  }
+  h+='<button class="btn ghost" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  if(S.liberarTudo){
+    $("#trancar").onclick=function(){S.liberarTudo=false;save();telaMapa();};
+  }else{
+    var pw=$("#pw");
+    var tenta=function(){
+      if(String(h53(pw.value))===SENHA_PROF){S.liberarTudo=true;save();telaMapa();}
+      else{$("#pwerr").textContent="Senha incorreta.";pw.value="";pw.focus();}
+    };
+    $("#lib").onclick=tenta;
+    pw.addEventListener("keydown",function(e){if(e.key==="Enter")tenta();});
+    setTimeout(function(){pw.focus();},100);
+  }
+  window.scrollTo(0,0);
+}
+
+function telaTeoria(lv){
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+   '<div class="card"><h2>'+lv.glyph+' Antes de jogar</h2><ul class="theory" style="padding-left:20px;margin:0">'+
+   lv.teoria.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul></div>'+
+   '<button class="btn" id="ir">Começar o nível</button>'+
+   '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#ir").onclick=function(){iniciarNivel(lv);};
+  window.scrollTo(0,0);
+}
+
+/* ============================================================ MOTOR DO NÍVEL ============================================================ */
+function iniciarNivel(lv){
+  limparVistos(lv);
+  jogo={lv:lv,fila:shuffle(lv.qs),idx:0,vidas:(lv.hearts||5),total:lv.qs.length,
+        acertosPrimeira:0,respondidas:0,hab:{},tempoIni:Date.now()};
+  proxima();
+}
+function regHab(q,acertou){
+  var s=q.skill||jogo.lv.skill;
+  if(!jogo.hab[s])jogo.hab[s]={c:0,t:0};
+  jogo.hab[s].t++;if(acertou)jogo.hab[s].c++;
+}
+function proxima(){
+  if(jogo.idx>=jogo.fila.length){fimNivel(true);return;}
+  render(jogo.fila[jogo.idx]);
+}
+
+var cron=null;
+function render(q){
+  if(cron){clearInterval(cron);cron=null;}
+  var lv=jogo.lv;
+  jogo.travado=false;document.body.classList.remove("travado");
+  var velho=document.querySelector(".feed");if(velho)velho.remove();
+  var prog=Math.round(jogo.respondidas/jogo.total*100);
+  var vidas="";for(var i=0;i<jogo.vidas;i++)vidas+="♥";
+  var h=topo('<button class="iconbtn" id="sair">✕</button>'+
+     '<div class="grow"><div class="bar"><i style="width:'+Math.min(100,prog)+'%"></i></div></div>'+
+     (lv.timer?'<span class="pill timer" id="cron">'+lv.timer+'s</span>':'')+
+     '<span class="pill hp">'+vidas+'</span>');
+
+  h+='<h2 style="margin-bottom:12px">'+esc(q.p)+'</h2>';
+  h+='<div id="area"></div>';
+  h+='<div id="acao"></div><div class="spacer"></div>';
+  app.innerHTML=h;
+  $("#sair").onclick=function(){ if(confirm("Sair do nível? O que você fez agora não conta.")){ if(cron)clearInterval(cron); telaMapa(); } };
+
+  var area=$("#area"),acao=$("#acao");
+  RENDER[q.t](q,area,acao);
+
+  if(lv.timer){
+    var t=lv.timer,c=$("#cron");
+    cron=setInterval(function(){
+      t--;if(c){c.textContent=t+"s";if(t<=7)c.classList.add("low");}
+      if(t<=0){clearInterval(cron);cron=null;julgar(q,false,"Tempo esgotado.");}
+    },1000);
+  }
+  window.scrollTo(0,0);
+}
+
+function botaoConferir(acao,fn){
+  var b=el('<button class="btn" disabled id="conf">Conferir</button>');
+  acao.appendChild(b);b.onclick=fn;return b;
+}
+function ligarConferir(on){var b=$("#conf");if(b)b.disabled=!on;}
+
+var RENDER={
+  hot:function(q,area){
+    area.innerHTML=sCode(q.rows);
+    area.insertBefore(el('<p class="sub">Toque no trecho certo do código.</p>'),area.firstChild);
+    area.addEventListener("click",function(ev){
+      var z=ev.target.closest("[data-zone]");if(!z)return;
+      var ok=q.ok.indexOf(z.dataset.zone)>=0;
+      if(!ok){z.classList.add("zone-hit");setTimeout(function(){z.classList.remove("zone-hit");},320);}
+      julgar(q,ok);
+    });
+  },
+  pick:function(q,area){
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark"></span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){julgar(q,i===q.ok);};
+      area.appendChild(b);
+    });
+  },
+  multi:function(q,area,acao){
+    var sel=[];
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark">✓</span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){
+        var p=sel.indexOf(i);
+        if(p>=0){sel.splice(p,1);b.classList.remove("sel");}else{sel.push(i);b.classList.add("sel");}
+        ligarConferir(sel.length===q.ok.length);
+      };
+      area.appendChild(b);
+    });
+    botaoConferir(acao,function(){
+      var ok=sel.length===q.ok.length&&sel.every(function(i){return q.ok.indexOf(i)>=0;});
+      julgar(q,ok);
+    });
+  },
+  type:function(q,area,acao){
+    area.appendChild(el('<input type="text" id="resp" autocomplete="off" autocapitalize="none" placeholder="Escreva a resposta">'));
+    if(q.dica)area.appendChild(el('<p class="sub" style="margin-top:8px">Dica: '+esc(q.dica)+'</p>'));
+    var inp=$("#resp");
+    inp.addEventListener("input",function(){ligarConferir(inp.value.trim().length>0);});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&inp.value.trim()){var b=$("#conf");if(b)b.click();}});
+    botaoConferir(acao,function(){
+      var v=norm(inp.value);
+      var ok=q.ac.some(function(a){return norm(a)===v||norm(a)===limpaResp(v)||limpaResp(a)===limpaResp(v);});
+      julgar(q,ok,ok?null:"Resposta esperada: "+q.ac[0]);
+    });
+    setTimeout(function(){inp.focus();},120);
+  },
+  order:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque na ordem certa. Toque de novo em cima para tirar.</p>'));
+    var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
+    var bank=el('<div class="chips"></div>');area.appendChild(bank);
+    var todos=shuffle(q.items.concat(q.extra||[]));
+    var montado=[]; // {text, btn}
+    todos.forEach(function(it){
+      var b=el('<button class="chip'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
+      b.onclick=function(){
+        if(b.classList.contains("used")||montado.length>=q.items.length)return;
+        montado.push({text:it,btn:b});b.classList.add("used");pintarTray();
+      };
+      bank.appendChild(b);
+    });
+    function pintarTray(){
+      tray.innerHTML="";
+      montado.forEach(function(m,pos){
+        var c=el('<button class="chip sel'+(q.mono?" mono":"")+'">'+esc(m.text)+'</button>');
+        c.onclick=function(){ montado.splice(pos,1); m.btn.classList.remove("used"); pintarTray(); };
+        tray.appendChild(c);
+      });
+      ligarConferir(montado.length===q.items.length);
+    }
+    botaoConferir(acao,function(){
+      var vals=montado.map(function(m){return m.text;});
+      var ok=vals.length===q.items.length&&vals.every(function(v,i){return v===q.items[i];});
+      julgar(q,ok,ok?null:"A ordem certa é: "+q.items.join(q.mono?"  ":" → "));
+    });
+  },
+  slots:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque numa resposta e depois no espaço certo.</p>'));
+    var wrap=el('<div class="slots"></div>');
+    var bank=el('<div class="chips"></div>');
+    var sel=null,posto={};
+    q.pairs.forEach(function(pr,i){
+      var row=el('<div class="slotrow"><span class="nm">'+esc(pr[0])+'</span><span class="slot" data-i="'+i+'"></span></div>');
+      wrap.appendChild(row);
+    });
+    area.appendChild(wrap);area.appendChild(bank);
+    var bots={};
+    shuffle(q.pairs.map(function(p){return p[1];})).forEach(function(v){
+      var b=el('<button class="chip">'+esc(v)+'</button>');
+      bots[v]=b;
+      b.onclick=function(){
+        if(sel===v){sel=null;b.classList.remove("sel");return;}
+        Object.keys(bots).forEach(function(k){bots[k].classList.remove("sel");});
+        sel=v;b.classList.add("sel");
+      };
+      bank.appendChild(b);
+    });
+    Array.prototype.forEach.call(wrap.querySelectorAll(".slot"),function(sl){
+      sl.onclick=function(){
+        var i=sl.dataset.i;
+        if(posto[i]){ bots[posto[i]].classList.remove("used"); delete posto[i]; sl.textContent="";sl.classList.remove("full"); }
+        if(sel){ posto[i]=sel; sl.textContent=sel; sl.classList.add("full"); bots[sel].classList.add("used"); bots[sel].classList.remove("sel"); sel=null; }
+        ligarConferir(Object.keys(posto).length===q.pairs.length);
+      };
+    });
+    botaoConferir(acao,function(){
+      var ok=q.pairs.every(function(pr,i){return posto[i]===pr[1];});
+      julgar(q,ok,ok?null:"Confira as ligações na teoria do nível.");
+    });
+  }
+};
+function shuffleIdx(q){var a=[];for(var i=0;i<q.opts.length;i++)a.push(i);return shuffle(a);}
+
+function julgar(q,ok,msg){
+  if(!jogo||jogo.travado)return;          /* uma resposta por questão: ignora toques extras */
+  jogo.travado=true;document.body.classList.add("travado");
+  if(cron){clearInterval(cron);cron=null;}
+  if(q._vista!==true){ q._vista=true; regHab(q,ok); if(ok)jogo.acertosPrimeira++; }
+  if(ok){ jogo.respondidas++; S.xp+=q._rep?4:10; }
+  else{ jogo.vidas--; }
+  save();
+
+  var f=el('<div class="feed '+(ok?"good":"bad")+'"><div class="inner">'+
+    '<b>'+(ok?"Isso mesmo":"Ainda não")+'</b>'+
+    '<p>'+esc(msg?msg+" ":"")+esc(q.e)+'</p>'+
+    '<button class="btn '+(ok?"ok":"")+'" id="cont">Continuar</button></div></div>');
+  document.body.appendChild(f);
+  var bc=f.querySelector("#cont");
+  bc.onclick=function(){
+    if(bc._ok)return;bc._ok=true;
+    f.remove();document.body.classList.remove("travado");
+    if(!ok){
+      if(jogo.vidas<=0){fimNivel(false);return;}
+      var copia={};for(var k in q)copia[k]=q[k];copia._rep=true;copia._vista=true;
+      jogo.fila.push(copia);
+    }
+    jogo.idx++;proxima();
+  };
+  bc.focus();
+}
+
+function fimNivel(venceu){
+  var lv=jogo.lv;
+  var pct=Math.round(jogo.acertosPrimeira/jogo.total*100);
+  var estrelas=0;
+  if(venceu)estrelas = pct>=100?3 : pct>=75?2 : 1;
+
+  if(venceu){
+    var ant=S.niveis[lv.id];
+    if(!ant||pct>=ant.pct){
+      S.niveis[lv.id]={estrelas:Math.max(estrelas,ant?ant.estrelas:0),pct:pct,hab:jogo.hab,
+                       quando:new Date().toISOString().slice(0,10)};
+    }else{
+      ant.estrelas=Math.max(ant.estrelas,estrelas);
+    }
+    if(estrelas===3)S.xp+=20;
+    save();
+  }
+  var st="";for(var k=1;k<=3;k++)st+=(k<=estrelas?"★":"☆");
+  app.innerHTML=topo('<div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+    '<div class="card" style="text-align:center">'+
+      '<div style="font-size:46px;line-height:1">'+(venceu?lv.glyph:"💤")+'</div>'+
+      '<h2 style="margin-top:8px">'+(venceu?"Nível concluído":"Vidas acabaram")+'</h2>'+
+      '<div class="stars" style="font-size:30px;margin:6px 0">'+st+'</div>'+
+      '<p class="sub">'+(venceu
+         ? "Acertos de primeira: "+pct+"% · "+jogo.acertosPrimeira+" de "+jogo.total
+         : "Revise a teoria e volte. O melhor resultado anterior continua salvo.")+'</p>'+
+    '</div>'+
+    (venceu&&pct<100?'<div class="warn">Refaça o nível para tentar as 3 estrelas: as questões vêm embaralhadas.</div>':'')+
+    '<button class="btn" id="mapa">Voltar para a trilha</button>'+
+    '<button class="btn ghost small" id="denovo">'+(venceu?"Jogar de novo":"Tentar de novo")+'</button>';
+  $("#mapa").onclick=telaMapa;
+  $("#denovo").onclick=function(){ limparVistos(lv); iniciarNivel(lv); };
+  window.scrollTo(0,0);
+}
+function limparVistos(lv){lv.qs.forEach(function(q){delete q._vista;});}
+
+/* ============================================================ RELATÓRIO ============================================================ */
+function agregarHab(){
+  var r={};
+  Object.keys(HAB).forEach(function(h){r[h]={c:0,t:0};});
+  LEVELS.forEach(function(lv){
+    var st=S.niveis[lv.id];if(!st||!st.hab)return;
+    for(var h in st.hab){ if(!r[h])r[h]={c:0,t:0}; r[h].c+=st.hab[h].c; r[h].t+=st.hab[h].t; }
+  });
+  return r;
+}
+function codigo(){
+  var base=S.nome+"|"+S.xp+"|"+concluidos()+"|"+totalEstrelas()+"|"+GAME.eyebrow+"|"+(new Date().toISOString().slice(0,10));
+  var h=5381;for(var i=0;i<base.length;i++){h=((h<<5)+h+base.charCodeAt(i))>>>0;}
+  return h.toString(36).toUpperCase().slice(0,6).padStart(6,"X");
+}
+function medalha(){
+  var f=concluidos(),e=totalEstrelas(),totalNv=LEVELS.length;
+  if(f>=totalNv&&e>=totalNv*3-2)return ["🏆","Engenheiro(a) de Operadores"];
+  if(f>=totalNv)return ["🥇","Compilou sem erros"];
+  if(f>=Math.ceil(totalNv*0.6))return ["🥈","Depurador(a) em treino"];
+  if(f>=Math.ceil(totalNv*0.3))return ["🥉","Estagiário(a) de sintaxe"];
+  return ["🧩","Começando agora"];
+}
+
+function telaRelatorio(){
+  if(!S.nome){telaInicio();return;}
+  var hab=agregarHab(),med=medalha(),totalNv=LEVELS.length,fim=concluidos()>=totalNv;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Relatório</b></div>');
+  h+='<div class="medal"><span class="m">'+med[0]+'</span><div><b>'+med[1]+'</b><div class="sub">'+esc(S.nome)+(S.turma?' · '+esc(S.turma):'')+'</div></div></div>';
+  if(!fim)h+='<div class="warn">Relatório parcial: faltam '+(totalNv-concluidos())+' nível(is). Dá para continuar em casa e gerar de novo.</div>';
+
+  h+='<div class="card"><h3>Resumo</h3>'+
+     kv("Níveis concluídos",concluidos()+" de "+totalNv)+
+     kv("Estrelas",totalEstrelas()+" de "+(totalNv*3))+
+     kv("XP",S.xp)+
+     kv("Tempo de estudo",fmtTempo(S.tempo||0))+
+     kv("Sessões",(S.sessoes||1))+
+     kv("Saídas da página durante o jogo",(S.saidas||0))+
+     (S.liberarTudo?kv("Fases liberadas pelo professor","sim"):"")+
+     kv("Data",new Date().toLocaleDateString("pt-BR"))+
+     '</div>';
+
+  h+='<div class="card"><h3>Habilidades avaliadas</h3>';
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    var cor=!d.t?"var(--line)":p>=75?"var(--ok)":p>=50?"var(--gold)":"var(--bad)";
+    h+='<div class="skill"><div class="hd"><span>'+esc(HAB[k])+'</span><i>'+(d.t?p+"%":"—")+'</i></div>'+
+       '<div class="bar"><i style="width:'+p+'%;background:'+cor+'"></i></div></div>';
+  });
+  h+='</div>';
+
+  var fracos=Object.keys(HAB).filter(function(k){var d=hab[k];return d.t&&d.c/d.t<0.75;});
+  h+='<div class="card"><h3>O que revisar antes da prova</h3>'+
+      (fracos.length? '<ul style="padding-left:20px;margin:0">'+fracos.map(function(k){return "<li>"+esc(HAB[k])+"</li>";}).join("")+'</ul>'
+       : '<p class="sub" style="margin:0">'+(concluidos()?"Nada pendente até aqui. Refaça os níveis de menos estrelas para fixar.":"Jogue pelo menos um nível para o relatório mostrar as habilidades.")+'</p>')+
+     '</div>';
+
+  h+='<div class="card" style="text-align:center"><h3>Código de verificação</h3>'+
+     '<div class="code">'+codigo()+'</div>'+
+     '<p class="sub" style="margin:6px 0 0">Mostre este código junto com o print.</p></div>';
+
+  h+='<button class="btn" id="png">Baixar relatório em imagem</button>'+
+     '<button class="btn ghost small" id="print">Imprimir ou salvar em PDF</button>'+
+     '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>'+
+     '<div class="note">Envie a imagem (ou o print desta tela) no Google Classroom.</div>'+
+     '<div id="saida"></div>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#print").onclick=function(){window.print();};
+  $("#png").onclick=function(){gerarPNG(hab,med);};
+  window.scrollTo(0,0);
+}
+function kv(a,b){return '<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';}
+
+function gerarPNG(hab,med){
+  var totalNv=LEVELS.length;
+  var W=900,H=1240,c=document.createElement("canvas");c.width=W;c.height=H;
+  var x=c.getContext("2d");
+  var F='"Segoe UI",Roboto,system-ui,sans-serif';
+  x.fillStyle="#ffffff";x.fillRect(0,0,W,H);
+  x.fillStyle="#15697f";x.fillRect(0,0,W,120);
+  x.fillStyle="#ffffff";x.font="700 30px "+F;x.fillText(GAME.eyebrow,48,58);
+  x.font="400 19px "+F;x.fillText(GAME.titulo.replace(/<[^>]+>/g,"")+" · relatório de treino",48,92);
+
+  var y=170;
+  x.fillStyle="#0f2230";x.font="700 30px "+F;x.fillText(S.nome,48,y);y+=34;
+  x.fillStyle="#4a6478";x.font="400 20px "+F;
+  x.fillText((S.turma||"Turma não informada")+"  ·  "+new Date().toLocaleDateString("pt-BR"),48,y);y+=46;
+
+  x.fillStyle="#fdf0d4";x.fillRect(48,y-28,W-96,64);
+  x.fillStyle="#e0900a";x.fillRect(48,y-28,6,64);
+  x.fillStyle="#0f2230";x.font="700 24px "+F;x.fillText(med[0]+"  "+med[1],70,y+10);y+=88;
+
+  function linha(a,b){
+    x.fillStyle="#4a6478";x.font="400 20px "+F;x.fillText(a,48,y);
+    x.fillStyle="#0f2230";x.font="700 20px "+F;x.textAlign="right";x.fillText(String(b),W-48,y);x.textAlign="left";
+    x.strokeStyle="#e2eaf0";x.beginPath();x.moveTo(48,y+12);x.lineTo(W-48,y+12);x.stroke();y+=42;
+  }
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Resumo",48,y);y+=34;
+  linha("Níveis concluídos",concluidos()+" de "+totalNv);
+  linha("Estrelas",totalEstrelas()+" de "+(totalNv*3));
+  linha("XP acumulado",S.xp);
+  linha("Tempo de estudo",fmtTempo(S.tempo||0));
+  linha("Sessões",(S.sessoes||1));
+  linha("Saídas da página durante o jogo",(S.saidas||0));
+  y+=22;
+
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Habilidades avaliadas",48,y);y+=34;
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    x.fillStyle="#0f2230";x.font="400 16px "+F;
+    var txt=HAB[k];
+    x.fillText(txt.length>66?txt.slice(0,64)+"…":txt,48,y);
+    x.textAlign="right";x.font="700 17px "+F;x.fillText(d.t?p+"%":"—",W-48,y);x.textAlign="left";
+    y+=12;
+    x.fillStyle="#e2eaf0";x.fillRect(48,y,W-96,12);
+    x.fillStyle=!d.t?"#c6d4de":p>=75?"#1f8a4c":p>=50?"#e0900a":"#c23b4d";
+    x.fillRect(48,y,(W-96)*p/100,12);
+    y+=38;
+  });
+
+  y+=10;
+  x.fillStyle="#f3f7fa";x.fillRect(48,y,W-96,74);
+  x.fillStyle="#4a6478";x.font="400 18px "+F;x.fillText("Código de verificação",70,y+30);
+  x.fillStyle="#15697f";x.font="700 30px ui-monospace,Consolas,monospace";x.fillText(codigo(),70,y+62);
+  x.fillStyle="#4a6478";x.font="400 16px "+F;x.textAlign="right";
+  x.fillText("Prof. Rosival D. Silva",W-70,y+62);x.textAlign="left";
+
+  var saida=$("#saida");saida.innerHTML="";
+  try{
+    c.toBlob(function(b){
+      if(!b){saida.appendChild(c);return;}
+      var u=URL.createObjectURL(b),a=document.createElement("a");
+      a.href=u;a.download="relatorio-"+STORE+"-"+norm(S.nome).replace(/ /g,"-")+".png";
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(u);},4000);
+      saida.appendChild(el('<div class="note" style="margin-top:12px">Se o download não abrir, use a imagem abaixo: segure o dedo sobre ela para salvar.</div>'));
+      saida.appendChild(c);
+    },"image/png");
+  }catch(e){
+    saida.appendChild(el('<div class="note" style="margin-top:12px">Segure o dedo sobre a imagem para salvar.</div>'));
+    saida.appendChild(c);
+  }
+  setTimeout(function(){saida.scrollIntoView({behavior:"smooth",block:"start"});},300);
+}
+
+/* ---------- start ---------- */
+load();
+setInterval(save,15000);
+window.addEventListener("beforeunload",save);
+telaInicio();
+</script>
+</body>
+</html>

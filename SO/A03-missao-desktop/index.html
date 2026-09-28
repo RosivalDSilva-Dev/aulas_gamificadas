@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Missão Desktop — Revisão de Sistemas Operacionais (Aula 03)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wall:#2a7f86;--wall2:#236c72;--chrome:#e6e9f0;--paper:#f7f8fb;--ink:#16213e;--dim:#56607f;
+  --blue:#2f4fa3;--blueD:#1d3277;--yel:#ffd23f;--coral:#ff6b4a;--good:#23a664;--bad:#e0483b;--line:#16213e;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background-color:var(--wall);
+  background-image:radial-gradient(var(--wall2) 1.5px,transparent 1.6px);
+  background-size:22px 22px;
+  color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5;min-height:100vh;
+}
+#app{max-width:940px;margin:0 auto;padding:16px 12px 60px}
+.px{font-family:'Pixelify Sans','Courier New',monospace;font-weight:700}
+h1,h2,h3{font-family:'Pixelify Sans','Courier New',monospace;margin:0}
+
+/* janela-moldura do jogo */
+.frame{background:var(--chrome);border:2px solid var(--line);border-radius:8px;box-shadow:7px 7px 0 #0b2b2f99;overflow:hidden}
+.tbar{display:flex;justify-content:space-between;align-items:center;background:var(--blue);color:#fff;padding:7px 12px;font-family:'Pixelify Sans',monospace;font-weight:700;font-size:16px;border-bottom:2px solid var(--line)}
+.tbar .wb2{display:flex;gap:5px}
+.tbar .wb2 i{width:16px;height:16px;background:#ffffff33;border:1.5px solid #fff;border-radius:3px;display:block}
+.tbar .wb2 i:last-child{background:var(--coral)}
+.inner{padding:18px}
+.small{font-size:13px;color:var(--dim)}
+.btn{font:inherit;font-weight:700;border:2px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;border-radius:6px;box-shadow:3px 3px 0 var(--line);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line)}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.warn{background:var(--yel)}
+.btn.sm{padding:5px 10px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.key:focus-visible,.tile:focus-visible,.chip:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(--line);border-radius:6px;background:#fff;width:100%}
+
+/* login */
+.login p{max-width:60ch}
+.rules{display:grid;gap:8px;margin:14px 0;padding:0;list-style:none}
+.rules li{background:#fff;border:2px solid var(--line);border-radius:6px;padding:9px 12px}
+.field{margin:12px 0;max-width:420px}
+.field label{display:block;font-weight:600;margin-bottom:4px}
+
+/* mapa */
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.lvl{min-width:260px;flex:1;max-width:360px}
+.xpbar{height:16px;background:#fff;border:2px solid var(--line);border-radius:5px;overflow:hidden}
+.xpbar>i{display:block;height:100%;background:var(--yel);border-right:2px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin:14px 0}
+.pcard{text-align:left;font:inherit;color:inherit;background:#fff;border:2px solid var(--line);border-radius:8px;padding:12px 14px;box-shadow:4px 4px 0 var(--line);cursor:pointer}
+.pcard:hover{background:#fffbe8}
+.pcard .ic{font-size:28px}
+.pcard h3{font-size:19px;margin:2px 0}
+.pcard.done{background:#e3f6ea}
+.pcard.locked{background:#d3d7e2;cursor:not-allowed;box-shadow:none}
+.pcard.boss{border-color:var(--coral);grid-column:1/-1}
+.stars{letter-spacing:2px;font-size:18px;color:#b98a00}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.badge{background:#fff;border:2px solid var(--line);border-radius:20px;padding:3px 10px;font-size:13px;font-weight:600}
+
+/* jogo */
+.hud{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hud-t{font-size:18px}
+.hud-r{display:flex;gap:14px;align-items:center;font-weight:700}
+.dots{display:flex;gap:6px;margin:12px 0}
+.dot{flex:1;height:10px;background:#fff;border:2px solid var(--line);border-radius:4px}
+.dot.now{background:var(--yel)}.dot.ok{background:var(--good)}.dot.bad{background:var(--bad)}
+.kind{color:var(--blue);font-size:15px}
+.prompt{font-size:19px;font-weight:600;margin:4px 0 10px;max-width:70ch}
+.timer{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.bar{flex:1;height:10px;background:#fff;border:2px solid var(--line);border-radius:5px;overflow:hidden}
+.bar-f{height:100%;width:100%;background:var(--blue)}
+.bar-f.low{background:var(--coral)}
+.tt{font-weight:700;min-width:34px;text-align:right}
+.stage,.chbox{-webkit-user-select:none;user-select:none}
+.frozen{pointer-events:none}
+.fb{margin-top:14px;padding:12px 14px;border:2px solid var(--line);border-radius:8px;box-shadow:4px 4px 0 var(--line)}
+.fb.ok{background:#d6f3e2}.fb.bad{background:#ffe0da}
+.fb-h{font-weight:700;font-size:18px;font-family:'Pixelify Sans',monospace}
+.fb-b{margin:4px 0 10px}
+
+/* peças de arrastar */
+.chip{display:inline-block;background:var(--yel);color:#2b2200;border:2px solid var(--line);box-shadow:2px 2px 0 var(--line);padding:7px 11px;border-radius:6px;font-weight:600;font-size:15px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.chip.sel{outline:3px solid var(--coral);outline-offset:1px}
+.chip.dragging{opacity:.35}
+.chip.ok{background:#a8e6c1}.chip.bad{background:#ffb4aa}
+.chip.locked{cursor:default}
+.ghost{position:fixed;z-index:999;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:5px 5px 0 #0007}
+.dz{border-radius:6px}
+.dz.slot{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:44px;min-width:120px;padding:4px;border:2px dashed var(--blue);background:#fff}
+.dz.slot.wide{display:flex;width:100%}
+.dz.slot.tall{min-height:96px;align-items:flex-start}
+.dz.slot.mini{min-width:120px}
+.dz.slot.inline{margin:0 3px;vertical-align:middle}
+.dz.hover{background:#fff4b8}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:8px;margin-top:6px;background:#d7dcea;border:2px inset #9ba4c4}
+.pool-label{margin-top:14px;font-size:13px;color:var(--dim)}
+.order .orow{display:flex;align-items:center;gap:10px;margin:6px 0}
+.onum{width:30px;height:30px;border:2px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:700;background:#fff;flex:none}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.bucket-t{font-weight:700;margin-bottom:4px}
+.bucket-z{display:flex;flex-wrap:wrap;gap:5px;min-height:110px;padding:6px;border:2px dashed var(--blue);background:#fff;align-content:flex-start}
+.cloze{font-size:18px;line-height:2.4;background:#fff;border:2px solid var(--line);border-radius:6px;padding:10px 14px}
+.mrow{display:grid;grid-template-columns:minmax(120px,1fr) minmax(150px,1fr);gap:10px;align-items:center;margin:7px 0}
+.mlabel{font-weight:600}
+
+/* multi */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.tile{font:inherit;font-weight:600;text-align:left;background:#fff;border:2px solid var(--line);border-radius:6px;padding:11px 12px;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
+.tile.on{background:#cfe0ff;box-shadow:none;transform:translate(2px,2px)}
+.tile.ok{background:#a8e6c1}.tile.bad{background:#ffb4aa}
+
+/* simulações do sistema */
+.mock{background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:6px;overflow:hidden;-webkit-user-select:none;user-select:none}
+.desk{display:flex;flex-direction:column;height:300px;max-width:660px;margin:0 auto}
+.desk .wall{flex:1;background:linear-gradient(135deg,#7c9cff,#b58cff 60%,#ff9cc4);padding:10px;cursor:pointer}
+.icons{display:flex;flex-direction:column;gap:6px;width:92px;padding:6px;border-radius:8px;cursor:pointer}
+.ico{font-size:11px;text-align:center;color:#fff;text-shadow:0 1px 2px #000a}
+.ico i{display:block;font-style:normal;font-size:24px}
+.taskbar{display:flex;align-items:center;gap:8px;background:#dfe3f2;height:46px;padding:0 6px;border-top:2px solid var(--line)}
+.start{background:#ffd5cc;border:2px solid #d24c3b;border-radius:6px;padding:6px 10px;font-weight:700;font-size:13px;cursor:pointer}
+.tbapps{flex:1;display:flex;gap:6px;padding:4px;border-radius:6px;cursor:pointer;min-height:34px}
+.tbapp{width:30px;height:30px;border-radius:6px;background:#fff;display:grid;place-items:center;border:1px solid #9aa2c8}
+.tbapp.on{border-bottom:3px solid var(--blue)}
+.tray{display:flex;gap:10px;align-items:center;font-size:12px;padding:6px 8px;border-radius:6px;cursor:pointer}
+[data-area]:hover{filter:brightness(1.07)}
+[data-area].ok,[data-z].ok{outline:4px solid var(--good);outline-offset:-3px}
+[data-area].bad,[data-z].bad{outline:4px solid var(--bad);outline-offset:-3px}
+.win{max-width:660px;margin:0 auto;background:#fff}
+.w-title{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#5f79c4;color:#fff;padding:8px 10px;font-weight:700;font-size:14px}
+.w-btns{display:flex;gap:6px;align-items:center}
+.wb{width:30px;height:26px;border-radius:5px;display:grid;place-items:center;background:#ffffff40;font-weight:700;cursor:pointer}
+.wb.close{background:#ff9aa8;color:#4a0010}
+.w-addr{background:#eef0f8;padding:7px 10px;font-size:13px;border-bottom:1px solid #d0d5ec;font-family:ui-monospace,Menlo,monospace}
+.w-body{display:flex;min-height:130px}
+.w-side{width:32%;background:#f2f4fb;padding:8px 10px;font-size:13px;border-right:1px solid #d0d5ec;line-height:1.8}
+.w-content{flex:1;padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-content:flex-start}
+.wfile{width:88px;text-align:center;font-size:11px}
+.wfile i{display:block;height:42px;border-radius:6px;background:#dfe6ff;margin-bottom:3px}
+.w-status{background:#eef0f8;padding:5px 10px;font-size:12px;color:var(--dim);border-top:1px solid #d0d5ec}
+.w-side .slot,.w-content .slot{width:100%;min-height:80px}
+.tag{font-size:10px;background:#16213ecc;color:#fff;border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:600}
+.startm{max-width:440px;margin:0 auto;padding:12px;background:#e8ecfa}
+.sm-cap{font-size:12px;color:var(--dim);margin-bottom:8px}
+.sm-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.sm-ic{font-size:22px;width:28px;text-align:center;padding-top:6px}
+.sm-box{max-width:440px;margin:0 auto;padding:14px;background:#e8ecfa}
+.sm-res{margin-top:10px;font-size:14px;color:var(--dim)}
+.tree{max-width:540px;margin:0 auto;padding:10px 12px}
+.fold,.file{padding:5px 8px;border-radius:6px;cursor:pointer;font-size:14px}
+.fold:hover,.file:hover{background:#dfe6ff}
+.kids{display:none;margin-left:16px;border-left:2px solid #c3cbe8;padding-left:6px}
+.node.open>.kids{display:block}
+.node.open>.fold .car{transform:rotate(90deg)}
+.car{display:inline-block;transition:transform .15s;margin-right:4px}
+.file.ok{background:#a8e6c1}.file.bad{background:#ffb4aa}
+.cfg{max-width:540px;margin:0 auto;padding:12px}
+.cfg-h{font-weight:700;margin-bottom:8px}
+.cfg-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cfg-t{background:#fff;border:2px solid #b8c0e2;border-radius:8px;padding:12px 6px;text-align:center;font-size:13px;font-weight:700;cursor:pointer}
+.cfg-t i{display:block;font-style:normal;font-size:24px;margin-bottom:4px}
+.cfg-t.ok{background:#a8e6c1;border-color:var(--good)}.cfg-t.bad{background:#ffb4aa;border-color:var(--bad)}
+.serp{max-width:580px;margin:0 auto;display:grid;gap:8px}
+.urlbar{background:#fff;border:1px solid #b8c0e2;border-radius:20px;padding:6px 12px;font-size:13px;margin:8px}
+.res{background:#fff;border:2px solid #cdd3ee;border-radius:8px;padding:9px 12px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.res .u{color:#1a7f37;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+.res .tt2{color:#1a0dab;font-weight:700}
+.res.ad{background:#fff3b0;border:2px dashed #d9a400}
+.res.ok{background:#a8e6c1;border-color:var(--good)}.res.bad{background:#ffb4aa;border-color:var(--bad)}
+
+/* teclado virtual */
+.combo{background:#0d1530;border:2px solid var(--line);color:#7ff0ff;border-radius:6px;padding:12px;text-align:center;font-family:'Pixelify Sans',monospace;font-size:22px;min-height:54px;margin-bottom:10px}
+.kb{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0}
+.key{font:inherit;font-weight:700;background:#fff;color:var(--ink);border:2px solid var(--line);border-bottom-width:5px;border-radius:7px;min-width:54px;padding:9px 12px;cursor:pointer}
+.key.mod{background:#e3e0ff}
+.key.on{background:var(--yel);border-bottom-width:2px;transform:translateY(3px)}
+
+/* cartão */
+.cardp{background:#fff;border:3px solid var(--line);border-radius:8px;padding:16px;box-shadow:5px 5px 0 var(--line)}
+.cardp h2{font-size:24px}
+.crow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.stat{background:var(--chrome);border:2px solid var(--line);border-radius:6px;padding:8px 10px}
+.stat b{display:block;font-size:20px;font-family:'Pixelify Sans',monospace}
+.ptab{width:100%;border-collapse:collapse;margin:8px 0}
+.ptab td,.ptab th{border:2px solid var(--line);padding:5px 8px;text-align:left;font-size:14px}
+.ptab th{background:var(--chrome)}
+.code{font-family:'Pixelify Sans',monospace;font-size:26px;letter-spacing:3px;background:var(--yel);border:2px solid var(--line);border-radius:6px;padding:4px 12px;display:inline-block}
+.review{background:#fff;border:2px solid var(--line);border-radius:6px;padding:8px 14px;margin:10px 0}
+.review li{margin:6px 0}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(700deg)}}
+@media(max-width:560px){.inner{padding:12px}.prompt{font-size:17px}.mrow{grid-template-columns:1fr}.cfg-g{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.confetti{display:none}}
+@media print{body{background:#fff}.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(()=>{
+'use strict';
+/* ================= CONFIG ================= */
+// PROFESSOR: troque o texto abaixo por algo só seu ANTES de publicar (e não mude mais depois).
+const SALT='SO03-troque-este-texto-secreto';
+const LS='missao-desktop-so03-v1';
+const APP=document.getElementById('app');
+
+/* ================= UTILIDADES ================= */
+function h(tag,attrs,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs||{})){
+    if(v===false||v==null) continue;
+    if(k==='class') e.className=v;
+    else if(k==='html') e.innerHTML=v;
+    else if(k.startsWith('on')) e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v);
+  }
+  kids.flat(Infinity).forEach(c=>{ if(c==null||c===false) return; e.append(c.nodeType?c:document.createTextNode(c)); });
+  return e;
+}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hash32(s){let x=2166136261;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619);}return x>>>0;}
+function rng(seed){
+  let a=seed>>>0;
+  const f=()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};
+  f.int=n=>Math.floor(f()*n);
+  f.pick=a=>a[f.int(a.length)];
+  f.shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=f.int(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+  return f;
+}
+function frame(title,content){
+  return h('div',{class:'frame'},h('div',{class:'tbar'},h('span',{},title),h('span',{class:'wb2'},h('i'),h('i'),h('i'))),h('div',{class:'inner'},content));
+}
+const mount=(title,node)=>{APP.replaceChildren(frame(title,node));window.scrollTo(0,0);};
+
+/* ================= ESTADO ================= */
+let S=load();
+function load(){try{return JSON.parse(localStorage.getItem(LS))}catch(e){return null}}
+function persist(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const firstName=()=>{const n=(S&&S.name||'Aluno').trim().split(/\s+/)[0];return n.charAt(0).toUpperCase()+n.slice(1);};
+const totalXP=()=>Object.values(S.phases).reduce((a,p)=>a+(p.xp||0),0);
+const doneCount=(noBoss)=>Object.entries(S.phases).filter(([id,p])=>p.done&&!(noBoss&&id==='boss')).length;
+const LEVELS=[[0,'Estagiário'],[800,'Assistente de TI'],[2000,'Técnico Júnior'],[3500,'Técnico Pleno'],[5000,'Mestre do Desktop']];
+function level(xp){let i=0;LEVELS.forEach((l,k)=>{if(xp>=l[0])i=k;});return{i,name:LEVELS[i][1],cur:LEVELS[i][0],next:LEVELS[i+1]?LEVELS[i+1][0]:null};}
+function verCode(name,xp,ph,leaves){
+  const n=hash32([name.trim().toLowerCase(),xp,ph,leaves,SALT].join('|')).toString(36).toUpperCase().padStart(7,'0');
+  return n.slice(0,4)+'-'+n.slice(4);
+}
+
+/* som (desligado por padrão) e confete */
+let audio=null,muted=true;
+function sfx(t){
+  if(muted) return;
+  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);
+    o.type='square';o.frequency.value=t==='ok'?740:170;g.gain.value=.04;o.start();o.stop(audio.currentTime+.13);}catch(e){}
+}
+function confetti(){
+  const c=h('div',{class:'confetti'});
+  for(let i=0;i<50;i++){const p=h('i');p.style.left=Math.random()*100+'%';p.style.background=['#ffd23f','#2f4fa3','#ff6b4a','#23a664'][i%4];p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.6+Math.random()*1.4+'s';c.append(p);}
+  document.body.append(c);setTimeout(()=>c.remove(),3600);
+}
+
+/* controle de saídas da página + tempo de uso */
+let awayStart=null;
+function away(){ if(awayStart==null) awayStart=Date.now(); }
+function back(){ if(awayStart!=null){ if(S&&S.name&&Date.now()-awayStart>2500){S.stats.leaves++;persist();} awayStart=null; } }
+document.addEventListener('visibilitychange',()=>document.hidden?away():back());
+window.addEventListener('blur',away);
+window.addEventListener('focus',back);
+setInterval(()=>{ if(S&&S.name&&!document.hidden){S.stats.seconds++; if(S.stats.seconds%15===0) persist();} },1000);
+
+/* ================= MOTOR DE ARRASTAR ================= */
+function chip(text,key){return h('div',{class:'chip','data-key':key||'',tabindex:'0'},text);}
+function slot(key,extra){return h('div',{class:'dz slot '+(extra||''),'data-key':key,'data-cap':'1'});}
+function bucket(key,title){return h('div',{class:'bucket'},h('div',{class:'bucket-t'},title),h('div',{class:'dz bucket-z','data-key':key,'data-cap':'99'}));}
+function poolOf(chips,r){const p=h('div',{class:'dz pool'});r.shuffle(chips).forEach(c=>p.append(c));return p;}
+
+function enableDnD(root){
+  let sel=null,d=null;
+  const pool=()=>root.querySelector('.pool');
+  const clearSel=()=>{if(sel)sel.classList.remove('sel');sel=null;};
+  const isPool=z=>z.classList.contains('pool');
+  function place(chipEl,zone){
+    if(!isPool(zone)){
+      const cap=parseInt(zone.dataset.cap||'1',10);
+      const inside=[...zone.children].filter(x=>x.classList.contains('chip')&&x!==chipEl);
+      if(inside.length>=cap) pool().append(inside[0]);
+    }
+    zone.append(chipEl);
+  }
+  const zoneAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);const z=el&&el.closest('.dz');return z&&root.contains(z)?z:null;};
+  root.addEventListener('pointerdown',e=>{
+    const c=e.target.closest('.chip');if(!c||c.classList.contains('locked'))return;
+    d={chip:c,x:e.clientX,y:e.clientY,moved:false,ghost:null,id:e.pointerId};
+    try{c.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  root.addEventListener('pointermove',e=>{
+    if(!d||e.pointerId!==d.id)return;
+    if(!d.moved&&Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){
+      d.moved=true;d.ghost=d.chip.cloneNode(true);d.ghost.classList.add('ghost');document.body.append(d.ghost);
+      d.chip.classList.add('dragging');clearSel();
+    }
+    if(d.moved){
+      d.ghost.style.left=e.clientX+'px';d.ghost.style.top=e.clientY+'px';
+      root.querySelectorAll('.dz.hover').forEach(x=>x.classList.remove('hover'));
+      const z=zoneAt(e);if(z)z.classList.add('hover');
+    }
+  });
+  const end=e=>{
+    if(!d||e.pointerId!==d.id)return;
+    const {chip:c,moved,ghost}=d;d=null;
+    root.querySelectorAll('.dz.hover').forEach(x=>x.classList.remove('hover'));
+    if(moved){
+      ghost.remove();c.classList.remove('dragging');
+      const z=zoneAt(e);if(z)place(c,z);
+    }else{
+      const pz=c.parentElement;
+      if(sel===c){clearSel();}
+      else if(sel&&!isPool(pz)){place(sel,pz);clearSel();}
+      else if(sel&&isPool(pz)&&!isPool(sel.parentElement)){place(sel,pool());clearSel();}
+      else{clearSel();sel=c;c.classList.add('sel');}
+    }
+  };
+  root.addEventListener('pointerup',end);
+  root.addEventListener('pointercancel',end);
+  root.addEventListener('click',e=>{
+    if(e.target.closest('.chip'))return;
+    const z=e.target.closest('.dz');
+    if(z&&sel){place(sel,z);clearSel();}
+  });
+}
+function dnd(box,done,layout,poolEl){
+  const wrap=h('div',{class:'dnd'},layout,h('div',{class:'pool-label'},'Peças — arraste até o lugar certo (ou toque na peça e depois no lugar)'),poolEl);
+  const btn=h('button',{class:'btn primary',onclick:()=>{
+    let ok=true;
+    wrap.querySelectorAll('.chip').forEach(c=>{
+      const z=c.parentElement,key=c.dataset.key;
+      const good=key?(!z.classList.contains('pool')&&z.dataset.key===key):z.classList.contains('pool');
+      c.classList.add(good?'ok':'bad','locked');
+      if(!good)ok=false;
+    });
+    btn.disabled=true;done(ok);
+  }},'Verificar');
+  box.append(wrap,h('div',{class:'actions'},btn));
+  enableDnD(wrap);
+}
+
+/* ================= DESAFIOS ================= */
+const KIND={click:'🎯 Clique no alvo',drag:'🧲 Arraste e solte',order:'🔢 Coloque na ordem',multi:'☑️ Marque todas as corretas',type:'⌨️ Digite',keys:'⌨️ Monte o atalho',find:'🔎 Explore e encontre'};
+const FILES=['prova.docx','lista.txt','foto.jpg','trabalho.docx','notas.txt','musica.mp3'];
+
+/* ---- Fase 1: Área de trabalho ---- */
+function deskMock(r){
+  const icons=r.shuffle(['Este PC','Docs','Fotos','Lixeira','Escola','Jogos','Música']).slice(0,4);
+  const apps=r.shuffle(['📁','🌐','📝','🧮','🎨']).slice(0,3);
+  const time=String(9+r.int(9)).padStart(2,'0')+':'+String(r.int(60)).padStart(2,'0');
+  return h('div',{class:'mock desk'},
+    h('div',{class:'wall','data-area':'wall'},
+      h('div',{class:'icons','data-area':'icons'},icons.map(n=>h('div',{class:'ico'},h('i',{},n==='Lixeira'?'🗑️':'🗂️'),n)))),
+    h('div',{class:'taskbar'},
+      h('div',{class:'start','data-area':'start'},'⊞ Iniciar'),
+      h('div',{class:'tbapps','data-area':'apps'},apps.map((a,i)=>h('span',{class:'tbapp'+(i===0?' on':'')},a))),
+      h('div',{class:'tray','data-area':'tray'},h('span',{},'WiFi'),h('span',{},'🔊'),h('b',{},time))));
+}
+const DESK_T=[
+ {a:'start',p:'Clique no botão que abre o <b>Menu Iniciar</b> (para abrir programas).',e:'O botão <b>Iniciar</b> fica na barra de tarefas e abre a lista de programas.'},
+ {a:'tray',p:'Onde aparecem <b>hora, data, Wi-Fi e volume</b> (bandeja do sistema)?',e:'Hora, data, Wi-Fi e volume ficam na <b>bandeja do sistema</b>, no canto direito da barra de tarefas.'},
+ {a:'apps',p:'Clique na parte da barra de tarefas que mostra os <b>programas abertos agora</b>.',e:'No meio da barra de tarefas ficam os ícones dos programas que estão abertos.'},
+ {a:'icons',p:'Clique na região dos <b>ícones de atalho</b> (Este PC, Docs, Fotos…).',e:'Os ícones de atalho ficam sobre a área de trabalho, geralmente à esquerda.'},
+ {a:'wall',p:'Clique no que é <b>só decoração</b> da área de trabalho.',e:'O <b>papel de parede</b> é só decoração.'}
+];
+const clickDesktop=(r,c)=>{
+  const t=c.uniq('desk',DESK_T);
+  return{kind:'click',prompt:t.p,time:40,explain:t.e,mount(box,done){
+    const m=deskMock(r);box.append(m);
+    m.addEventListener('click',e=>{
+      const a=e.target.closest('[data-area]');if(!a)return;
+      const ok=a.dataset.area===t.a;a.classList.add(ok?'ok':'bad');
+      if(!ok)m.querySelector('[data-area="'+t.a+'"]').classList.add('ok');
+      done(ok);
+    },{once:true});
+  }};
+};
+const bucketDesk=(r)=>{
+  const D=['Ícone Este PC','Papel de parede','Pasta Docs','Lixeira','Atalho Fotos'];
+  const B=['Botão Iniciar','Relógio','Wi-Fi e volume','Programas abertos','Bandeja do sistema'];
+  return{kind:'drag',prompt:'Separe: o que fica na <b>área de trabalho</b> e o que fica na <b>barra de tarefas</b>?',time:80,
+    explain:'<b>Área de trabalho</b>: ícones, pastas e papel de parede. <b>Barra de tarefas</b>: Iniciar, programas abertos e bandeja (hora, Wi-Fi, volume).',
+    mount(box,done){
+      const chips=[...r.shuffle(D).slice(0,4).map(t=>chip(t,'desk')),...r.shuffle(B).slice(0,4).map(t=>chip(t,'bar'))];
+      dnd(box,done,h('div',{class:'buckets'},bucket('desk','🖥️ Área de trabalho'),bucket('bar','▬ Barra de tarefas')),poolOf(chips,r));
+    }};
+};
+const labelStart=(r)=>({kind:'drag',prompt:'Arraste cada nome para a parte certa do <b>Menu Iniciar</b>.',time:75,
+  explain:'O Menu Iniciar tem: <b>caixa de pesquisa</b> (digite o nome do app), <b>lista de programas instalados</b> e atalhos para <b>Configurações, Desligar e conta</b>.',
+  mount(box,done){
+    const layout=h('div',{class:'mock startm'},
+      h('div',{class:'sm-cap'},'Menu Iniciar (abre com o botão Iniciar ou a tecla Win)'),
+      h('div',{class:'sm-row'},h('span',{class:'sm-ic'},'🔍'),slot('search','wide')),
+      h('div',{class:'sm-row'},h('span',{class:'sm-ic'},'📃'),slot('list','wide tall')),
+      h('div',{class:'sm-row'},h('span',{class:'sm-ic'},'⏻'),slot('power','wide')));
+    dnd(box,done,layout,poolOf([chip('Caixa de pesquisa','search'),chip('Lista de programas instalados','list'),chip('Atalhos: Configurações, Desligar e conta','power'),chip('Papel de parede',''),chip('Bandeja do sistema','')],r));
+  }});
+function orderC(prompt,steps,time){
+  return (r)=>({kind:'order',prompt,time:time||70,
+    explain:'Ordem correta: '+steps.map((s,i)=>'<b>'+(i+1)+'</b>) '+esc(s)).join(' → '),
+    mount(box,done){
+      const layout=h('div',{class:'order'},steps.map((s,i)=>h('div',{class:'orow'},h('span',{class:'onum'},i+1),slot(String(i+1),'wide'))));
+      dnd(box,done,layout,poolOf(steps.map((s,i)=>chip(s,String(i+1))),r));
+    }});
+}
+const orderPin=orderC('Você quer deixar seu programa favorito sempre à mão na <b>barra de tarefas</b>. Coloque os passos em ordem.',['Localize o ícone do programa','Clique com o botão direito no ícone','Escolha “Fixar na barra de tarefas”'],60);
+
+/* ---- Fase 2: Arquivos ---- */
+const pathBuild=(r,c)=>{
+  const nome=c.first.replace(/[^\p{L}\d]/gu,'')||'Aluno';
+  const pasta=r.pick(['Escola','Trabalhos','Provas','Fotos 2025','Músicas']);
+  const arq=r.pick(FILES);
+  const parts=['C:','Users',nome,'Documentos',pasta,arq];
+  return{kind:'drag',time:80,
+    prompt:'O arquivo <b>'+esc(arq)+'</b> está na pasta <b>'+esc(pasta)+'</b>, dentro de <b>Documentos</b> do usuário <b>'+esc(nome)+'</b>, no disco <b>C:</b>. Monte o <b>caminho completo</b>.',
+    explain:'Caminho = endereço completo: <b>'+esc(parts.join('\\'))+'</b>',
+    mount(box,done){
+      const row=h('div',{class:'cloze'});
+      parts.forEach((p,i)=>{if(i)row.append(' \\ ');row.append(slot(String(i),'inline'));});
+      const chips=parts.map((p,i)=>chip(p,String(i)));
+      chips.push(chip('Program Files',''),chip('Downloads',''));
+      dnd(box,done,row,poolOf(chips,r));
+    }};
+};
+const treeFind=(r)=>{
+  const tops=[{n:'C: (Local)',kids:['Trabalhos','Escola']},{n:'Documentos',kids:['Fotos 2025']},{n:'Downloads',kids:['Músicas','Provas']}];
+  const target=r.pick(FILES);
+  const allF=[];tops.forEach(t=>t.kids.forEach(k=>allF.push({top:t.n,name:k})));
+  const sh=r.shuffle(allF);const tf=sh[0],df=sh[1];
+  const fmap={};
+  allF.forEach(f=>{
+    const isT=(f===tf||f===df);const set=new Set();
+    if(isT)set.add(target);
+    while(set.size<2){const x=r.pick(FILES);if(x!==target)set.add(x);}
+    fmap[f.top+'/'+f.name]=r.shuffle([...set]);
+  });
+  return{kind:'find',time:70,
+    prompt:'Ache o arquivo <b>'+target+'</b> que está na pasta <b>'+tf.name+'</b> (dentro de <b>'+tf.top+'</b>). Cuidado: outras pastas têm arquivos com o mesmo nome!',
+    explain:'O caminho certo era: <b>Este PC \\ '+tf.top+' \\ '+tf.name+' \\ '+target+'</b>',
+    mount(box,done){
+      const ans=(top,folder,name,el)=>{
+        const ok=(top===tf.top&&folder===tf.name&&name===target);
+        el.classList.add(ok?'ok':'bad');
+        done(ok,ok?'Achou! Caminho: <b>Este PC \\ '+top+' \\ '+folder+' \\ '+name+'</b>':'Você abriu: <b>Este PC \\ '+top+' \\ '+folder+' \\ '+name+'</b>.<br>'+'O certo era: <b>Este PC \\ '+tf.top+' \\ '+tf.name+' \\ '+target+'</b>');
+      };
+      const fold=(label,kids)=>{const w=h('div',{class:'node'});w.append(h('div',{class:'fold',onclick:()=>w.classList.toggle('open')},h('span',{class:'car'},'▸'),'📁 '+label),h('div',{class:'kids'},kids));return w;};
+      const tree=h('div',{class:'mock tree'},h('div',{class:'node open'},h('div',{class:'fold'},'🖥️ Este PC'),h('div',{class:'kids'},
+        r.shuffle(tops).map(t=>fold(t.n,r.shuffle(t.kids).map(k=>fold(k,fmap[t.n+'/'+k].map(f=>{const el=h('div',{class:'file'},'📄 '+f);el.addEventListener('click',()=>ans(t.n,k,f,el),{once:true});return el;}))))))));
+      box.append(tree,h('p',{class:'small'},'Toque nas pastas para abrir.'));
+    }};
+};
+function multiC(build){
+  return (r,c)=>{
+    const m=build(r,c);
+    return{kind:'multi',prompt:m.prompt,time:m.time||60,explain:m.explain,mount(box,done){
+      const sel=new Set();
+      const grid=h('div',{class:'tiles'},r.shuffle(m.options).map(o=>{
+        const t=h('button',{class:'tile','data-k':o.k,onclick:()=>{if(sel.has(o.k)){sel.delete(o.k);t.classList.remove('on');}else{sel.add(o.k);t.classList.add('on');}}},o.t);return t;}));
+      const btn=h('button',{class:'btn primary',onclick:()=>{
+        const good=new Set(m.correct);const ok=sel.size===good.size&&[...sel].every(k=>good.has(k));
+        grid.querySelectorAll('.tile').forEach(t=>{if(good.has(t.dataset.k))t.classList.add('ok');else if(t.classList.contains('on'))t.classList.add('bad');});
+        btn.disabled=true;done(ok);
+      }},'Verificar');
+      box.append(grid,h('div',{class:'actions'},btn));
+    }};
+  };
+}
+const multiSys=multiC((r)=>{
+  const good=['Windows','Program Files','System32'];
+  const bad=r.shuffle(['Fotos 2025','Downloads','Provas','Escola','Trabalhos']).slice(0,3);
+  return{prompt:'Cuidado! Marque as pastas que você <b>NUNCA</b> deve apagar (o computador pode parar de funcionar).',
+    options:[...good,...bad].map(t=>({k:t,t})),correct:good,
+    explain:'Nunca apague as pastas do sistema: <b>Windows, Program Files e System32</b>. O computador pode parar de funcionar!'};
+});
+function clozeC(prompt,text,distract,time){
+  return (r)=>({kind:'drag',prompt,time:time||75,
+    explain:'Certo: '+esc(text).replace(/\[\[(.+?)\]\]/g,'<b>$1</b>'),
+    mount(box,done){
+      const parts=text.split(/\[\[(.+?)\]\]/);const chips=[];const line=h('div',{class:'cloze'});
+      parts.forEach((p,i)=>{if(i%2===0)line.append(p);else{const k='c'+i;line.append(slot(k,'inline'));chips.push(chip(p,k));}});
+      distract.forEach(x=>chips.push(chip(x,'')));
+      dnd(box,done,line,poolOf(chips,r));
+    }});
+}
+const clozePasta=clozeC('Complete as definições com as peças certas.','Pasta = [[gaveta]] que guarda arquivos. Caminho = [[endereço completo]] (ex: C:\\Users\\Aluno\\prova.docx).',['atalho','papel de parede']);
+
+/* ---- Fase 3: Janela ---- */
+const WNAMES={title:'Barra de título',buttons:'Botões',address:'Endereço',side:'Menu lateral',content:'Conteúdo',status:'Status'};
+function winMock(o){
+  const {r,mode}=o;const lab=mode==='label';const ask=new Set(o.ask||[]);
+  const part=(k,cls,real)=>{
+    const e=h('div',{class:cls,'data-z':lab?null:k});
+    if(lab&&ask.has(k))e.append(slot(k,'mini'));
+    else{if(lab)e.append(h('span',{class:'tag'},WNAMES[k]));e.append(...real());}
+    return e;
+  };
+  const order=lab?['min','max','close']:r.shuffle(['min','max','close']);
+  const btns=part('buttons','w-btns',()=>order.map(b=>h('span',{class:'wb '+b,'data-z':lab?null:'btn-'+b},{min:'_',max:'▢',close:'✕'}[b])));
+  const title=h('div',{class:'w-title','data-z':lab?null:'title'});
+  if(lab&&ask.has('title'))title.append(slot('title','mini'));
+  else title.append(h('span',{},'Documento1.txt - Bloco de Notas',lab?h('span',{class:'tag'},WNAMES.title):null));
+  title.append(btns);
+  return h('div',{class:'mock win'},title,
+    part('address','w-addr',()=>['C:\\Users\\'+o.nome+'\\Documentos']),
+    h('div',{class:'w-body'},
+      part('side','w-side',()=>['Acesso rápido',h('br'),'Este PC',h('br'),'Documentos',h('br'),'Downloads']),
+      part('content','w-content',()=>['trabalho.docx','foto.jpg','lista.txt'].map(f=>h('div',{class:'wfile'},h('i'),f)))),
+    part('status','w-status',()=>['3 arquivos | 245 KB']));
+}
+const labelWindow=(r,c)=>{
+  const keys=Object.keys(WNAMES);const ask=r.shuffle(keys).slice(0,5);
+  return{kind:'drag',prompt:'Arraste o nome de cada parte para o lugar certo da <b>janela</b>.',time:85,
+    explain:'Toda janela tem: <b>barra de título</b> (com botões, incluindo o X), <b>endereço</b> (onde você está), <b>menu lateral</b>, <b>conteúdo</b> (arquivos ou texto) e <b>status</b>.',
+    mount(box,done){
+      const m=winMock({r,mode:'label',ask,nome:c.first});
+      const chips=ask.map(k=>chip(WNAMES[k],k));chips.push(chip('Papel de parede',''),chip('Botão Iniciar',''));
+      dnd(box,done,m,poolOf(chips,r));
+    }};
+};
+const WIN_T=[
+ {z:'title',p:'Clique na <b>barra de título</b> da janela (mostra o nome do programa).',e:'A barra de título fica no topo e mostra o nome do programa e o arquivo.'},
+ {z:'close',p:'{n} quer <b>fechar</b> a janela. Clique no botão certo.',e:'O <b>X</b> fecha a janela. Os outros botões minimizam e maximizam.'},
+ {z:'address',p:'Clique na <b>barra de endereço</b> (mostra onde você está).',e:'A barra de endereço mostra o caminho da pasta atual.'},
+ {z:'content',p:'Clique na <b>área de conteúdo</b> (onde aparecem os arquivos ou o texto).',e:'A área de conteúdo mostra os arquivos ou o texto.'},
+ {z:'side',p:'Clique no <b>menu lateral</b> (Acesso rápido).',e:'O menu lateral dá acesso rápido às pastas principais.'},
+ {z:'status',p:'Clique na <b>barra de status</b> (quantidade de arquivos e tamanho).',e:'A barra de status mostra informações como o número de arquivos e o tamanho.'}
+];
+const clickWindow=(r,c)=>{
+  const t=c.uniq('win',WIN_T);
+  return{kind:'click',prompt:t.p.replace('{n}',esc(c.first)),time:40,explain:t.e,mount(box,done){
+    const m=winMock({r,mode:'click',nome:c.first});box.append(m);
+    m.addEventListener('click',e=>{
+      const z=e.target.closest('[data-z]');if(!z)return;
+      const zk=z.dataset.z;const ok=t.z==='close'?zk==='btn-close':zk===t.z;
+      z.classList.add(ok?'ok':'bad');
+      if(!ok){const sel=t.z==='close'?'.wb.close':'[data-z="'+t.z+'"]';const g=m.querySelector(sel);if(g)g.classList.add('ok');}
+      done(ok);
+    },{once:true});
+  }};
+};
+const multiGold=multiC((r)=>{
+  const good=['Barra de título (com X para fechar)','Barra de endereço','Área de conteúdo'];
+  const bad=['Barra de tarefas','Botão Iniciar','Papel de parede'];
+  return{prompt:'<b>Regra de ouro:</b> marque as 3 partes que toda janela tem.',options:[...good,...bad].map(t=>({k:t,t})),correct:good,
+    explain:'Toda janela tem barra de título (com X para fechar), barra de endereço (mostra onde você está) e área de conteúdo.'};
+});
+const clozeJanela=clozeC('Complete a “regra de ouro” da janela.','Toda janela tem: barra de [[título]] (com X para fechar), barra de [[endereço]] (mostra onde você está) e área de [[conteúdo]] (onde aparecem os arquivos ou o texto).',['tarefas','bandeja'],85);
+
+/* ---- Fase 4: Configurações ---- */
+const CFG=[{k:'sys',t:'Sistema',i:'💻'},{k:'dev',t:'Dispositivos',i:'⌨️'},{k:'net',t:'Rede e Internet',i:'🌐'},{k:'per',t:'Personalização',i:'🎨'},{k:'acc',t:'Contas',i:'👤'},{k:'app',t:'Aplicativos',i:'📦'}];
+const CFG_SC=[
+ {k:'acc',p:'{n} precisa <b>trocar a senha</b> da conta.',e:'<b>Contas</b>: trocar foto ou senha.'},
+ {k:'net',p:'{n} quer conectar o PC ao <b>Wi-Fi</b>.',e:'<b>Rede e Internet</b> cuida do Wi-Fi e da conexão.'},
+ {k:'app',p:'{n} quer <b>desinstalar um programa</b>.',e:'<b>Aplicativos</b>: instalar e remover programas.'},
+ {k:'per',p:'{n} quer mudar o <b>papel de parede</b>.',e:'<b>Personalização</b>: papel de parede e cores.'},
+ {k:'dev',p:'{n} quer configurar a <b>impressora</b>.',e:'<b>Dispositivos</b>: teclado, mouse e impressora.'},
+ {k:'sys',p:'{n} quer ajustar o <b>som</b> e a <b>tela</b>.',e:'<b>Sistema</b>: tela, som e energia.'}
+];
+const clickCfg=(r,c)=>{
+  const s=c.uniq('cfg',CFG_SC);const tiles=r.shuffle(CFG);
+  return{kind:'click',prompt:s.p.replace('{n}',esc(c.first))+' Em qual categoria de Configurações?',time:40,explain:s.e,mount(box,done){
+    const m=h('div',{class:'mock cfg'},h('div',{class:'cfg-h'},'⚙️ Configurações'),h('div',{class:'cfg-g'},tiles.map(t=>h('div',{class:'cfg-t','data-k':t.k},h('i',{},t.i),t.t))));
+    box.append(m);
+    m.addEventListener('click',e=>{
+      const t=e.target.closest('.cfg-t');if(!t)return;
+      const ok=t.dataset.k===s.k;t.classList.add(ok?'ok':'bad');
+      if(!ok)m.querySelector('[data-k="'+s.k+'"]').classList.add('ok');
+      done(ok);
+    },{once:true});
+  }};
+};
+const bucketCfg=(r)=>{
+  const M={sys:['Tela','Som','Energia'],dev:['Teclado','Mouse','Impressora'],net:['Wi-Fi','Internet'],per:['Papel de parede','Cores'],acc:['Trocar foto','Trocar senha'],app:['Instalar programas','Remover programas']};
+  const cats=r.shuffle(CFG).slice(0,3);
+  return{kind:'drag',prompt:'Arraste cada item para a <b>categoria de Configurações</b> onde ele é encontrado.',time:90,
+    explain:cats.map(c=>'<b>'+c.t+'</b>: '+M[c.k].slice(0,2).join(', ').toLowerCase()).join('<br>'),
+    mount(box,done){
+      const chips=[];cats.forEach(c=>r.shuffle(M[c.k]).slice(0,2).forEach(t=>chips.push(chip(t,c.k))));
+      dnd(box,done,h('div',{class:'buckets'},cats.map(c=>bucket(c.k,c.i+' '+c.t))),poolOf(chips,r));
+    }};
+};
+const clozeCfg=clozeC('Complete o texto sobre onde mudar as configurações.','Para mudar papel de parede, senha, som ou rede, use o [[Painel de Controle]] (antigo) ou as [[Configurações]] (novo no Windows 10/11). Atalho para abrir: [[Win + I]].',['Lixeira','Win + D'],85);
+
+/* ---- Fase 5: Instalar e remover ---- */
+const orderInstall=orderC('<b>Instalar um programa:</b> coloque os passos na ordem correta.',['Baixar o instalador no site oficial','Clicar duas vezes no arquivo .exe ou .msi','Seguir as telas (Aceitar > Próximo > Instalar)','Conferir o ícone no menu Iniciar ou na área de trabalho'],80);
+const orderRemove=orderC('<b>Remover um programa</b> do jeito certo: coloque os passos na ordem.',['Abrir Configurações > Aplicativos','Achar o programa na lista','Clicar em Desinstalar','Confirmar'],70);
+const spotSite=(r)=>{
+  const P=[{n:'Google Chrome',s:'chrome',u:'google.com/chrome'},{n:'Mozilla Firefox',s:'firefox',u:'mozilla.org/firefox'},{n:'VLC',s:'vlc',u:'videolan.org/vlc'},{n:'7-Zip',s:'7zip',u:'7-zip.org'}];
+  const p=r.pick(P);
+  const bad=r.shuffle(['baixar-'+p.s+'-gratis.xyz','download-'+p.s+'-full.top','www.'+p.s+'-crack-download.net']).slice(0,2);
+  return{kind:'click',time:50,prompt:'A professora pediu para instalar o <b>'+p.n+'</b>. De onde você baixa o instalador?',
+    explain:'<b>Só baixe de sites oficiais</b> (ex: '+p.u+') e evite pop-ups duvidosos!',mount(box,done){
+      const cards=[
+        {ok:true,el:h('button',{class:'res'},h('div',{class:'tt2'},p.n+' — Download oficial'),h('div',{class:'u'},'https://'+p.u),h('div',{class:'small'},'Site do desenvolvedor.'))},
+        ...bad.map(u=>({ok:false,el:h('button',{class:'res'},h('div',{class:'tt2'},p.n+' GRÁTIS 100% completo'),h('div',{class:'u'},'http://'+u),h('div',{class:'small'},'Baixe agora! Sem cadastro!'))})),
+        {ok:false,el:h('button',{class:'res ad'},h('div',{class:'tt2'},'🎉 PARABÉNS! Você é o visitante nº 1.000.000!'),h('div',{class:'small'},'Clique aqui para receber seu prêmio e instalar o programa.'))}
+      ];
+      const list=h('div',{class:'serp'},r.shuffle(cards).map(x=>{x.el.addEventListener('click',()=>{x.el.classList.add(x.ok?'ok':'bad');if(!x.ok)cards.find(y=>y.ok).el.classList.add('ok');done(x.ok);},{once:true});return x.el;}));
+      box.append(h('div',{class:'mock'},h('div',{class:'urlbar'},'🔎 baixar '+p.n.toLowerCase()),list));
+    }};
+};
+const multiRemove=multiC((r)=>{
+  const good=['Configurações > Aplicativos > Desinstalar','Painel de Controle antigo: Programas e Recursos > clique direito > Desinstalar'];
+  const bad=['Arrastar a pasta do programa para a Lixeira','Apagar só o ícone da área de trabalho','Deletar a pasta do programa manualmente'];
+  return{prompt:'A professora pediu para <b>remover o Edge</b> que veio de fábrica. Marque os jeitos <b>corretos</b>.',options:[...good,...bad].map(t=>({k:t,t})),correct:good,
+    explain:'Use sempre o <b>desinstalador oficial</b> (Configurações > Aplicativos ou Programas e Recursos). Deletar a pasta deixa arquivos espalhados e o PC fica bagunçado.'};
+});
+const clozeInst=clozeC('Complete o texto sobre instalação e remoção.','Instaladores no Windows têm extensão [[.exe]] ou [[.msi]]. Para remover, use sempre o [[desinstalador]] oficial e nunca delete a [[pasta]] do programa manualmente.',['.jpg','.txt'],85);
+
+/* ---- Fase 6: Acessórios ---- */
+const ACC=[{k:'calc',n:'Calculadora',u:'Fazer contas rápidas'},{k:'note',n:'Bloco de Notas',u:'Anotar texto simples (sem formatação)'},{k:'nav',n:'Navegador',u:'Abrir sites'},{k:'paint',n:'Paint',u:'Desenhar ou editar imagens simples'},{k:'snip',n:'Recortes',u:'Tirar foto da tela'},{k:'exp',n:'Explorador de Arquivos',u:'Ver pastas e arquivos'}];
+const matchAcc=(r)=>{
+  const it=r.shuffle(ACC).slice(0,5);
+  return{kind:'drag',prompt:'Ligue cada <b>acessório</b> ao que ele serve: arraste a função para o programa certo.',time:85,
+    explain:it.map(a=>'<b>'+a.n+'</b>: '+a.u.toLowerCase()).join('<br>'),
+    mount(box,done){
+      const layout=h('div',{class:'mrows'},it.map(a=>h('div',{class:'mrow'},h('div',{class:'mlabel'},'🧰 '+a.n),slot(a.k))));
+      dnd(box,done,layout,poolOf(it.map(a=>chip(a.u,a.k)),r));
+    }};
+};
+const typeStart=(r)=>{
+  const t=r.pick([
+    {p:'Você quer abrir a <b>Calculadora</b> pela caixa de pesquisa do Menu Iniciar. Digite o comando curto usado na aula.',ok:['calc','calculadora'],e:'Digite <b>calc</b> no menu Iniciar para abrir a Calculadora.'},
+    {p:'Você quer abrir o <b>Bloco de Notas</b> pela caixa de pesquisa do Menu Iniciar. Digite o comando curto usado na aula.',ok:['notepad','bloco de notas'],e:'Digite <b>notepad</b> no menu Iniciar para abrir o Bloco de Notas.'}]);
+  return{kind:'type',prompt:t.p,time:45,explain:t.e,mount(box,done){
+    const inp=h('input',{type:'text',class:'sm-input',placeholder:'Digite aqui…',autocomplete:'off',autocapitalize:'off',spellcheck:'false','aria-label':'Caixa de pesquisa do Menu Iniciar'});
+    const go=()=>{const v=inp.value.trim().toLowerCase();btn.disabled=true;inp.disabled=true;done(t.ok.includes(v));};
+    const btn=h('button',{class:'btn primary',onclick:go},'Pesquisar');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+    box.append(h('div',{class:'mock sm-box'},h('div',{class:'sm-cap'},'Menu Iniciar › 🔍 Caixa de pesquisa'),inp),h('div',{class:'actions'},btn));
+  }};
+};
+const multiAcc=multiC((r)=>{
+  const good=r.shuffle(['Calculadora','Bloco de Notas','Paint','Recortes']).slice(0,3);
+  const bad=r.shuffle(['Photoshop','Spotify','Jogo da Steam','Antivírus pago']).slice(0,3);
+  return{prompt:'<b>Acessórios</b> são programas pequenos que já vêm com o Windows. Marque os que são acessórios.',options:[...good,...bad].map(t=>({k:t,t})),correct:good,
+    explain:'Acessório = programa pequeno que já vem com o Windows para tarefas rápidas. Calculadora, Bloco de Notas, Paint e Recortes são exemplos.'};
+});
+const clozeAcc=clozeC('Complete a definição de acessório.','Acessório = programa [[pequeno]] que já vem com o [[Windows]] para tarefas rápidas do dia a dia. Não precisa [[instalar]] nada extra.',['gigante','desinstalar'],75);
+
+/* ---- Fase 7: Atalhos ---- */
+const KEYCAPS=['Win','Ctrl','Alt','Shift','Tab','Esc','PrtSc','A','C','D','E','I','V','X','Z'];
+const MODS=['Win','Ctrl','Alt','Shift'];
+const KEYS_SC=[
+ {id:'copy',t:['Ctrl','C'],d:'Ctrl + C',f:'Copia o texto ou arquivo selecionado',p:n=>n+' selecionou um trecho de texto e quer <b>copiar</b> para usar em outro lugar.'},
+ {id:'paste',t:['Ctrl','V'],d:'Ctrl + V',f:'Cola o que foi copiado',p:n=>n+' já copiou o texto e agora quer <b>colar</b> no novo documento.'},
+ {id:'cut',t:['Ctrl','X'],d:'Ctrl + X',f:'Corta (move) o texto ou arquivo',p:n=>n+' quer <b>mover</b> (não duplicar) um arquivo para outra pasta. Qual atalho <b>corta</b>?'},
+ {id:'undo',t:['Ctrl','Z'],d:'Ctrl + Z',f:'Desfaz a última ação',p:n=>n+' apagou um parágrafo sem querer! Qual atalho <b>desfaz</b> a última ação?'},
+ {id:'selectall',t:['Ctrl','A'],d:'Ctrl + A',f:'Seleciona tudo',p:n=>n+' quer <b>selecionar tudo</b> o que está no Bloco de Notas de uma vez.'},
+ {id:'desktop',t:['Win','D'],d:'Win + D',f:'Mostra a área de trabalho (minimiza tudo)',p:n=>n+' tem várias janelas abertas e precisa ver a <b>área de trabalho</b> rapidinho, minimizando tudo.'},
+ {id:'explorer',t:['Win','E'],d:'Win + E',f:'Abre o Explorador de Arquivos',p:n=>n+' quer abrir o <b>Explorador de Arquivos</b> sem procurar com o mouse.'},
+ {id:'settings',t:['Win','I'],d:'Win + I',f:'Abre as Configurações',p:n=>n+' quer abrir as <b>Configurações</b> pelo teclado.'},
+ {id:'alttab',t:['Alt','Tab'],d:'Alt + Tab',f:'Troca entre programas abertos',p:n=>n+' está com dois programas abertos e quer <b>trocar</b> de um para o outro sem usar o mouse.'},
+ {id:'taskmgr',t:['Ctrl','Shift','Esc'],d:'Ctrl + Shift + Esc',f:'Abre o Gerenciador de Tarefas',p:n=>'O computador de '+n+' <b>travou</b>. Qual atalho de três teclas abre o <b>Gerenciador de Tarefas</b>?'},
+ {id:'prtsc',t:['PrtSc'],d:'Print Screen',f:'Tira foto da tela inteira',p:n=>n+' quer <b>tirar uma foto da tela inteira</b>.'},
+ {id:'start',t:['Win'],d:'Tecla Win',f:'Abre o menu Iniciar',p:n=>n+' quer abrir o <b>menu Iniciar</b> só com o teclado.'}
+];
+const keysC=(ids)=>(r,c)=>{
+  const pool=ids?KEYS_SC.filter(s=>ids.includes(s.id)):KEYS_SC;
+  const s=c.uniq('keys'+(ids?ids.join():''),pool);
+  return{kind:'keys',prompt:s.p(esc(c.first)),time:45,explain:'Atalho correto: <b>'+s.d+'</b> — '+s.f.toLowerCase()+'.',mount(box,done){
+    const sel=new Set();const disp=h('div',{class:'combo'},'toque nas teclas');
+    const upd=()=>{disp.textContent=sel.size?KEYCAPS.filter(k=>sel.has(k)).join(' + '):'toque nas teclas';};
+    const mk=k=>{const b=h('button',{class:'key'+(MODS.includes(k)?' mod':''),onclick:()=>{if(sel.has(k)){sel.delete(k);b.classList.remove('on');}else{sel.add(k);b.classList.add('on');}upd();}},k);return b;};
+    const btn=h('button',{class:'btn primary',onclick:()=>{const ok=sel.size===s.t.length&&s.t.every(k=>sel.has(k));btn.disabled=true;done(ok);}},'Enviar atalho');
+    box.append(disp,h('div',{class:'kb'},['Win','Ctrl','Alt','Shift'].map(mk)),h('div',{class:'kb'},['Tab','Esc','PrtSc'].map(mk)),h('div',{class:'kb'},r.shuffle(['A','C','D','E','I','V','X','Z']).map(mk)),h('div',{class:'actions'},btn));
+  }};
+};
+const matchKeys=(r)=>{
+  const it=r.shuffle(KEYS_SC).slice(0,5);
+  return{kind:'drag',prompt:'Ligue cada <b>função</b> ao <b>atalho</b> certo: arraste o atalho até o que ele faz.',time:85,
+    explain:it.map(s=>'<b>'+s.d+'</b>: '+s.f.toLowerCase()).join('<br>'),
+    mount(box,done){
+      const layout=h('div',{class:'mrows'},it.map(s=>h('div',{class:'mrow'},h('div',{class:'mlabel'},s.f),slot(s.id))));
+      dnd(box,done,layout,poolOf(it.map(s=>chip(s.d,s.id)),r));
+    }};
+};
+const orderCopy=orderC('Prática do Bloco de Notas: coloque em ordem os passos para <b>duplicar um texto</b>.',['Selecionar o texto (Ctrl + A)','Copiar (Ctrl + C)','Clicar onde quer colar','Colar (Ctrl + V)'],70);
+
+/* ================= FASES ================= */
+const PH=[
+ {id:'desk',icon:'🖥️',title:'Fase 1 · Área de Trabalho',short:'Desktop, barra de tarefas e Menu Iniciar',badge:'Explorador do Desktop',ch:[clickDesktop,clickDesktop,bucketDesk,labelStart,orderPin]},
+ {id:'files',icon:'📁',title:'Fase 2 · Arquivos e Pastas',short:'Explorador, caminhos e cuidados',badge:'Arquivista',ch:[pathBuild,treeFind,multiSys,clozePasta,pathBuild]},
+ {id:'win',icon:'🪟',title:'Fase 3 · A Janela',short:'Título, botões, endereço, conteúdo e status',badge:'Mestre das Janelas',ch:[labelWindow,clickWindow,clickWindow,multiGold,clozeJanela]},
+ {id:'cfg',icon:'⚙️',title:'Fase 4 · Configurações',short:'Painel de Controle e Configurações',badge:'Configurador',ch:[bucketCfg,clickCfg,clickCfg,keysC(['settings']),clozeCfg]},
+ {id:'inst',icon:'📦',title:'Fase 5 · Instalar e Remover',short:'Do jeito certo e seguro',badge:'Instalador Seguro',ch:[orderInstall,spotSite,orderRemove,multiRemove,clozeInst]},
+ {id:'acc',icon:'🧰',title:'Fase 6 · Acessórios',short:'Calculadora, Bloco de Notas e cia.',badge:'Faz-Tudo',ch:[matchAcc,typeStart,keysC(['prtsc','explorer']),multiAcc,clozeAcc]},
+ {id:'keys',icon:'⌨️',title:'Fase 7 · Atalhos de Teclado',short:'Win, Alt+Tab, Ctrl+C/V/X/Z…',badge:'Mestre do Atalho',ch:[keysC(),keysC(),keysC(),matchKeys,orderCopy]},
+ {id:'boss',boss:true,icon:'👾',title:'CHEFÃO · Manutenção do Laboratório',short:'7 desafios misturados, tempo apertado. Libera ao concluir 5 fases.',badge:'Chefão Derrotado',ch:[]}
+];
+
+/* ================= TELAS ================= */
+function showLogin(){
+  const name=h('input',{type:'text',id:'nm',placeholder:'Ex.: Maria Souza',autocomplete:'off','aria-label':'Nome completo'});
+  const turma=h('input',{type:'text',id:'tm',placeholder:'Ex.: 2º Info A',autocomplete:'off','aria-label':'Turma'});
+  const err=h('div',{class:'small',style:'color:#e0483b;min-height:20px'});
+  const go=()=>{
+    const n=name.value.trim().replace(/\s+/g,' ');
+    if(n.length<3){err.textContent='Digite seu nome completo para começar.';return;}
+    S={name:n,turma:turma.value.trim(),started:Date.now(),phases:{},attempts:{},stats:{answered:0,correct:0,maxStreak:0,leaves:0,seconds:0}};
+    persist();showMap();
+  };
+  mount('Missão Desktop.exe',h('div',{class:'login'},
+    h('h1',{style:'font-size:32px'},'Missão Desktop'),
+    h('p',{},'Revisão da Aula 03 de Sistemas Operacionais: área de trabalho, arquivos, janelas, configurações, programas e atalhos.'),
+    h('ul',{class:'rules'},
+      h('li',{html:'❤️ Cada fase tem <b>3 vidas</b>. Errou, perdeu uma. Sem vidas, a fase recomeça com <b>questões novas</b>.'}),
+      h('li',{html:'🎲 As questões mudam <b>de aluno para aluno</b> e a cada tentativa. Vale mais entender do que copiar.'}),
+      h('li',{html:'⏱️ Cada desafio tem tempo. Quanto mais rápido e mais acertos seguidos, mais XP.'}),
+      h('li',{html:'🕶️ O jogo registra quantas vezes você sai da página. Jogo limpo dá medalha.'}),
+      h('li',{html:'📸 No fim, abra o <b>Cartão de progresso</b>, tire um print e envie ao professor.'})),
+    h('div',{class:'field'},h('label',{for:'nm'},'Seu nome completo'),name),
+    h('div',{class:'field'},h('label',{for:'tm'},'Turma (opcional)'),turma),
+    err,
+    h('div',{class:'actions'},h('button',{class:'btn primary',onclick:go},'Começar missão ▶')),
+    h('p',{class:'small',style:'margin-top:22px'},'Seu progresso fica salvo só neste navegador. ',h('a',{href:'#',onclick:e=>{e.preventDefault();showProf();}},'Área do professor'))
+  ));
+  name.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+}
+function badgesList(){
+  const P=S.phases;const b=[];
+  PH.forEach(p=>{if(P[p.id]&&P[p.id].done)b.push({i:p.icon,t:p.badge});});
+  if(Object.values(P).some(x=>x.stars===3))b.push({i:'💎',t:'Perfeitão (3 estrelas)'});
+  if(S.stats.maxStreak>=5)b.push({i:'🔥',t:'Combo x5'});
+  if(S.stats.leaves===0&&doneCount()>=3)b.push({i:'🕶️',t:'Jogo limpo'});
+  return b;
+}
+function showMap(){
+  stopTimer();run=null;
+  const tx=totalXP(),lv=level(tx);
+  const pct=lv.next?Math.min(100,Math.round((tx-lv.cur)/(lv.next-lv.cur)*100)):100;
+  const bl=badgesList();
+  const cards=PH.map(p=>{
+    const st=S.phases[p.id];
+    const locked=p.boss&&doneCount(true)<5&&!S.liberarTudo;
+    const b=h('button',{class:'pcard'+(st&&st.done?' done':'')+(locked?' locked':'')+(p.boss?' boss':''),disabled:locked?'disabled':null,onclick:()=>play(p.id)},
+      h('div',{class:'ic'},locked?'🔒':p.icon),h('h3',{},p.title),h('div',{class:'small'},p.short),
+      h('div',{class:'stars'},st&&st.done?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.xp+' XP':(locked?'Complete 5 fases para liberar':'Ainda não jogada')));
+    return b;
+  });
+  mount('Missão Desktop.exe — '+S.name,h('div',{},
+    h('div',{class:'top'},
+      h('div',{},h('div',{class:'small'},'Aluno'),h('h1',{style:'font-size:28px'},S.name)),
+      h('div',{class:'lvl'},h('div',{class:'px'},'Nível: '+lv.name),h('div',{class:'xpbar'},h('i',{style:'width:'+pct+'%'})),h('div',{class:'small'},tx+' XP'+(lv.next?' · próximo nível em '+lv.next+' XP':' · nível máximo!')))),
+    bl.length?h('div',{class:'badges'},bl.map(x=>h('span',{class:'badge'},x.i+' '+x.t))):h('p',{class:'small'},'Nenhuma medalha ainda. Escolha uma fase para começar.'),
+    h('div',{class:'grid'},cards),
+    h('div',{class:'actions'},
+      h('button',{class:'btn warn',onclick:showCard},'📸 Cartão de progresso (enviar print)'),
+      h('button',{class:'btn',onclick:()=>{muted=!muted;showMap();}},muted?'🔇 Som desligado':'🔊 Som ligado'),
+      h('button',{class:'btn',onclick:showProf},'⚙️ Área do professor'),
+      h('button',{class:'btn',onclick:()=>{if(confirm('Trocar de aluno apaga o progresso salvo neste navegador. Continuar?')){try{localStorage.removeItem(LS);}catch(e){}S=null;showLogin();}}},'Trocar aluno'))));
+}
+
+/* ---- motor de jogo ---- */
+let run=null,tmr=null;
+function stopTimer(){if(tmr){clearInterval(tmr);tmr=null;}}
+function play(id){
+  const ph=PH.find(p=>p.id===id);
+  S.attempts[id]=(S.attempts[id]||0)+1;persist();
+  const seed=hash32(S.name.toLowerCase().trim()+'|'+id+'|'+S.attempts[id]);
+  const rr=rng(seed);const used={};
+  const ctx={first:firstName(),uniq(key,list){
+    used[key]=used[key]||[];let av=list.filter(x=>!used[key].includes(x));
+    if(!av.length){used[key]=[];av=list;}
+    const x=rr.pick(av);used[key].push(x);return x;}};
+  const list=ph.boss?rr.shuffle(PH.filter(p=>!p.boss).map(p=>rr.pick(p.ch))):ph.ch.slice();
+  run={ph,seed,ctx,list,total:list.length,i:0,hearts:3,xp:0,streak:0,right:0,missed:[],rem:1};
+  run.stage=h('div',{class:'stage'});
+  run.hE=h('span');run.xE=h('span');run.cE=h('span');
+  run.bar=h('div',{class:'bar-f'});run.tt=h('span',{class:'tt'});
+  run.dots=list.map(()=>h('span',{class:'dot'}));
+  const hud=h('div',{class:'hud'},
+    h('button',{class:'btn sm',onclick:()=>{if(confirm('Sair da fase? O progresso desta tentativa será perdido.')){stopTimer();showMap();}}},'← Mapa'),
+    h('div',{class:'hud-t px'},ph.icon+' '+ph.title),
+    h('div',{class:'hud-r'},run.hE,run.xE,run.cE));
+  mount('Missão Desktop.exe — '+ph.title,h('div',{},hud,h('div',{class:'dots'},run.dots),run.stage));
+  updHud();nextChallenge();
+}
+function updHud(){
+  run.hE.textContent='❤️'.repeat(Math.max(0,run.hearts))+'🖤'.repeat(3-Math.max(0,run.hearts));
+  run.xE.textContent='⭐ '+run.xp+' XP';
+  run.cE.textContent=run.streak>=2?'🔥 x'+run.streak:'';
+}
+function nextChallenge(){
+  const i=run.i;const r=rng(run.seed+i*7919+13);
+  const ch=run.list[i](r,run.ctx);
+  const box=h('div',{class:'chbox'});const fbHost=h('div');
+  run.cur={ch,box,fbHost,answered:false};
+  run.dots.forEach((d,k)=>{if(k===i)d.classList.add('now');else d.classList.remove('now');});
+  run.stage.replaceChildren(
+    h('div',{class:'kind px'},(run.total>1?(i+1)+'/'+run.total+' · ':'')+KIND[ch.kind]),
+    h('div',{class:'prompt',html:ch.prompt}),
+    h('div',{class:'timer'},h('div',{class:'bar'},run.bar),run.tt),
+    box,fbHost);
+  ch.mount(box,(ok,extra)=>answer(ok,extra));
+  startTimer(ch.time*(run.ph.boss?0.8:1));
+}
+function startTimer(sec){
+  stopTimer();run.t0=Date.now();run.dur=sec*1000;run.rem=1;
+  const tick=()=>{
+    const rem=Math.max(0,run.dur-(Date.now()-run.t0));
+    run.rem=rem/run.dur;run.bar.style.width=(run.rem*100)+'%';
+    run.bar.classList.toggle('low',run.rem<.25);run.tt.textContent=Math.ceil(rem/1000)+'s';
+    if(rem<=0){answer(false,null,true);}
+  };
+  tick();tmr=setInterval(tick,200);
+}
+function answer(ok,extra,timeout){
+  const cur=run&&run.cur;if(!cur||cur.answered)return;
+  cur.answered=true;stopTimer();cur.box.classList.add('frozen');
+  let gain=0;S.stats.answered++;
+  if(ok){
+    run.streak++;run.right++;S.stats.correct++;S.stats.maxStreak=Math.max(S.stats.maxStreak,run.streak);
+    gain=100+Math.round(50*run.rem)+Math.min(run.streak-1,5)*10;run.xp+=gain;sfx('ok');
+  }else{run.streak=0;run.hearts--;run.missed.push(cur.ch.explain);sfx('bad');}
+  persist();updHud();
+  run.dots[run.i].className='dot '+(ok?'ok':'bad');
+  const last=run.i+1>=run.total;
+  const fb=h('div',{class:'fb '+(ok?'ok':'bad')},
+    h('div',{class:'fb-h'},ok?'✅ Correto! +'+gain+' XP':(timeout?'⏰ Tempo esgotado':'❌ Não foi dessa vez (−1 vida)')),
+    h('div',{class:'fb-b',html:extra||cur.ch.explain}),
+    h('button',{class:'btn primary',onclick:()=>{if(cur.segue)return;cur.segue=true;run.i++;if(run.hearts<=0)return showResult(false);if(last)return showResult(true);nextChallenge();}},
+      run.hearts<=0?'Ver resultado':(last?'Finalizar fase':'Continuar ▶')));
+  cur.fbHost.append(fb);
+  try{fb.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}
+}
+function showResult(success){
+  stopTimer();const ph=run.ph;const stars=Math.max(0,run.hearts);
+  let extra='';
+  if(success){
+    const prev=S.phases[ph.id]||{stars:0,xp:0};
+    S.phases[ph.id]={done:true,stars:Math.max(prev.stars,stars),xp:Math.max(prev.xp,run.xp)};persist();
+    confetti();
+    extra='Melhor pontuação da fase: '+S.phases[ph.id].xp+' XP · '+'★'.repeat(S.phases[ph.id].stars)+'☆'.repeat(3-S.phases[ph.id].stars);
+  }
+  const missed=run.missed;
+  mount('Missão Desktop.exe — Resultado',h('div',{},
+    h('h1',{style:'font-size:30px'},success?'Fase concluída! 🎉':'Sem vidas 💔'),
+    h('p',{},success?ph.icon+' Medalha: '+ph.badge:'Revise os pontos abaixo e tente de novo. As questões mudam a cada tentativa.'),
+    h('div',{class:'stars',style:'font-size:34px'},success?'★'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆'),
+    h('p',{},'Acertos: '+run.right+' de '+run.total+' · XP desta rodada: '+run.xp),
+    extra?h('p',{class:'small'},extra):null,
+    missed.length?h('div',{class:'review'},h('b',{},'📖 Para revisar na apostila:'),h('ul',{},missed.map(m=>h('li',{html:m})))):null,
+    h('div',{class:'actions'},
+      h('button',{class:'btn primary',onclick:showMap},'Voltar ao mapa'),
+      h('button',{class:'btn',onclick:()=>play(ph.id)},'Jogar de novo (questões novas)'),
+      h('button',{class:'btn warn',onclick:showCard},'📸 Cartão de progresso'))));
+}
+
+/* ---- cartão de progresso (para print) ---- */
+function fmtTime(s){const m=Math.floor(s/60);return m+'min '+String(s%60).padStart(2,'0')+'s';}
+function showCard(){
+  stopTimer();
+  const tx=totalXP(),lv=level(tx),nph=doneCount(),lv2=S.stats.leaves;
+  const acc=S.stats.answered?Math.round(S.stats.correct/S.stats.answered*100):0;
+  const code=verCode(S.name,tx,nph,lv2);
+  const bl=badgesList();
+  const rows=PH.map(p=>{const st=S.phases[p.id];return h('tr',{},h('td',{},p.icon+' '+p.title.replace(/^Fase \d · /,'')),h('td',{},st&&st.done?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars):'—'),h('td',{},st&&st.done?st.xp:'—'),h('td',{},S.attempts[p.id]||0));});
+  const summary='Missão Desktop (Aula 03) — '+S.name+(S.turma?' ('+S.turma+')':'')+' | Nível: '+lv.name+' | XP: '+tx+' | Fases: '+nph+'/'+PH.length+' | Acertos: '+acc+'% | Saídas da página: '+lv2+' | Código: '+code;
+  mount('Missão Desktop.exe — Cartão de progresso',h('div',{},
+    h('div',{class:'cardp'},
+      h('div',{class:'small'},'Sistemas Operacionais · Aula 03 · Área de Trabalho e Aplicativos'),
+      h('h2',{},S.name),
+      h('div',{class:'small'},(S.turma?'Turma: '+S.turma+' · ':'')+new Date().toLocaleString('pt-BR')),
+      h('div',{class:'crow'},
+        h('div',{class:'stat'},'Nível',h('b',{},lv.name)),
+        h('div',{class:'stat'},'XP total',h('b',{},tx)),
+        h('div',{class:'stat'},'Fases concluídas',h('b',{},nph+' / '+PH.length)),
+        h('div',{class:'stat'},'Acertos',h('b',{},acc+'%')),
+        h('div',{class:'stat'},'Tempo de jogo',h('b',{style:'font-size:17px'},fmtTime(S.stats.seconds))),
+        h('div',{class:'stat'},'Saídas da página',h('b',{},lv2))),
+      h('table',{class:'ptab'},h('thead',{},h('tr',{},h('th',{},'Fase'),h('th',{},'Estrelas'),h('th',{},'Melhor XP'),h('th',{},'Tent.'))),h('tbody',{},rows)),
+      h('div',{class:'badges'},bl.length?bl.map(x=>h('span',{class:'badge'},x.i+' '+x.t)):h('span',{class:'small'},'Sem medalhas ainda')),
+      h('div',{style:'margin-top:8px'},h('span',{class:'small'},'Código de verificação: '),h('span',{class:'code'},code))),
+    h('p',{class:'small noprint'},'Tire um print desta tela inteira (Print Screen ou Recortes) e envie ao professor.'),
+    h('div',{class:'actions noprint'},
+      h('button',{class:'btn primary',onclick:showMap},'← Voltar ao mapa'),
+      h('button',{class:'btn',onclick:e=>{try{navigator.clipboard.writeText(summary);e.target.textContent='Copiado ✔';}catch(_){e.target.textContent='Não foi possível copiar';}}},'Copiar resumo em texto'))));
+}
+
+/* ---- área do professor: confere o cartão ---- */
+function h53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+const SENHA_PROF='8570079599154905';
+function libBox(){
+  if(!(S&&S.name))return null;
+  if(S.liberarTudo)return h('div',{class:'prompt'},'🔓 Todas as fases (inclusive o Chefão) estão liberadas neste aparelho. ',
+    h('button',{class:'btn sm',onclick:()=>{S.liberarTudo=false;persist();showProf();}},'Bloquear de novo'));
+  const pw=h('input',{type:'password',id:'pw',autocomplete:'off',placeholder:'Senha do professor'});
+  const err=h('div',{class:'small',style:'color:#e0483b;min-height:20px'});
+  const go=()=>{if(String(h53(pw.value))===SENHA_PROF){S.liberarTudo=true;persist();showMap();}else{err.textContent='Senha incorreta.';pw.value='';pw.focus();}};
+  pw.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  return h('div',{class:'prompt'},h('b',{},'🔒 Liberar todas as fases'),h('p',{class:'small'},'Libera o Chefão neste aparelho sem precisar concluir 5 fases.'),
+    h('div',{class:'field'},pw),err,h('div',{class:'actions'},h('button',{class:'btn primary',onclick:go},'Liberar')));
+}
+function showProf(){
+  const f=(l,id,ph)=>h('div',{class:'field'},h('label',{for:id},l),h('input',{type:'text',id,placeholder:ph||''}));
+  const out=h('div',{class:'prompt'});
+  const chk=()=>{
+    const g=id=>document.getElementById(id).value.trim();
+    const c=verCode(g('pn'),parseInt(g('px'),10)||0,parseInt(g('pf'),10)||0,parseInt(g('ps'),10)||0);
+    const typed=g('pc').toUpperCase();
+    out.textContent=typed===c?'✅ Código confere: o cartão é autêntico.':'❌ Código NÃO confere. Esperado para esses dados: '+c;
+  };
+  mount('Área do professor',h('div',{},
+    libBox(),
+    h('p',{},'Digite os dados exatamente como aparecem no print do aluno e o código de verificação. O nome deve estar igual ao do cartão.'),
+    f('Nome do aluno','pn'),f('XP total','px'),f('Fases concluídas (só o primeiro número, ex.: 6)','pf'),f('Saídas da página','ps'),f('Código (ex.: AB12-CDE)','pc'),
+    h('div',{class:'actions'},h('button',{class:'btn primary',onclick:chk},'Conferir'),h('button',{class:'btn',onclick:()=>S&&S.name?showMap():showLogin()},'Voltar')),out,
+    h('p',{class:'small'},'Dica: o código depende do texto SALT no início do script. Troque por algo só seu antes de publicar e não altere depois, ou os códigos antigos deixam de conferir.')));
+}
+
+/* ---- início ---- */
+if(S&&S.name)showMap();else showLogin();
+})();
+</script>
+</body>
+</html>

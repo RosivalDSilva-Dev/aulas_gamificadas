@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Introdução ao JavaScript</title>
+<meta name="description" content="Treino interativo de JavaScript: client-side, inclusão no HTML, alert/console.log, variáveis e tipos, operadores, prompt/confirm e um programa completo.">
+<style>
+:root{
+  --bg:#e7edf2; --surface:#ffffff; --surface-2:#f3f7fa;
+  --ink:#0f2230; --ink-2:#4a6478; --line:#c6d4de;
+  --primary:#15697f; --primary-d:#0e4c5d; --primary-l:#d8ecf1;
+  --ok:#1f8a4c; --ok-d:#166b3a; --ok-l:#dcf3e5;
+  --bad:#c23b4d; --bad-d:#982b3b; --bad-l:#fae1e4;
+  --gold:#e0900a; --gold-l:#fdf0d4;
+  --r:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1820; --surface:#132633; --surface-2:#0f202b; --ink:#e8f1f6; --ink-2:#9fb6c4;
+    --line:#26404f; --primary:#3aa8c4; --primary-d:#2b8299; --primary-l:#123542;
+    --ok:#3fbf75; --ok-d:#2c8f56; --ok-l:#102e20; --bad:#f0697c; --bad-d:#b84656; --bad-l:#33161c;
+    --gold:#f4b73f; --gold-l:#332611;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI Variable Text","Segoe UI",Roboto,Ubuntu,system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.shell{max-width:560px;margin:0 auto;min-height:100%;padding:0 14px 40px}
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -14px 14px;
+  padding:10px 14px;background:var(--surface);border-bottom:2px solid var(--line);
+  display:flex;align-items:center;gap:10px;
+}
+.topbar .grow{flex:1;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;
+  padding:4px 9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.xp{color:var(--gold);border-color:var(--gold)}
+.pill.hp{color:var(--bad);border-color:var(--bad)}
+.bar{height:12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+.iconbtn{background:none;border:0;padding:6px;border-radius:9px;cursor:pointer;color:var(--ink-2);font-size:20px;line-height:1}
+.iconbtn:hover{background:var(--surface-2)}
+
+h1{font-size:26px;line-height:1.15;letter-spacing:-.02em;margin:.2em 0 .3em;font-weight:700}
+h2{font-size:21px;line-height:1.2;letter-spacing:-.01em;margin:0 0 .4em;font-weight:700}
+h3{font-size:16px;margin:0 0 6px;font-weight:700}
+p{margin:0 0 .8em}
+.sub{color:var(--ink-2);font-size:15px}
+
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.btn{
+  display:block;width:100%;padding:14px 16px;border-radius:var(--r);border:0;
+  background:var(--primary);color:#fff;font-weight:700;font-size:17px;cursor:pointer;
+  box-shadow:0 4px 0 var(--primary-d);margin-bottom:12px;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--primary-d)}
+.btn[disabled]{background:var(--line);color:var(--ink-2);box-shadow:0 4px 0 var(--line);cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--primary);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.ok{background:var(--ok);box-shadow:0 4px 0 var(--ok-d)}
+.btn.small{padding:10px 12px;font-size:15px}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+input[type=text]{
+  width:100%;padding:13px 14px;border-radius:var(--r);border:2px solid var(--line);
+  background:var(--surface-2);color:var(--ink);font-size:17px;font-family:inherit;
+}
+input[type=text]:focus{border-color:var(--primary);outline:none}
+label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
+
+/* ---------- boot ---------- */
+.boot{border:2px solid var(--line);border-radius:var(--r);overflow:hidden;background:#0a1620;margin-bottom:16px}
+.boot .screen{aspect-ratio:16/9;position:relative;background:
+  radial-gradient(120% 90% at 70% 15%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
+.boot .bootline{position:absolute;left:16px;top:16px;color:#8fd4e8;font-size:12px;opacity:0}
+.boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0;padding:0 20px;text-align:center}
+.boot .lg b{color:#eaf6fb;font-size:clamp(18px,5.6vw,27px);letter-spacing:-.02em;line-height:1.25}
+.boot .cursor{display:inline-block;width:9px;height:1.1em;background:#8fd4e8;vertical-align:-2px;margin-left:2px;
+  animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+@keyframes fadein{to{opacity:1}}
+.boot .bootline{animation:fadein .01s .15s forwards}
+.boot .lg{animation:fadein .7s .5s forwards}
+
+/* ---------- mapa de níveis ---------- */
+.trail{display:flex;flex-direction:column;gap:10px}
+.node{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;
+  box-shadow:0 3px 0 var(--line);
+}
+.node:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.node[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.node .glyph{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:var(--primary-l);
+  display:grid;place-items:center;font-size:23px;border:2px solid var(--line)}
+.node.done .glyph{background:var(--ok-l);border-color:var(--ok)}
+.node.boss .glyph{background:var(--gold-l);border-color:var(--gold)}
+.node .t{flex:1;min-width:0}
+.node .t b{display:block;font-size:16px}
+.node .t span{font-size:13px;color:var(--ink-2)}
+.stars{letter-spacing:1px;font-size:14px;color:var(--gold)}
+.stars .off{color:var(--line)}
+
+/* ---------- cena de código ---------- */
+.scene{user-select:none;-webkit-user-select:none;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.scene.code{background:#0d1b24;color:#d7e6ee;font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace;
+  padding:14px 10px;line-height:1.85;font-size:13.5px;border:2px solid var(--line);overflow-x:auto}
+.scene.code .cline{display:flex;gap:10px;white-space:pre;padding:1px 4px;border-radius:6px}
+.scene.code .cno{width:18px;flex:0 0 18px;text-align:right;color:#4f7186;user-select:none}
+.scene.code .ccode{white-space:pre-wrap;word-break:break-word}
+.scene.code .cplain{color:#c7dbe6}
+.scene.code .ctok{cursor:pointer;border-radius:4px;padding:1px 2px;border-bottom:2px dotted #3aa8c4}
+.scene.code .ctok:hover,.scene.code .ctok:active{background:rgba(58,168,196,.22)}
+.zone-hit{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ---------- respostas ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{
+  background:var(--surface);border:2px solid var(--line);border-radius:11px;padding:10px 13px;
+  font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 3px 0 var(--line);
+}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.chip.sel{background:var(--primary-l);border-color:var(--primary);color:var(--primary-d)}
+.chip.used{opacity:.25;pointer-events:none}
+.tray{min-height:54px;border:2px dashed var(--line);border-radius:11px;padding:8px;display:flex;
+  flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;background:var(--surface-2)}
+.tray:empty::after{content:"Toque nas peças abaixo para montar a resposta";color:var(--ink-2);font-size:13px}
+.opt{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;margin-bottom:10px;
+  background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:13px;
+  box-shadow:0 3px 0 var(--line);font-size:16px;
+}
+.opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.opt.sel{background:var(--primary-l);border-color:var(--primary)}
+.opt .mark{width:22px;height:22px;flex:0 0 22px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.sel .mark{background:var(--primary);border-color:var(--primary);color:#fff}
+.slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.slotrow{display:flex;align-items:center;gap:9px}
+.slotrow .nm{flex:0 0 42%;font-weight:700;font-size:13.5px}
+.slot{flex:1;min-height:46px;border:2px dashed var(--line);border-radius:11px;background:var(--surface-2);
+  display:flex;align-items:center;padding:6px 9px;font-size:14px;font-weight:600;cursor:pointer}
+.slot.full{border-style:solid;background:var(--primary-l);border-color:var(--primary)}
+
+/* ---------- feedback ---------- */
+.feed{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  border-top:3px solid;background:var(--surface)}
+.feed.good{background:var(--ok-l);border-color:var(--ok)}
+.feed.bad{background:var(--bad-l);border-color:var(--bad)}
+.feed .inner{max-width:560px;margin:0 auto}
+.feed b{display:block;font-size:17px;margin-bottom:3px}
+.feed.good b{color:var(--ok-d)}.feed.bad b{color:var(--bad-d)}
+.feed p{font-size:15px;margin:0 0 10px}
+.feed .btn{margin:0}
+.spacer{height:150px}
+
+/* ---------- relatório ---------- */
+.skill{margin-bottom:12px}
+.skill .hd{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:4px}
+.skill .hd i{font-style:normal;color:var(--ink-2)}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:20px;letter-spacing:.14em;font-weight:700;color:var(--primary)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.kv:last-child{border:0}
+.kv b{font-weight:700}
+.medal{display:flex;align-items:center;gap:12px;background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:12px;margin-bottom:14px}
+.medal .m{font-size:34px}
+.warn{background:var(--gold-l);border:2px solid var(--gold);border-radius:var(--r);padding:11px;font-size:14px;margin-bottom:14px}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:11px;font-size:14px;color:var(--ink-2)}
+.theory li{margin-bottom:7px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+.timer.low{color:var(--bad)}
+canvas{max-width:100%;height:auto;border:2px solid var(--line);border-radius:var(--r)}
+
+.travado #app{pointer-events:none}
+.pwrow{display:flex;gap:10px;margin-top:10px}
+.pwrow input{flex:1}
+.pwerr{color:var(--bad-d,#b3261e);font-size:14px;min-height:20px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Programação Web I — Aula 01: Introdução ao JavaScript
+   Treino gamificado. Prof. Rosival D. Silva.
+   ============================================================ */
+
+var STORE = "pwi_a01_v1";
+var GAME = {
+  eyebrow: "PWI · Aula 01",
+  titulo: "Introdução ao JavaScript",
+  sub: "Oito níveis de treino sobre os fundamentos do JavaScript, antes da atividade avaliativa.",
+  boot: "carregando o script...",
+  bossUnlock: 8
+};
+var HAB = {"H1": "O que é JavaScript (client-side, diferente de Java)", "H2": "JavaScript vs outras tecnologias (client-side x server-side)", "H3": "Incluir JavaScript no HTML (script interno/externo, boas práticas)", "H4": "Primeiros comandos (alert, console.log, document.write)", "H5": "Variáveis e tipos de dados (let/const/var, tipagem dinâmica, typeof)", "H6": "Operadores em JavaScript (aritméticos, concatenação, atribuição)", "H7": "Entrada de dados (prompt, confirm, conversão de tipos)", "H8": "Programa completo (juntar tudo numa calculadora simples)"};
+var LEVELS = [{"id": 1, "nome": "O que é JavaScript", "glyph": "🌐", "skill": "H1", "teoria": ["JavaScript é uma linguagem leve, <b>interpretada pelo navegador</b>, que deixa páginas web interativas e dinâmicas.", "HTML estrutura o conteúdo, CSS estiliza a aparência, e o <b>JavaScript cuida do comportamento</b> da página.", "JavaScript NÃO é a mesma coisa que Java! Java é compilado e roda numa máquina virtual; JavaScript é interpretado pelo navegador.", "JavaScript é case-sensitive: minhaVar é diferente de minhavar."], "qs": [{"t": "pick", "p": "JavaScript é executado onde?", "opts": ["No navegador do usuário (client-side)", "Só no servidor", "Dentro de uma máquina virtual Java", "No banco de dados"], "ok": 0, "e": "JavaScript roda no navegador, no computador de quem está vendo a página."}, {"t": "multi", "p": "Para que serve o JavaScript numa página? Marque os 3 usos certos.", "opts": ["Reagir a cliques e teclas do usuário", "Validar formulários antes de enviar", "Manipular o HTML e o CSS da página", "Compilar o código numa JVM", "Armazenar arquivos no servidor", "Criar o banco de dados"], "ok": [0, 1, 2], "e": "JS reage a eventos, valida formulários e manipula a página (o DOM). Compilar em JVM e mexer no servidor não são coisas do JS."}, {"t": "type", "p": "JavaScript e Java são a mesma linguagem? Responda sim ou não.", "ac": ["nao"], "e": "São linguagens completamente diferentes, apesar do nome parecido."}, {"t": "pick", "p": "Qual afirmação sobre JavaScript é verdadeira?", "opts": ["É interpretado pelo navegador, não compilado", "É compilado antes de rodar, como o Java", "Precisa de uma JVM para funcionar", "Só roda dentro do servidor"], "ok": 0, "e": "JavaScript é interpretado direto pelo navegador; Java é compilado e roda em máquina virtual."}, {"t": "slots", "p": "Ligue cada ideia à característica certa.", "pairs": [["JavaScript", "interpretado pelo navegador, tipos dinâmicos"], ["Java", "compilado, executado em máquina virtual"], ["minhaVar e minhavar", "são variáveis diferentes (case-sensitive)"]], "e": "São mundos diferentes, apesar do nome parecido — e JS sempre diferencia maiúsculas de minúsculas."}, {"t": "pick", "p": "minhaVar e minhavar são a mesma variável em JavaScript?", "opts": ["Não, JS é case-sensitive (maiúsculas e minúsculas importam)", "Sim, são iguais", "Só se usar var", "Depende do navegador"], "ok": 0, "e": "JavaScript diferencia maiúsculas de minúsculas: são duas variáveis diferentes."}, {"t": "type", "p": "JavaScript é responsável pelo _________ da página (o HTML estrutura, o CSS estiliza, e o JS cuida do quê?)", "ac": ["comportamento"], "e": "JavaScript controla o comportamento: reações, cálculos e interatividade."}]}, {"id": 2, "nome": "Client-side vs Server-side", "glyph": "🔀", "skill": "H2", "teoria": ["<b>Client-side</b>: código que roda no navegador do usuário (JavaScript). É rápido e não precisa recarregar a página.", "<b>Server-side</b>: código que roda no servidor (PHP, Python, Java, entre outros). Tem acesso direto a bancos de dados.", "Quando você acessa um site: o navegador pede a página ao servidor, o servidor processa e devolve o HTML, e então o JavaScript roda no seu computador."], "qs": [{"t": "pick", "p": "Onde o JavaScript executa?", "opts": ["No navegador (client-side)", "No servidor (server-side)", "Nos dois ao mesmo tempo", "Em nenhum: ele só é lido"], "ok": 0, "e": "JavaScript é uma linguagem client-side: executa no navegador."}, {"t": "pick", "p": "PHP e Python, no contexto de páginas web, são exemplos de tecnologias...", "opts": ["Server-side", "Client-side", "Que rodam só no navegador", "Que substituem o HTML"], "ok": 0, "e": "PHP e Python normalmente processam a página no servidor, antes de ela chegar ao navegador."}, {"t": "multi", "p": "Marque as vantagens do client-side (JavaScript no navegador).", "opts": ["É rápido, sem precisar recarregar a página", "Tem acesso direto ao banco de dados do servidor", "Reage a cliques e eventos na hora", "É sempre mais seguro que o servidor"], "ok": [0, 2], "e": "Acesso a banco de dados é coisa de server-side, não de client-side."}, {"t": "slots", "p": "Ligue cada tecnologia ao lado em que ela normalmente roda.", "pairs": [["JavaScript", "Client-side"], ["PHP", "Server-side"], ["Python", "Server-side"]], "e": "JavaScript roda no navegador; PHP e Python costumam rodar no servidor."}, {"t": "order", "p": "Ordene o caminho de uma requisição de página, do início ao fim.", "items": ["Navegador pede a página (GET)", "Servidor executa o script (PHP, por exemplo)", "Servidor devolve o HTML pronto", "Navegador executa o JavaScript da página"], "e": "Primeiro o pedido, depois o processamento no servidor, a resposta em HTML, e só então o JavaScript roda no navegador."}, {"t": "pick", "p": "Para acessar diretamente um banco de dados, normalmente você usa...", "opts": ["Uma linguagem server-side, como PHP", "JavaScript no navegador", "Só HTML", "Só CSS"], "ok": 0, "e": "O acesso ao banco de dados costuma ficar do lado do servidor, por segurança e organização."}]}, {"id": 3, "nome": "JavaScript no HTML", "glyph": "📄", "skill": "H3", "teoria": ["Existem duas formas de incluir JavaScript numa página: <b>interno</b> (dentro da tag &lt;script&gt;, no próprio HTML) e <b>externo</b> (arquivo .js separado, referenciado pelo HTML).", "Boa prática: sempre que possível, use arquivo .js separado. Isso mantém conteúdo (HTML), aparência (CSS) e comportamento (JS) organizados.", "A tag &lt;script&gt; pode ficar no &lt;head&gt; ou no fim do &lt;body&gt;. A prática moderna recomenda colocá-la antes do fechamento de &lt;/body&gt;, para não travar o carregamento da página."], "qs": [{"t": "pick", "p": "Qual tag inclui JavaScript dentro de uma página HTML?", "opts": ["<script>", "<js>", "<style>", "<code>"], "ok": 0, "e": "A tag <script> é usada tanto para JS interno quanto para referenciar um arquivo externo."}, {"t": "hot", "skill": "H3", "rows": ["<html>", "<head><title>Pagina</title></head>", "<body>", "  [[tag|<script>alert(\"Ola!\");<\/script>]]", "</body></html>"], "p": "Toque no trecho que contém o código JavaScript interno.", "ok": ["tag"], "e": "O JavaScript interno fica dentro da própria tag <script>, no meio do arquivo HTML."}, {"t": "type", "p": "Qual é a extensão de um arquivo JavaScript externo?", "ac": [".js", "js"], "e": "Arquivos JavaScript externos usam a extensão .js."}, {"t": "pick", "p": "Qual é a boa prática recomendada pela apostila?", "opts": ["Colocar o JavaScript num arquivo .js separado", "Sempre escrever JS dentro da tag <style>", "Nunca usar a tag <script>", "Escrever todo o JS em letras maiúsculas"], "ok": 0, "e": "Separar o JS num arquivo .js mantém conteúdo, aparência e comportamento organizados."}, {"t": "multi", "p": "Sobre incluir JavaScript no HTML, marque as afirmações certas.", "opts": ["Pode ser interno (dentro do HTML) ou externo (arquivo .js)", "A tag <script> pode ir no <head> ou perto do fim do <body>", "JS externo é referenciado com <script src=\"arquivo.js\"><\/script>", "JavaScript só funciona se estiver dentro do <head>"], "ok": [0, 1, 2], "e": "O <script> pode ficar em vários lugares; a última opção é falsa: ele funciona também perto do fim do <body> (aliás, é o recomendado)."}, {"t": "hot", "skill": "H3", "rows": ["<head>", "  [[head|<script src=\"a.js\"><\/script>]]", "</head>", "<body>", "  ...conteudo da pagina...", "  [[body|<script src=\"a.js\"><\/script>]]", "</body>"], "p": "A prática moderna recomenda colocar o <script> em qual lugar? Toque nele.", "ok": ["body"], "e": "Colocar o <script> perto do fim do <body> evita bloquear o carregamento do resto da página."}, {"t": "pick", "p": "No JavaScript externo, o código fica...", "opts": ["Num arquivo .js separado, referenciado pelo HTML", "Dentro da tag <style>", "Escondido nos comentários do HTML", "Só existe JavaScript interno"], "ok": 0, "e": "JavaScript externo vive num arquivo .js à parte, ligado ao HTML pelo atributo src."}]}, {"id": 4, "nome": "Primeiros comandos", "glyph": "💬", "skill": "H4", "teoria": ["<b>alert()</b> exibe uma janela de diálogo com uma mensagem para o usuário.", "<b>console.log()</b> exibe mensagens no console do navegador (F12 &gt; Console), útil para depuração.", "<b>document.write()</b> escreve texto direto no HTML — mas, se usado depois que a página já carregou, ele substitui TODO o conteúdo da página. Use com cuidado."], "qs": [{"t": "pick", "p": "Qual comando mostra uma janela de mensagem (pop-up) para o usuário?", "opts": ["alert()", "console.log()", "let()", "if()"], "ok": 0, "e": "alert() abre uma caixa de diálogo visível ao usuário."}, {"t": "pick", "p": "Qual comando exibe mensagens só no console do navegador (F12), sem aparecer para o usuário final?", "opts": ["console.log()", "alert()", "document.write()", "prompt()"], "ok": 0, "e": "console.log() é uma ferramenta de depuração, invisível para quem só está usando o site."}, {"t": "type", "p": "Qual comando escreve texto diretamente no HTML da página, como em algo(\"Oi\")? Escreva o nome do comando.", "ac": ["document.write", "document.write()"], "e": "document.write() escreve texto direto no corpo da página."}, {"t": "pick", "p": "Por que devemos ter cuidado com document.write() depois que a página já carregou?", "opts": ["Porque ele substitui TODO o conteúdo da página", "Porque ele apaga o CSS do site", "Porque ele é mais lento que alert()", "Porque ele não funciona em nenhum navegador"], "ok": 0, "e": "Usado após o carregamento, document.write() apaga e substitui a página inteira."}, {"t": "hot", "skill": "H4", "rows": ["[[a|alert(\"Bem-vindo!\");]]", "console.log(\"Depuracao\");", "let x = 10;"], "p": "Toque na linha que abre uma janela de mensagem para o usuário.", "ok": ["a"], "e": "alert() é o comando que abre a janela pop-up visível ao usuário."}, {"t": "multi", "p": "Marque os comandos usados para EXIBIR alguma coisa (para o usuário ou para quem está depurando).", "opts": ["alert()", "console.log()", "document.write()", "let", "if"], "ok": [0, 1, 2], "e": "let declara variável e if é uma decisão — nenhum dos dois exibe uma mensagem sozinho."}, {"t": "type", "p": "No DevTools do navegador, em qual aba você vê as mensagens do console.log()? (F12 e a aba ______)", "ac": ["console"], "e": "A aba Console mostra tudo que é passado para console.log()."}]}, {"id": 5, "nome": "Variáveis e tipos", "glyph": "🧬", "skill": "H5", "teoria": ["Variáveis podem ser declaradas com <b>var</b> (forma antiga, evitar), <b>let</b> (forma moderna, pode reatribuir) ou <b>const</b> (constante, não pode reatribuir).", "JavaScript tem tipagem dinâmica: o tipo é determinado automaticamente pelo valor, sem precisar declarar.", "typeof mostra o tipo: \"string\", \"number\", \"boolean\", \"undefined\"... e, por um erro histórico da linguagem, typeof null devolve \"object\"."], "qs": [{"t": "pick", "p": "Qual palavra-chave é a forma MODERNA de declarar uma variável que pode ser reatribuída depois?", "opts": ["let", "const", "int", "string"], "ok": 0, "e": "let é a forma moderna e recomendada para variáveis que mudam de valor."}, {"t": "pick", "p": "Qual palavra-chave declara uma CONSTANTE, que não pode ser reatribuída?", "opts": ["const", "let", "var", "null"], "ok": 0, "e": "const trava o valor: depois de declarado, não pode ser reatribuído."}, {"t": "type", "p": "let idade = 17; console.log(typeof idade); // o que aparece?", "ac": ["number"], "e": "17 é um número, então typeof devolve \"number\"."}, {"t": "type", "p": "let nome = \"Maria\"; console.log(typeof nome); // o que aparece?", "ac": ["string"], "e": "\"Maria\" é texto, então typeof devolve \"string\"."}, {"t": "type", "p": "let aprovado = true; console.log(typeof aprovado); // o que aparece?", "ac": ["boolean"], "e": "true é um valor lógico, então typeof devolve \"boolean\"."}, {"t": "pick", "p": "Uma variável declarada mas sem valor (let endereco;) tem o tipo...", "opts": ["undefined", "null", "number", "string"], "ok": 0, "e": "Sem valor atribuído, a variável fica undefined."}, {"t": "pick", "p": "Qual é o \"erro histórico\" da linguagem, citado na apostila, sobre o typeof null?", "opts": ["typeof null devolve \"object\"", "typeof null devolve \"null\"", "null não existe em JavaScript", "null é igual a 0"], "ok": 0, "e": "Por um erro antigo de implementação, typeof null devolve \"object\", mesmo null não sendo um objeto de verdade."}, {"t": "multi", "p": "Sobre nomes de variáveis em JavaScript, marque as regras certas.", "opts": ["Devem começar com letra, _ ou $", "Podem conter espaços", "São case-sensitive (nome é diferente de Nome)", "Podem ser uma palavra reservada, como \"if\""], "ok": [0, 2], "e": "Nomes não podem ter espaços nem ser palavras reservadas da linguagem."}, {"t": "hot", "skill": "H5", "rows": ["var nome = \"Joao\";   // [[old|forma antiga, evitar]]", "let idade = 17;   // forma moderna"], "p": "Toque na parte que indica a forma que deve ser evitada hoje em dia.", "ok": ["old"], "e": "var é a forma antiga; a apostila recomenda usar let (ou const) no lugar."}]}, {"id": 6, "nome": "Operadores em JavaScript", "glyph": "➗", "skill": "H6", "teoria": ["Operadores aritméticos: + - * / % e também <b>**</b> (exponenciação). Exemplo: 2 ** 3 = 8.", "O operador <b>+</b> também serve para <b>concatenar</b> (juntar) textos: \"Ana\" + \" \" + \"Silva\" = \"Ana Silva\".", "Os operadores de atribuição (+=, -=, *=, /=) funcionam igual ao que você já viu em outras linguagens."], "qs": [{"t": "type", "p": "2 ** 3 = ? (exponenciação)", "ac": ["8"], "e": "** eleva a potência: 2 elevado a 3 é 8."}, {"t": "type", "p": "10 % 3 = ?", "ac": ["1"], "e": "10 dividido por 3 dá 3, resto 1."}, {"t": "type", "p": "let a = \"Ana\"; let b = \"Silva\"; let nome = a + \" \" + b; // valor de nome?", "ac": ["ana silva"], "e": "O + concatena os textos com o espaço no meio: \"Ana Silva\"."}, {"t": "pick", "p": "Em JavaScript, o operador + também serve para...", "opts": ["Concatenar (juntar) textos", "Comparar dois valores", "Criar uma função", "Declarar uma variável"], "ok": 0, "e": "Quando usado com strings, + junta os textos em vez de somar números."}, {"t": "hot", "skill": "H6", "rows": ["let nome = \"Joao\";", "console.log(\"Ola, \" [[c|+ nome]] + \"!\");"], "p": "Toque na parte que faz a concatenação (junção) do texto com o valor da variável.", "ok": ["c"], "e": "+ nome junta o texto \"Ola, \" com o conteúdo da variável nome."}, {"t": "multi", "p": "Marque os operadores de atribuição válidos em JavaScript.", "opts": ["+=", "-=", "*=", "/=", "=="], "ok": [0, 1, 2, 3], "e": "== é de comparação, não de atribuição."}, {"t": "type", "p": "let x = 5; x++; Qual o valor de x depois?", "ac": ["6"], "e": "x++ soma 1 a x: 5 + 1 = 6."}, {"t": "pick", "p": "Qual é a principal diferença entre 10 / 3 em JavaScript e 10 / 3 em Java (com dois int)?", "opts": ["Em JS o resultado vem com casas decimais; em Java (int/int) o resultado é truncado", "Em JS o resultado é sempre 0", "Em Java o resultado sempre tem casas decimais", "Não existe diferença nenhuma"], "ok": 0, "e": "JavaScript não distingue int de double como o Java: a divisão sempre traz as casas decimais."}]}, {"id": 7, "nome": "Entrada de dados", "glyph": "⌨️", "skill": "H7", "teoria": ["<b>prompt()</b> abre uma caixa com um campo de texto para o usuário digitar algo. O valor retornado é SEMPRE uma string.", "<b>confirm()</b> abre uma caixa com os botões OK e Cancelar, e retorna true ou false.", "Como prompt() sempre devolve texto, para calcular com o valor digitado é preciso converter com <b>Number()</b> ou <b>parseInt()</b>."], "qs": [{"t": "pick", "p": "O que o comando prompt() sempre retorna, mesmo se o usuário digitar só números?", "opts": ["Uma string (texto)", "Um número", "Um valor booleano", "Nada, só mostra a mensagem"], "ok": 0, "e": "prompt() sempre devolve uma string, seja lá o que o usuário digitar."}, {"t": "pick", "p": "O comando confirm() retorna qual tipo de valor?", "opts": ["Boolean: true ou false", "String", "Number", "Undefined"], "ok": 0, "e": "confirm() devolve true (OK) ou false (Cancelar)."}, {"t": "pick", "p": "Por que costumamos escrever Number(prompt(...)) em vez de só prompt(...)?", "opts": ["Porque prompt() sempre devolve texto, e precisamos de um número para calcular", "Porque prompt() não funciona sem Number()", "Porque Number() é quem abre a caixa de diálogo", "Porque é uma regra obrigatória de sintaxe do JavaScript"], "ok": 0, "e": "Number() converte o texto digitado em número, para que se possa somar, subtrair etc."}, {"t": "hot", "skill": "H7", "rows": ["let resposta = confirm(\"Voce gosta de programar?\");", "if [[cond|(resposta)]] {", "  console.log(\"Que bom!\");", "} else {", "  console.log(\"Que pena!\");", "}"], "p": "Toque na parte que é testada pelo if.", "ok": ["cond"], "e": "O if testa diretamente o valor de resposta, que já é um boolean (true ou false)."}, {"t": "multi", "p": "Marque as afirmações certas sobre prompt() e confirm().", "opts": ["prompt() mostra uma caixa com campo de texto", "confirm() mostra os botões OK e Cancelar", "prompt() sempre retorna uma string", "confirm() retorna um número"], "ok": [0, 1, 2], "e": "confirm() retorna um boolean, não um número."}, {"t": "type", "p": "Qual função converte um texto em número, como em Number(prompt(...))? Escreva o nome dela.", "ac": ["number"], "e": "Number() é a função de conversão usada no exemplo."}, {"t": "order", "mono": true, "p": "Monte o programa que lê um número e mostra o dobro dele.", "items": ["let n = Number(prompt(\"Digite um numero:\"));", "let dobro = n * 2;", "alert(\"O dobro e \" + dobro);"], "extra": ["let dobro = n / 2;", "console.log(n);"], "e": "Primeiro lê e converte o número, depois calcula o dobro, e por fim mostra o resultado."}]}, {"id": 8, "nome": "Programa completo", "glyph": "🧮", "skill": "H8", "teoria": ["Um programa simples de entrada e saída segue a ordem: ler dado com prompt() → calcular → mostrar o resultado com alert().", "Exemplo da apostila: a calculadora de idade lê o ano de nascimento, calcula a idade e mostra numa mensagem."], "qs": [{"t": "order", "mono": true, "p": "Monte a Calculadora de Idade na ordem certa.", "items": ["let anoNascimento = Number(prompt(\"Em que ano voce nasceu?\"));", "let anoAtual = 2026;", "let idade = anoAtual - anoNascimento;", "alert(\"Voce tem \" + idade + \" anos!\");"], "extra": ["let idade = anoNascimento - anoAtual;", "console.log(idade);"], "e": "Primeiro lê e converte o ano, depois fixa o ano atual, calcula a diferença e por fim mostra a mensagem."}, {"t": "type", "p": "Na calculadora de idade, se anoAtual = 2026 e anoNascimento = 2010, qual o valor de idade?", "ac": ["16"], "e": "2026 - 2010 = 16."}, {"t": "hot", "skill": "H8", "rows": ["let anoNascimento = [[conv|Number(prompt(\"Em que ano voce nasceu?\"))]];", "let anoAtual = 2026;", "let idade = anoAtual - anoNascimento;", "alert(\"Voce tem \" + idade + \" anos!\");"], "p": "Toque na parte que converte o texto digitado em número.", "ok": ["conv"], "e": "Number() é quem transforma a string devolvida pelo prompt() num número utilizável na conta."}, {"t": "multi", "p": "Marque o que é verdade sobre JavaScript, revisando toda a aula.", "opts": ["É client-side e interpretado pelo navegador", "let e const são formas modernas de declarar variáveis", "O operador + também concatena textos", "prompt() sempre retorna um número pronto para calcular", "alert() mostra uma mensagem numa janela pop-up"], "ok": [0, 1, 2, 4], "e": "prompt() sempre devolve texto (string) — é preciso converter com Number() antes de calcular."}, {"t": "pick", "p": "Qual é a ordem certa de um programa simples de entrada e saída em JavaScript?", "opts": ["Ler dado com prompt() → calcular → mostrar com alert()", "Mostrar com alert() → ler com prompt() → calcular", "Calcular → ler com prompt() → mostrar", "Não existe uma ordem: tanto faz"], "ok": 0, "e": "Primeiro entra o dado, depois processa, e só então mostra o resultado."}, {"t": "type", "p": "Complete a mensagem final do programa: alert(\"Voce tem \" + idade + \" ____\");", "ac": ["anos"], "e": "A mensagem final da calculadora de idade termina em \"anos!\"."}]}, {"id": 9, "nome": "Desafio final", "glyph": "🏆", "skill": "MIX", "boss": true, "timer": 30, "hearts": 3, "teoria": ["Vale tudo o que você treinou nos 8 níveis. Cada questão tem 30 segundos e você só tem 3 vidas.", "Terminando aqui, o relatório com as suas habilidades fica pronto para enviar ao professor."], "qs": [{"t": "pick", "skill": "H1", "p": "JavaScript roda onde?", "opts": ["No navegador (client-side)", "No servidor", "Numa máquina virtual Java", "No banco de dados"], "ok": 0, "e": "JavaScript é interpretado pelo navegador do usuário."}, {"t": "order", "skill": "H2", "p": "Ordene o caminho de uma requisição de página.", "items": ["Navegador pede a página", "Servidor executa o script", "Servidor devolve o HTML", "Navegador roda o JavaScript"], "e": "Pedido, processamento no servidor, resposta em HTML, e só então o JS roda no navegador."}, {"t": "pick", "skill": "H3", "p": "Onde deve ficar o <script>, pela prática moderna?", "opts": ["Perto do fim do <body>", "No meio da tag <title>", "Dentro do CSS", "Não pode usar <script>"], "ok": 0, "e": "Colocar perto do fim do <body> evita travar o carregamento da página."}, {"t": "hot", "skill": "H4", "rows": ["[[a|alert(\"Oi!\");]]", "console.log(\"debug\");"], "p": "Toque na linha que abre uma janela de mensagem para o usuário.", "ok": ["a"], "e": "alert() é o comando que mostra a janela pop-up."}, {"t": "type", "skill": "H5", "p": "let x = 10; console.log(typeof x); // resultado?", "ac": ["number"], "e": "10 é um número, então typeof devolve \"number\"."}, {"t": "type", "skill": "H6", "p": "\"Ana\" + \" \" + \"Silva\" resulta em?", "ac": ["ana silva"], "e": "O + concatena os três textos, formando \"Ana Silva\"."}, {"t": "pick", "skill": "H7", "p": "prompt() sempre retorna...", "opts": ["Uma string (texto)", "Um número", "Um boolean", "Nada"], "ok": 0, "e": "O retorno de prompt() é sempre texto, mesmo digitando números."}, {"t": "type", "skill": "H8", "p": "anoAtual = 2026, anoNascimento = 2005. Valor de idade?", "ac": ["21"], "e": "2026 - 2005 = 21."}, {"t": "multi", "skill": "H1", "p": "Marque o que é verdade sobre JavaScript.", "opts": ["É interpretado pelo navegador", "É a mesma linguagem que Java", "É case-sensitive", "Serve para reagir a cliques e eventos"], "ok": [0, 2, 3], "e": "JavaScript e Java são linguagens diferentes, apesar do nome parecido."}]}];
+
+/* ---------- cena de código ---------- */
+function codeRow(n, raw){
+  var re=/\[\[([^|]+)\|([^\]]+)\]\]/g;
+  var out="",last=0,m;
+  while((m=re.exec(raw))){
+    out+= raw.slice(last,m.index).length? '<span class="cplain">'+esc(raw.slice(last,m.index))+'</span>':'';
+    out+= '<span class="ctok" data-zone="'+m[1]+'">'+esc(m[2])+'</span>';
+    last=re.lastIndex;
+  }
+  var rest=raw.slice(last);
+  if(rest.length)out+= '<span class="cplain">'+esc(rest)+'</span>';
+  return '<div class="cline"><span class="cno">'+(n!=null?n:'')+'</span><span class="ccode">'+out+'</span></div>';
+}
+function sCode(rows){
+  return '<div class="scene code">'+rows.map(function(l,i){
+    if(Array.isArray(l))return codeRow(l[0],l[1]);
+    return codeRow(i+1,l);
+  }).join('')+'</div>';
+}
+
+/* ---------- estado ---------- */
+var S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};
+function load(){
+  try{var r=localStorage.getItem(STORE);if(r){var d=JSON.parse(r);for(var k in d)S[k]=d[k];}}catch(e){}
+}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){}}
+
+/* ---------- utilidades ---------- */
+function $(s,c){return (c||document).querySelector(s);}
+function el(h){var d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function norm(s){return String(s).toLowerCase().replace(/,/g,".").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9. ]/g," ").replace(/\s+/g," ").trim();}
+function limpaResp(v){
+  v=norm(v);var r=/^(aparece|apareceria|imprime|imprimiria|imprimiu|mostra|escreve|sera|seria|resulta em|resultado|o resultado e|o resultado seria|a resposta e|resposta|e|eh|fica|vai imprimir|vai aparecer|o|a|um|uma)\s+/;
+  var ant;do{ant=v;v=v.replace(r,"");}while(v!==ant&&v.length>1);
+  return v;
+}
+function totalEstrelas(){var t=0;for(var k in S.niveis)t+=S.niveis[k].estrelas||0;return t;}
+function concluidos(){var n=0;for(var k in S.niveis)if(S.niveis[k].estrelas>0)n++;return n;}
+function nRegulares(){return LEVELS.filter(function(l){return !l.boss;}).length;}
+function desbloqueado(i){
+  if(i===0||S.liberarTudo)return true;
+  var lv=LEVELS[i];
+  if(lv.boss)return concluidos()>=GAME.bossUnlock;
+  return !!(S.niveis[LEVELS[i-1].id]&&S.niveis[LEVELS[i-1].id].estrelas>0);
+}
+function fmtTempo(ms){var s=Math.round(ms/1000);var m=Math.floor(s/60);return m+" min "+(s%60)+"s";}
+
+var tick=null;
+function iniciarRelogio(){
+  if(tick)return;
+  tick=setInterval(function(){ if(!document.hidden){S.tempo=(S.tempo||0)+1000;} },1000);
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden&&jogo){S.saidas=(S.saidas||0)+1;save();}
+});
+
+/* ============================================================ TELAS ============================================================ */
+var app=document.getElementById("app");
+var jogo=null;
+
+function topo(extra){return '<div class="topbar">'+(extra||"")+'</div>';}
+
+function telaInicio(){
+  jogo=null;
+  var temProg=!!S.nome;
+  var totalNv=LEVELS.length;
+  app.innerHTML=
+   '<div style="height:14px"></div>'+
+   '<div class="boot"><div class="screen">'+
+     '<div class="bootline mono">'+esc(GAME.boot)+'<span class="cursor"></span></div>'+
+     '<div class="lg"><b>'+GAME.eyebrow+'</b></div>'+
+   '</div></div>'+
+   '<h1>'+GAME.titulo+'</h1>'+
+   '<p class="sub">'+GAME.sub+' Dá para parar no meio e continuar depois — o progresso fica salvo neste aparelho.</p>'+
+   (temProg?
+     '<div class="card"><h3>Continuar como '+esc(S.nome)+'</h3>'+
+      '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de '+totalNv+' níveis · '+S.xp+' XP</p>'+
+      '<button class="btn" id="go">Continuar</button>'+
+      '<button class="btn ghost small" id="trocar">Trocar de aluno</button></div>'
+     :
+     '<div class="card">'+
+      '<label class="f" for="nm">Seu nome completo</label>'+
+      '<input type="text" id="nm" autocomplete="name" placeholder="Nome e sobrenome">'+
+      '<div style="height:10px"></div>'+
+      '<label class="f" for="tm">Turma</label>'+
+      '<input type="text" id="tm" placeholder="Ex.: 2º ano — Informática">'+
+      '<div style="height:14px"></div>'+
+      '<button class="btn" id="start">Começar</button></div>')+
+   '<div class="note">O relatório final registra o seu nome, o tempo de estudo e quantas vezes a página foi deixada de lado durante as questões. Resolva sozinho: o objetivo é chegar na prova sabendo.</div>';
+
+  if(temProg){
+    $("#go").onclick=function(){S.sessoes=(S.sessoes||0)+1;save();telaMapa();};
+    $("#trocar").onclick=function(){
+      if(confirm("Isto apaga o progresso salvo neste aparelho. Continuar?")){
+        S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};save();telaInicio();
+      }};
+  }else{
+    $("#start").onclick=function(){
+      var n=$("#nm").value.trim(),t=$("#tm").value.trim();
+      if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}
+      S.nome=n;S.turma=t;S.inicio=Date.now();S.sessoes=1;save();telaMapa();
+    };
+  }
+}
+
+function telaMapa(){
+  jogo=null;iniciarRelogio();
+  var feitos=concluidos(),totalNv=LEVELS.length,totalEst=totalNv*3;
+  var h=topo(
+    '<div class="grow"><b style="font-size:15px">'+esc(S.nome.split(" ")[0])+'</b>'+
+    '<div class="bar" style="margin-top:5px"><i style="width:'+Math.round(feitos/totalNv*100)+'%"></i></div></div>'+
+    '<span class="pill xp">★ '+S.xp+' XP</span>'+
+    '<button class="iconbtn" id="rep" title="Relatório">📋</button>'+
+    '<button class="iconbtn" id="cfg" title="Área do professor">⚙️</button>')+
+   '<h2>'+GAME.titulo+'</h2>'+
+   '<p class="sub" style="margin-bottom:14px">'+feitos+' de '+totalNv+' níveis concluídos · '+totalEstrelas()+' de '+totalEst+' estrelas</p>'+
+   '<div class="trail">';
+
+  LEVELS.forEach(function(lv,i){
+    var st=S.niveis[lv.id],ok=desbloqueado(i),e=st?st.estrelas:0;
+    var estrelas="";for(var k=1;k<=3;k++)estrelas+= (k<=e?'<span>★</span>':'<span class="off">★</span>');
+    h+='<button class="node'+(e?" done":"")+(lv.boss?" boss":"")+'" data-i="'+i+'"'+(ok?"":" disabled")+'>'+
+       '<span class="glyph">'+(ok?lv.glyph:"🔒")+'</span>'+
+       '<span class="t"><b>'+esc(lv.nome)+'</b><span>'+
+         (ok?(st?("melhor: "+st.pct+"% · "+lv.qs.length+" questões"):(lv.qs.length+" questões")):(lv.boss?("conclua os "+GAME.bossUnlock+" níveis"):"conclua o nível anterior"))+
+       '</span></span>'+
+       '<span class="stars">'+estrelas+'</span></button>';
+  });
+  h+='</div><div style="height:16px"></div>'+
+     '<button class="btn ghost" id="rep2">Ver meu relatório</button>';
+  app.innerHTML=h;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".node"),function(b){
+    b.onclick=function(){telaTeoria(LEVELS[+b.dataset.i]);};
+  });
+  $("#rep").onclick=$("#rep2").onclick=function(){telaRelatorio();};
+  $("#cfg").onclick=telaConfig;
+  window.scrollTo(0,0);
+}
+
+/* --- area do professor (senha) --- */
+function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+var SENHA_PROF="8570079599154905";
+function telaConfig(){
+  jogo=null;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Área do professor</b></div>');
+  if(S.liberarTudo){
+    h+='<div class="card"><h3>🔓 Todas as fases liberadas</h3>'+
+       '<p class="sub">Neste aparelho, todos os níveis da trilha (inclusive o desafio final) estão abertos.</p>'+
+       '<button class="btn ghost small" id="trancar">Bloquear de novo</button></div>';
+  }else{
+    h+='<div class="card"><h3>🔒 Liberar todas as fases</h3>'+
+       '<p class="sub">Uso do professor: libera todos os níveis desta trilha neste aparelho, sem precisar concluir os anteriores.</p>'+
+       '<div class="pwrow"><input type="password" id="pw" autocomplete="off" placeholder="Senha do professor">'+
+       '<button class="btn" id="lib" style="width:auto;margin:0">Liberar</button></div>'+
+       '<div class="pwerr" id="pwerr"></div></div>';
+  }
+  h+='<button class="btn ghost" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  if(S.liberarTudo){
+    $("#trancar").onclick=function(){S.liberarTudo=false;save();telaMapa();};
+  }else{
+    var pw=$("#pw");
+    var tenta=function(){
+      if(String(h53(pw.value))===SENHA_PROF){S.liberarTudo=true;save();telaMapa();}
+      else{$("#pwerr").textContent="Senha incorreta.";pw.value="";pw.focus();}
+    };
+    $("#lib").onclick=tenta;
+    pw.addEventListener("keydown",function(e){if(e.key==="Enter")tenta();});
+    setTimeout(function(){pw.focus();},100);
+  }
+  window.scrollTo(0,0);
+}
+
+function telaTeoria(lv){
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+   '<div class="card"><h2>'+lv.glyph+' Antes de jogar</h2><ul class="theory" style="padding-left:20px;margin:0">'+
+   lv.teoria.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul></div>'+
+   '<button class="btn" id="ir">Começar o nível</button>'+
+   '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#ir").onclick=function(){iniciarNivel(lv);};
+  window.scrollTo(0,0);
+}
+
+/* ============================================================ MOTOR DO NÍVEL ============================================================ */
+function iniciarNivel(lv){
+  limparVistos(lv);
+  jogo={lv:lv,fila:shuffle(lv.qs),idx:0,vidas:(lv.hearts||5),total:lv.qs.length,
+        acertosPrimeira:0,respondidas:0,hab:{},tempoIni:Date.now()};
+  proxima();
+}
+function regHab(q,acertou){
+  var s=q.skill||jogo.lv.skill;
+  if(!jogo.hab[s])jogo.hab[s]={c:0,t:0};
+  jogo.hab[s].t++;if(acertou)jogo.hab[s].c++;
+}
+function proxima(){
+  if(jogo.idx>=jogo.fila.length){fimNivel(true);return;}
+  render(jogo.fila[jogo.idx]);
+}
+
+var cron=null;
+function render(q){
+  if(cron){clearInterval(cron);cron=null;}
+  var lv=jogo.lv;
+  jogo.travado=false;document.body.classList.remove("travado");
+  var velho=document.querySelector(".feed");if(velho)velho.remove();
+  var prog=Math.round(jogo.respondidas/jogo.total*100);
+  var vidas="";for(var i=0;i<jogo.vidas;i++)vidas+="♥";
+  var h=topo('<button class="iconbtn" id="sair">✕</button>'+
+     '<div class="grow"><div class="bar"><i style="width:'+Math.min(100,prog)+'%"></i></div></div>'+
+     (lv.timer?'<span class="pill timer" id="cron">'+lv.timer+'s</span>':'')+
+     '<span class="pill hp">'+vidas+'</span>');
+
+  h+='<h2 style="margin-bottom:12px">'+esc(q.p)+'</h2>';
+  h+='<div id="area"></div>';
+  h+='<div id="acao"></div><div class="spacer"></div>';
+  app.innerHTML=h;
+  $("#sair").onclick=function(){ if(confirm("Sair do nível? O que você fez agora não conta.")){ if(cron)clearInterval(cron); telaMapa(); } };
+
+  var area=$("#area"),acao=$("#acao");
+  RENDER[q.t](q,area,acao);
+
+  if(lv.timer){
+    var t=lv.timer,c=$("#cron");
+    cron=setInterval(function(){
+      t--;if(c){c.textContent=t+"s";if(t<=7)c.classList.add("low");}
+      if(t<=0){clearInterval(cron);cron=null;julgar(q,false,"Tempo esgotado.");}
+    },1000);
+  }
+  window.scrollTo(0,0);
+}
+
+function botaoConferir(acao,fn){
+  var b=el('<button class="btn" disabled id="conf">Conferir</button>');
+  acao.appendChild(b);b.onclick=fn;return b;
+}
+function ligarConferir(on){var b=$("#conf");if(b)b.disabled=!on;}
+
+var RENDER={
+  hot:function(q,area){
+    area.innerHTML=sCode(q.rows);
+    area.insertBefore(el('<p class="sub">Toque no trecho certo do código.</p>'),area.firstChild);
+    area.addEventListener("click",function(ev){
+      var z=ev.target.closest("[data-zone]");if(!z)return;
+      var ok=q.ok.indexOf(z.dataset.zone)>=0;
+      if(!ok){z.classList.add("zone-hit");setTimeout(function(){z.classList.remove("zone-hit");},320);}
+      julgar(q,ok);
+    });
+  },
+  pick:function(q,area){
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark"></span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){julgar(q,i===q.ok);};
+      area.appendChild(b);
+    });
+  },
+  multi:function(q,area,acao){
+    var sel=[];
+    shuffleIdx(q).forEach(function(i){
+      var b=el('<button class="opt"><span class="mark">✓</span><span>'+esc(q.opts[i])+'</span></button>');
+      b.onclick=function(){
+        var p=sel.indexOf(i);
+        if(p>=0){sel.splice(p,1);b.classList.remove("sel");}else{sel.push(i);b.classList.add("sel");}
+        ligarConferir(sel.length===q.ok.length);
+      };
+      area.appendChild(b);
+    });
+    botaoConferir(acao,function(){
+      var ok=sel.length===q.ok.length&&sel.every(function(i){return q.ok.indexOf(i)>=0;});
+      julgar(q,ok);
+    });
+  },
+  type:function(q,area,acao){
+    area.appendChild(el('<input type="text" id="resp" autocomplete="off" autocapitalize="none" placeholder="Escreva a resposta">'));
+    if(q.dica)area.appendChild(el('<p class="sub" style="margin-top:8px">Dica: '+esc(q.dica)+'</p>'));
+    var inp=$("#resp");
+    inp.addEventListener("input",function(){ligarConferir(inp.value.trim().length>0);});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&inp.value.trim()){var b=$("#conf");if(b)b.click();}});
+    botaoConferir(acao,function(){
+      var v=norm(inp.value);
+      var ok=q.ac.some(function(a){return norm(a)===v||norm(a)===limpaResp(v)||limpaResp(a)===limpaResp(v);});
+      julgar(q,ok,ok?null:"Resposta esperada: "+q.ac[0]);
+    });
+    setTimeout(function(){inp.focus();},120);
+  },
+  order:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque na ordem certa. Toque de novo em cima para tirar.</p>'));
+    var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
+    var bank=el('<div class="chips"></div>');area.appendChild(bank);
+    var todos=shuffle(q.items.concat(q.extra||[]));
+    var montado=[]; // {text, btn}
+    todos.forEach(function(it){
+      var b=el('<button class="chip'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
+      b.onclick=function(){
+        if(b.classList.contains("used")||montado.length>=q.items.length)return;
+        montado.push({text:it,btn:b});b.classList.add("used");pintarTray();
+      };
+      bank.appendChild(b);
+    });
+    function pintarTray(){
+      tray.innerHTML="";
+      montado.forEach(function(m,pos){
+        var c=el('<button class="chip sel'+(q.mono?" mono":"")+'">'+esc(m.text)+'</button>');
+        c.onclick=function(){ montado.splice(pos,1); m.btn.classList.remove("used"); pintarTray(); };
+        tray.appendChild(c);
+      });
+      ligarConferir(montado.length===q.items.length);
+    }
+    botaoConferir(acao,function(){
+      var vals=montado.map(function(m){return m.text;});
+      var ok=vals.length===q.items.length&&vals.every(function(v,i){return v===q.items[i];});
+      julgar(q,ok,ok?null:"A ordem certa é: "+q.items.join(q.mono?"  ":" → "));
+    });
+  },
+  slots:function(q,area,acao){
+    area.appendChild(el('<p class="sub">Toque numa resposta e depois no espaço certo.</p>'));
+    var wrap=el('<div class="slots"></div>');
+    var bank=el('<div class="chips"></div>');
+    var sel=null,posto={};
+    q.pairs.forEach(function(pr,i){
+      var row=el('<div class="slotrow"><span class="nm">'+esc(pr[0])+'</span><span class="slot" data-i="'+i+'"></span></div>');
+      wrap.appendChild(row);
+    });
+    area.appendChild(wrap);area.appendChild(bank);
+    var bots={};
+    shuffle(q.pairs.map(function(p){return p[1];})).forEach(function(v){
+      var b=el('<button class="chip">'+esc(v)+'</button>');
+      bots[v]=b;
+      b.onclick=function(){
+        if(sel===v){sel=null;b.classList.remove("sel");return;}
+        Object.keys(bots).forEach(function(k){bots[k].classList.remove("sel");});
+        sel=v;b.classList.add("sel");
+      };
+      bank.appendChild(b);
+    });
+    Array.prototype.forEach.call(wrap.querySelectorAll(".slot"),function(sl){
+      sl.onclick=function(){
+        var i=sl.dataset.i;
+        if(posto[i]){ bots[posto[i]].classList.remove("used"); delete posto[i]; sl.textContent="";sl.classList.remove("full"); }
+        if(sel){ posto[i]=sel; sl.textContent=sel; sl.classList.add("full"); bots[sel].classList.add("used"); bots[sel].classList.remove("sel"); sel=null; }
+        ligarConferir(Object.keys(posto).length===q.pairs.length);
+      };
+    });
+    botaoConferir(acao,function(){
+      var ok=q.pairs.every(function(pr,i){return posto[i]===pr[1];});
+      julgar(q,ok,ok?null:"Confira as ligações na teoria do nível.");
+    });
+  }
+};
+function shuffleIdx(q){var a=[];for(var i=0;i<q.opts.length;i++)a.push(i);return shuffle(a);}
+
+function julgar(q,ok,msg){
+  if(!jogo||jogo.travado)return;          /* uma resposta por questão: ignora toques extras */
+  jogo.travado=true;document.body.classList.add("travado");
+  if(cron){clearInterval(cron);cron=null;}
+  if(q._vista!==true){ q._vista=true; regHab(q,ok); if(ok)jogo.acertosPrimeira++; }
+  if(ok){ jogo.respondidas++; S.xp+=q._rep?4:10; }
+  else{ jogo.vidas--; }
+  save();
+
+  var f=el('<div class="feed '+(ok?"good":"bad")+'"><div class="inner">'+
+    '<b>'+(ok?"Isso mesmo":"Ainda não")+'</b>'+
+    '<p>'+esc(msg?msg+" ":"")+esc(q.e)+'</p>'+
+    '<button class="btn '+(ok?"ok":"")+'" id="cont">Continuar</button></div></div>');
+  document.body.appendChild(f);
+  var bc=f.querySelector("#cont");
+  bc.onclick=function(){
+    if(bc._ok)return;bc._ok=true;
+    f.remove();document.body.classList.remove("travado");
+    if(!ok){
+      if(jogo.vidas<=0){fimNivel(false);return;}
+      var copia={};for(var k in q)copia[k]=q[k];copia._rep=true;copia._vista=true;
+      jogo.fila.push(copia);
+    }
+    jogo.idx++;proxima();
+  };
+  bc.focus();
+}
+
+function fimNivel(venceu){
+  var lv=jogo.lv;
+  var pct=Math.round(jogo.acertosPrimeira/jogo.total*100);
+  var estrelas=0;
+  if(venceu)estrelas = pct>=100?3 : pct>=75?2 : 1;
+
+  if(venceu){
+    var ant=S.niveis[lv.id];
+    if(!ant||pct>=ant.pct){
+      S.niveis[lv.id]={estrelas:Math.max(estrelas,ant?ant.estrelas:0),pct:pct,hab:jogo.hab,
+                       quando:new Date().toISOString().slice(0,10)};
+    }else{
+      ant.estrelas=Math.max(ant.estrelas,estrelas);
+    }
+    if(estrelas===3)S.xp+=20;
+    save();
+  }
+  var st="";for(var k=1;k<=3;k++)st+=(k<=estrelas?"★":"☆");
+  app.innerHTML=topo('<div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
+    '<div class="card" style="text-align:center">'+
+      '<div style="font-size:46px;line-height:1">'+(venceu?lv.glyph:"💤")+'</div>'+
+      '<h2 style="margin-top:8px">'+(venceu?"Nível concluído":"Vidas acabaram")+'</h2>'+
+      '<div class="stars" style="font-size:30px;margin:6px 0">'+st+'</div>'+
+      '<p class="sub">'+(venceu
+         ? "Acertos de primeira: "+pct+"% · "+jogo.acertosPrimeira+" de "+jogo.total
+         : "Revise a teoria e volte. O melhor resultado anterior continua salvo.")+'</p>'+
+    '</div>'+
+    (venceu&&pct<100?'<div class="warn">Refaça o nível para tentar as 3 estrelas: as questões vêm embaralhadas.</div>':'')+
+    '<button class="btn" id="mapa">Voltar para a trilha</button>'+
+    '<button class="btn ghost small" id="denovo">'+(venceu?"Jogar de novo":"Tentar de novo")+'</button>';
+  $("#mapa").onclick=telaMapa;
+  $("#denovo").onclick=function(){ limparVistos(lv); iniciarNivel(lv); };
+  window.scrollTo(0,0);
+}
+function limparVistos(lv){lv.qs.forEach(function(q){delete q._vista;});}
+
+/* ============================================================ RELATÓRIO ============================================================ */
+function agregarHab(){
+  var r={};
+  Object.keys(HAB).forEach(function(h){r[h]={c:0,t:0};});
+  LEVELS.forEach(function(lv){
+    var st=S.niveis[lv.id];if(!st||!st.hab)return;
+    for(var h in st.hab){ if(!r[h])r[h]={c:0,t:0}; r[h].c+=st.hab[h].c; r[h].t+=st.hab[h].t; }
+  });
+  return r;
+}
+function codigo(){
+  var base=S.nome+"|"+S.xp+"|"+concluidos()+"|"+totalEstrelas()+"|"+GAME.eyebrow+"|"+(new Date().toISOString().slice(0,10));
+  var h=5381;for(var i=0;i<base.length;i++){h=((h<<5)+h+base.charCodeAt(i))>>>0;}
+  return h.toString(36).toUpperCase().slice(0,6).padStart(6,"X");
+}
+function medalha(){
+  var f=concluidos(),e=totalEstrelas(),totalNv=LEVELS.length;
+  if(f>=totalNv&&e>=totalNv*3-2)return ["🏆","Desenvolvedor(a) Front-end"];
+  if(f>=totalNv)return ["🥇","Script sem bugs"];
+  if(f>=Math.ceil(totalNv*0.6))return ["🥈","Programador(a) em treino"];
+  if(f>=Math.ceil(totalNv*0.3))return ["🥉","Estagiário(a) de console"];
+  return ["🧩","Começando agora"];
+}
+
+function telaRelatorio(){
+  if(!S.nome){telaInicio();return;}
+  var hab=agregarHab(),med=medalha(),totalNv=LEVELS.length,fim=concluidos()>=totalNv;
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Relatório</b></div>');
+  h+='<div class="medal"><span class="m">'+med[0]+'</span><div><b>'+med[1]+'</b><div class="sub">'+esc(S.nome)+(S.turma?' · '+esc(S.turma):'')+'</div></div></div>';
+  if(!fim)h+='<div class="warn">Relatório parcial: faltam '+(totalNv-concluidos())+' nível(is). Dá para continuar em casa e gerar de novo.</div>';
+
+  h+='<div class="card"><h3>Resumo</h3>'+
+     kv("Níveis concluídos",concluidos()+" de "+totalNv)+
+     kv("Estrelas",totalEstrelas()+" de "+(totalNv*3))+
+     kv("XP",S.xp)+
+     kv("Tempo de estudo",fmtTempo(S.tempo||0))+
+     kv("Sessões",(S.sessoes||1))+
+     kv("Saídas da página durante o jogo",(S.saidas||0))+
+     (S.liberarTudo?kv("Fases liberadas pelo professor","sim"):"")+
+     kv("Data",new Date().toLocaleDateString("pt-BR"))+
+     '</div>';
+
+  h+='<div class="card"><h3>Habilidades avaliadas</h3>';
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    var cor=!d.t?"var(--line)":p>=75?"var(--ok)":p>=50?"var(--gold)":"var(--bad)";
+    h+='<div class="skill"><div class="hd"><span>'+esc(HAB[k])+'</span><i>'+(d.t?p+"%":"—")+'</i></div>'+
+       '<div class="bar"><i style="width:'+p+'%;background:'+cor+'"></i></div></div>';
+  });
+  h+='</div>';
+
+  var fracos=Object.keys(HAB).filter(function(k){var d=hab[k];return d.t&&d.c/d.t<0.75;});
+  h+='<div class="card"><h3>O que revisar antes da prova</h3>'+
+      (fracos.length? '<ul style="padding-left:20px;margin:0">'+fracos.map(function(k){return "<li>"+esc(HAB[k])+"</li>";}).join("")+'</ul>'
+       : '<p class="sub" style="margin:0">'+(concluidos()?"Nada pendente até aqui. Refaça os níveis de menos estrelas para fixar.":"Jogue pelo menos um nível para o relatório mostrar as habilidades.")+'</p>')+
+     '</div>';
+
+  h+='<div class="card" style="text-align:center"><h3>Código de verificação</h3>'+
+     '<div class="code">'+codigo()+'</div>'+
+     '<p class="sub" style="margin:6px 0 0">Mostre este código junto com o print.</p></div>';
+
+  h+='<button class="btn" id="png">Baixar relatório em imagem</button>'+
+     '<button class="btn ghost small" id="print">Imprimir ou salvar em PDF</button>'+
+     '<button class="btn ghost small" id="volta2">Voltar para a trilha</button>'+
+     '<div class="note">Envie a imagem (ou o print desta tela) no Google Classroom.</div>'+
+     '<div id="saida"></div>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  $("#print").onclick=function(){window.print();};
+  $("#png").onclick=function(){gerarPNG(hab,med);};
+  window.scrollTo(0,0);
+}
+function kv(a,b){return '<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';}
+
+function gerarPNG(hab,med){
+  var totalNv=LEVELS.length;
+  var W=900,H=1240,c=document.createElement("canvas");c.width=W;c.height=H;
+  var x=c.getContext("2d");
+  var F='"Segoe UI",Roboto,system-ui,sans-serif';
+  x.fillStyle="#ffffff";x.fillRect(0,0,W,H);
+  x.fillStyle="#15697f";x.fillRect(0,0,W,120);
+  x.fillStyle="#ffffff";x.font="700 30px "+F;x.fillText(GAME.eyebrow,48,58);
+  x.font="400 19px "+F;x.fillText(GAME.titulo.replace(/<[^>]+>/g,"")+" · relatório de treino",48,92);
+
+  var y=170;
+  x.fillStyle="#0f2230";x.font="700 30px "+F;x.fillText(S.nome,48,y);y+=34;
+  x.fillStyle="#4a6478";x.font="400 20px "+F;
+  x.fillText((S.turma||"Turma não informada")+"  ·  "+new Date().toLocaleDateString("pt-BR"),48,y);y+=46;
+
+  x.fillStyle="#fdf0d4";x.fillRect(48,y-28,W-96,64);
+  x.fillStyle="#e0900a";x.fillRect(48,y-28,6,64);
+  x.fillStyle="#0f2230";x.font="700 24px "+F;x.fillText(med[0]+"  "+med[1],70,y+10);y+=88;
+
+  function linha(a,b){
+    x.fillStyle="#4a6478";x.font="400 20px "+F;x.fillText(a,48,y);
+    x.fillStyle="#0f2230";x.font="700 20px "+F;x.textAlign="right";x.fillText(String(b),W-48,y);x.textAlign="left";
+    x.strokeStyle="#e2eaf0";x.beginPath();x.moveTo(48,y+12);x.lineTo(W-48,y+12);x.stroke();y+=42;
+  }
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Resumo",48,y);y+=34;
+  linha("Níveis concluídos",concluidos()+" de "+totalNv);
+  linha("Estrelas",totalEstrelas()+" de "+(totalNv*3));
+  linha("XP acumulado",S.xp);
+  linha("Tempo de estudo",fmtTempo(S.tempo||0));
+  linha("Sessões",(S.sessoes||1));
+  linha("Saídas da página durante o jogo",(S.saidas||0));
+  y+=22;
+
+  x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Habilidades avaliadas",48,y);y+=34;
+  Object.keys(HAB).forEach(function(k){
+    var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
+    x.fillStyle="#0f2230";x.font="400 16px "+F;
+    var txt=HAB[k];
+    x.fillText(txt.length>66?txt.slice(0,64)+"…":txt,48,y);
+    x.textAlign="right";x.font="700 17px "+F;x.fillText(d.t?p+"%":"—",W-48,y);x.textAlign="left";
+    y+=12;
+    x.fillStyle="#e2eaf0";x.fillRect(48,y,W-96,12);
+    x.fillStyle=!d.t?"#c6d4de":p>=75?"#1f8a4c":p>=50?"#e0900a":"#c23b4d";
+    x.fillRect(48,y,(W-96)*p/100,12);
+    y+=38;
+  });
+
+  y+=10;
+  x.fillStyle="#f3f7fa";x.fillRect(48,y,W-96,74);
+  x.fillStyle="#4a6478";x.font="400 18px "+F;x.fillText("Código de verificação",70,y+30);
+  x.fillStyle="#15697f";x.font="700 30px ui-monospace,Consolas,monospace";x.fillText(codigo(),70,y+62);
+  x.fillStyle="#4a6478";x.font="400 16px "+F;x.textAlign="right";
+  x.fillText("Prof. Rosival D. Silva",W-70,y+62);x.textAlign="left";
+
+  var saida=$("#saida");saida.innerHTML="";
+  try{
+    c.toBlob(function(b){
+      if(!b){saida.appendChild(c);return;}
+      var u=URL.createObjectURL(b),a=document.createElement("a");
+      a.href=u;a.download="relatorio-"+STORE+"-"+norm(S.nome).replace(/ /g,"-")+".png";
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(u);},4000);
+      saida.appendChild(el('<div class="note" style="margin-top:12px">Se o download não abrir, use a imagem abaixo: segure o dedo sobre ela para salvar.</div>'));
+      saida.appendChild(c);
+    },"image/png");
+  }catch(e){
+    saida.appendChild(el('<div class="note" style="margin-top:12px">Segure o dedo sobre a imagem para salvar.</div>'));
+    saida.appendChild(c);
+  }
+  setTimeout(function(){saida.scrollIntoView({behavior:"smooth",block:"start"});},300);
+}
+
+/* ---------- start ---------- */
+load();
+setInterval(save,15000);
+window.addEventListener("beforeunload",save);
+telaInicio();
+</script>
+</body>
+</html>
