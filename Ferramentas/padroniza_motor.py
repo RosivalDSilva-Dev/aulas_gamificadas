@@ -5,7 +5,7 @@ Padroniza o motor das aulas gamificadas (trilha com niveis/estrelas).
 - barra de progresso so avanca no acerto
 - area do professor com senha para liberar todas as fases
 """
-import sys, re
+import sys, re, json
 
 SENHA_HASH = '8570079599154905'  # h53("javhash404!")
 
@@ -120,8 +120,86 @@ def patch(h):
     return h
 
 
+# ---------------------------------------------------------------- META DA AULA
+# Padrao (2026-09): 5 niveis de META (valem a nota) + 2 BONUS + 1 CHEFAO (libera com a meta).
+META_JS = r"""
+/* --- meta da aula: os META primeiros niveis valem a nota; depois vem bonus; chefao libera com a meta --- */
+var META=(typeof GAME!=="undefined"&&GAME.meta)||5;
+function metaFeitos(){var n=0;for(var i=0;i<META&&i<LEVELS.length;i++){var st=S.niveis[LEVELS[i].id];if(st&&st.estrelas>0)n++;}return n;}
+function metaOk(){return metaFeitos()>=META;}
+function metaTxt(){return metaOk()?"concluída ✔":metaFeitos()+" de "+META+" níveis";}
+function secaoNivel(i,lv){
+  if(i===0)return '<div class="secao">🎯 Meta da aula · vale a nota</div>';
+  if(lv.boss)return '<div class="secao">🏆 Chefão · libera quando a meta termina</div>';
+  if(i===META)return '<div class="secao">⭐ Bônus · para ir além</div>';
+  return '';
+}
+"""
+META_CSS = """
+.secao{font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);margin:16px 4px 6px}
+.metabox{background:var(--gold-l);border:1.5px solid var(--gold);border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:15px}
+"""
+
+
+def meta(h):
+    if 'function metaOk' in h:
+        return h
+    h = sub1(h, '</style>', META_CSS + '</style>', 'css meta')
+    h = sub1(h, 'function totalEstrelas(){', META_JS + 'function totalEstrelas(){', 'meta js')
+    h, n = re.subn(r'if\(lv\.boss\)return concluidos\(\)>=[^;]+;', 'if(lv.boss)return metaOk();', h)
+    assert n == 1, 'boss unlock'
+    h = sub1(h, """h+='<button class="node'""", """h+=secaoNivel(i,lv);h+='<button class="node'""", 'secoes')
+    h = h.replace('(lv.boss?("conclua os "+GAME.bossUnlock+" níveis"):', '(lv.boss?("conclua a meta ("+META+" níveis)"):')
+    h = h.replace('(lv.boss?"conclua os 8 níveis":', '(lv.boss?("conclua a meta ("+META+" níveis)"):')
+    assert 'conclua a meta' in h, 'rotulo chefao'
+    h = sub1(h, """   '<div class="trail">';""",
+             """   '<div class="metabox">🎯 Meta da aula: <b>'+metaTxt()+'</b>'+(metaOk()?' · agora é bônus ou Chefão!':'')+'</div>'+\n   '<div class="trail">';""", 'metabox mapa')
+    h = sub1(h, '     kv("Níveis concluídos"', '     kv("Meta da aula",metaTxt())+\n     kv("Níveis concluídos"', 'kv meta')
+    h = sub1(h, '  linha("Níveis concluídos"', '  linha("Meta da aula",metaTxt());\n  linha("Níveis concluídos"', 'png meta')
+    h = re.sub(r'var W=900,H=(\d+)', lambda m: 'var W=900,H=%d' % (int(m.group(1)) + 42), h, count=1)
+    h = sub1(h, 'function fimNivel(venceu){\n  var lv=jogo.lv;\n', 'function fimNivel(venceu){\n  var lv=jogo.lv;\n  var metaAntes=metaOk();\n', 'fim meta')
+    h = sub1(h, """'<h2 style="margin-top:8px">'+(venceu?"Nível concluído":"Vidas acabaram")+'</h2>'+""",
+             """'<h2 style="margin-top:8px">'+(venceu?"Nível concluído":"Vidas acabaram")+'</h2>'+\n      (!metaAntes&&metaOk()?'<div class="metabox">🎯 Meta da aula concluída! Agora escolha: bônus ou Chefão.</div>':'')+""", 'aviso meta')
+    # contagens fixas antigas (SO)
+    h = h.replace("feitos/9*100", "feitos/LEVELS.length*100").replace("' de 9 níveis concluídos · '", "' de '+LEVELS.length+' níveis concluídos · '")
+    h = h.replace("' de 27 estrelas</p>'", "' de '+(LEVELS.length*3)+' estrelas</p>'").replace('concluidos()+" de 9"', 'concluidos()+" de "+LEVELS.length')
+    h = h.replace("concluidos()+' de 9 níveis · '", "concluidos()+' de '+LEVELS.length+' níveis · '")
+    return h
+
+
+
+def confere(h, nome):
+    """Avisa problemas comuns nos dados (nao altera nada)."""
+    m = re.search(r'var LEVELS\s*=\s*(\[.*?\]);\n', h, re.S)
+    if not m:
+        return
+    if '</script' in m.group(1):
+        print('  AVISO', nome, ': escreva <\\/script> dentro de LEVELS')
+    try:
+        L = json.loads(m.group(1).replace('<\\/', '</'))
+    except Exception:
+        return
+    for lv in L:
+        for i, q in enumerate(lv['qs'], 1):
+            onde = '%s nivel %s questao %d' % (nome, lv['id'], i)
+            if q['t'] == 'slots' and len({b for a, b in q['pairs']}) != len(q['pairs']):
+                print('  AVISO', onde, ': slots com respostas repetidas (o aluno pode travar)')
+            if q['t'] == 'order' and len(set(q['items'])) != len(q['items']):
+                print('  AVISO', onde, ': order com linhas repetidas')
+            if q['t'] == 'type' and any(not re.sub(r'[^a-z0-9]', '', a.lower()) for a in q['ac']):
+                print('  AVISO', onde, ': resposta digitada so com simbolos (nao da para corrigir)')
+    regs = [l for l in L if not l.get('boss')]
+    print('  %s: %d niveis (%d meta + %d bonus + %d chefao), %d questoes' % (
+        nome, len(L), min(5, len(regs)), max(0, len(regs) - 5), len(L) - len(regs), sum(len(l['qs']) for l in L)))
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         s = open(a, encoding='utf-8').read().replace('\r\n', '\n')
-        open(a, 'w', encoding='utf-8', newline='\n').write(patch(s))
+        if 'function julgar(q,ok,msg)' not in s:
+            print('pulado (motor diferente, ajuste a mao):', a)
+            continue
+        h = meta(patch(s))
+        open(a, 'w', encoding='utf-8', newline='\n').write(h)
+        confere(h, a)
         print('ok', a)

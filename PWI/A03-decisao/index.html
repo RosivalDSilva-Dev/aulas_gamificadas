@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SO Aula 03 — Treino antes da prova</title>
-<meta name="description" content="Treino interativo de Sistemas Operacionais: área de trabalho, arquivos, janelas, configurações e atalhos.">
+<title>Decisão em JavaScript</title>
+<meta name="description" content="Treino interativo de decisão em JavaScript: comparações, if, else, else if, prompt e Number, e, ou e não.">
 <style>
 :root{
   --bg:#e7edf2; --surface:#ffffff; --surface-2:#f3f7fa;
@@ -53,15 +53,8 @@ button{font:inherit;color:inherit}
 .bar > i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
 .iconbtn{background:none;border:0;padding:6px;border-radius:9px;cursor:pointer;color:var(--ink-2);font-size:20px;line-height:1}
 .iconbtn:hover{background:var(--surface-2)}
-.cfgrow{display:flex;align-items:center;gap:14px;cursor:pointer}
-.cfgrow .grow{flex:1}
-.sw{appearance:none;-webkit-appearance:none;flex:none;width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;margin:0}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s}
-.sw:checked{background:var(--primary)}
-.sw:checked::after{left:23px}
-.sw:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
 
-h1{font-size:27px;line-height:1.15;letter-spacing:-.02em;margin:.2em 0 .3em;font-weight:700}
+h1{font-size:26px;line-height:1.15;letter-spacing:-.02em;margin:.2em 0 .3em;font-weight:700}
 h2{font-size:21px;line-height:1.2;letter-spacing:-.01em;margin:0 0 .4em;font-weight:700}
 h3{font-size:16px;margin:0 0 6px;font-weight:700}
 p{margin:0 0 .8em}
@@ -87,22 +80,19 @@ input[type=text]{
 input[type=text]:focus{border-color:var(--primary);outline:none}
 label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 
-/* ---------- boot / start ---------- */
+/* ---------- boot ---------- */
 .boot{border:2px solid var(--line);border-radius:var(--r);overflow:hidden;background:#0a1620;margin-bottom:16px}
-.boot .screen{aspect-ratio:16/10;position:relative;background:
-  radial-gradient(120% 90% at 70% 20%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
-.boot .bootline{position:absolute;left:14px;top:14px;color:#8fd4e8;font-size:12px;opacity:0}
-.boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0}
-.boot .lg b{color:#eaf6fb;font-size:clamp(20px,6vw,30px);letter-spacing:-.02em}
-.boot .tb{position:absolute;left:0;right:0;bottom:0;height:26px;background:#061019;display:flex;
-  align-items:center;gap:6px;padding:0 8px;transform:translateY(100%)}
-.boot .tb span{width:14px;height:14px;border-radius:4px;background:#2a5f75}
-.boot .tb .clk{margin-left:auto;color:#8fd4e8;font-size:11px;background:none;width:auto;height:auto}
+.boot .screen{aspect-ratio:16/9;position:relative;background:
+  radial-gradient(120% 90% at 70% 15%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
+.boot .bootline{position:absolute;left:16px;top:16px;color:#8fd4e8;font-size:12px;opacity:0}
+.boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0;padding:0 20px;text-align:center}
+.boot .lg b{color:#eaf6fb;font-size:clamp(18px,5.6vw,27px);letter-spacing:-.02em;line-height:1.25}
+.boot .cursor{display:inline-block;width:9px;height:1.1em;background:#8fd4e8;vertical-align:-2px;margin-left:2px;
+  animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
 @keyframes fadein{to{opacity:1}}
-@keyframes slideup{to{transform:translateY(0)}}
-.boot .bootline{animation:fadein .01s .2s forwards}
-.boot .lg{animation:fadein .7s .6s forwards}
-.boot .tb{animation:slideup .5s 1.3s forwards}
+.boot .bootline{animation:fadein .01s .15s forwards}
+.boot .lg{animation:fadein .7s .5s forwards}
 
 /* ---------- mapa de níveis ---------- */
 .trail{display:flex;flex-direction:column;gap:10px}
@@ -123,49 +113,16 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 .stars{letter-spacing:1px;font-size:14px;color:var(--gold)}
 .stars .off{color:var(--line)}
 
-/* ---------- cenas (mock de tela) ---------- */
-.scene{user-select:none;-webkit-user-select:none;border-radius:10px;overflow:hidden;border:2px solid var(--line);margin-bottom:12px}
-.scene [data-zone]{cursor:pointer}
-.desktop{position:relative;aspect-ratio:16/10;background:linear-gradient(140deg,#20566b,#0e2a38 60%,#0a1f2b);padding:10px}
-.desktop .icons{display:flex;flex-direction:column;gap:8px;width:74px}
-.desktop .ic{display:flex;flex-direction:column;align-items:center;gap:2px;color:#e6f2f7;font-size:10px}
-.desktop .icbox{width:26px;height:22px;border-radius:4px;background:#f0c368;border:1px solid #b98b2c}
-.desktop .ic:nth-child(2) .icbox{background:#9ec6d8;border-color:#5b91a8}
-.desktop .ic:nth-child(3) .icbox{background:#b6d8b0;border-color:#6ea467}
-.desktop .ic:nth-child(4) .icbox{background:#cfcfcf;border-color:#8d8d8d}
-.taskbar{position:absolute;left:0;right:0;bottom:0;height:34px;background:#08161e;display:flex;align-items:center;gap:8px;padding:0 7px}
-.tb-start{background:var(--primary);color:#fff;border:0;border-radius:6px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer}
-.tb-apps{display:flex;gap:5px;padding:4px}
-.tb-apps i{display:block;width:17px;height:17px;border-radius:4px;background:#2f6a82}
-.tb-tray{margin-left:auto;color:#cfe8f1;font-size:11px;padding:6px;display:flex;gap:6px;align-items:center}
-.taskbar.solo{position:static;height:44px;border-radius:8px}
-
-.screen4{position:relative;aspect-ratio:16/10;background:#123243;padding:26px}
-.screen4 .edge{position:absolute;background:rgba(255,255,255,.10);border:1px dashed rgba(255,255,255,.35);display:grid;place-items:center;color:#d5eaf2;font-size:11px}
-.screen4 .e-top{top:0;left:0;right:0;height:24px}
-.screen4 .e-bottom{bottom:0;left:0;right:0;height:24px}
-.screen4 .e-left{top:24px;bottom:24px;left:0;width:26px}
-.screen4 .e-right{top:24px;bottom:24px;right:0;width:26px}
-.screen4 .mid{position:absolute;inset:24px 26px;display:grid;place-items:center;color:#7fa9bd;font-size:12px;text-align:center}
-
-.win{background:var(--surface-2)}
-.win .titlebar{background:var(--primary);color:#fff;display:flex;align-items:center;gap:6px;padding:7px 8px;font-size:13px;font-weight:600}
-.win .titlebar .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.win .wbtn{width:24px;height:22px;border-radius:5px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:12px}
-.win .address{padding:7px 9px;background:var(--surface);border-bottom:1px solid var(--line);font-size:12px}
-.win .body{display:flex;min-height:104px}
-.win .side{width:104px;flex:0 0 104px;background:var(--surface);border-right:1px solid var(--line);padding:7px;font-size:11px;color:var(--ink-2);line-height:1.7}
-.win .content{flex:1;padding:9px;display:flex;gap:9px;flex-wrap:wrap;align-content:flex-start}
-.win .file{width:58px;text-align:center;font-size:10px;color:var(--ink-2)}
-.win .file b{display:block;height:34px;border-radius:5px;background:var(--primary-l);border:1px solid var(--line);margin-bottom:3px}
-.win .status{padding:5px 9px;border-top:1px solid var(--line);background:var(--surface);font-size:11px;color:var(--ink-2)}
-
-.tree{background:var(--surface-2);padding:12px 8px}
-.tree .lvl{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
-.tree .fold{background:var(--surface);border:2px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;font-weight:600}
-.tree .fold.root{background:var(--primary-l);border-color:var(--primary)}
-.tree .link{height:12px;border-left:2px solid var(--line);width:0;margin:0 auto}
-
+/* ---------- cena de código ---------- */
+.scene{user-select:none;-webkit-user-select:none;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.scene.code{background:#0d1b24;color:#d7e6ee;font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace;
+  padding:14px 10px;line-height:1.85;font-size:13.5px;border:2px solid var(--line);overflow-x:auto}
+.scene.code .cline{display:flex;gap:10px;white-space:pre;padding:1px 4px;border-radius:6px}
+.scene.code .cno{width:18px;flex:0 0 18px;text-align:right;color:#4f7186;user-select:none}
+.scene.code .ccode{white-space:pre-wrap;word-break:break-word}
+.scene.code .cplain{color:#c7dbe6}
+.scene.code .ctok{cursor:pointer;border-radius:4px;padding:1px 2px;border-bottom:2px dotted #3aa8c4}
+.scene.code .ctok:hover,.scene.code .ctok:active{background:rgba(58,168,196,.22)}
 .zone-hit{animation:shake .3s}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
@@ -178,7 +135,6 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 .chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
 .chip.sel{background:var(--primary-l);border-color:var(--primary);color:var(--primary-d)}
 .chip.used{opacity:.25;pointer-events:none}
-.chip.key{min-width:52px;text-align:center;font-family:ui-monospace,Consolas,monospace}
 .tray{min-height:54px;border:2px dashed var(--line);border-radius:11px;padding:8px;display:flex;
   flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;background:var(--surface-2)}
 .tray:empty::after{content:"Toque nas peças abaixo para montar a resposta";color:var(--ink-2);font-size:13px}
@@ -193,7 +149,7 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 .opt.sel .mark{background:var(--primary);border-color:var(--primary);color:#fff}
 .slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .slotrow{display:flex;align-items:center;gap:9px}
-.slotrow .nm{flex:0 0 40%;font-weight:700;font-size:14px}
+.slotrow .nm{flex:0 0 42%;font-weight:700;font-size:13.5px}
 .slot{flex:1;min-height:46px;border:2px dashed var(--line);border-radius:11px;background:var(--surface-2);
   display:flex;align-items:center;padding:6px 9px;font-size:14px;font-weight:600;cursor:pointer}
 .slot.full{border-style:solid;background:var(--primary-l);border-color:var(--primary)}
@@ -212,7 +168,7 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 
 /* ---------- relatório ---------- */
 .skill{margin-bottom:12px}
-.skill .hd{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-bottom:4px}
+.skill .hd{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:4px}
 .skill .hd i{font-style:normal;color:var(--ink-2)}
 .code{font-family:ui-monospace,Consolas,monospace;font-size:20px;letter-spacing:.14em;font-weight:700;color:var(--primary)}
 .kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
@@ -242,79 +198,41 @@ canvas{max-width:100%;height:auto;border:2px solid var(--line);border-radius:var
 <script>
 "use strict";
 /* ============================================================
-   SO — Aula 03: Área de Trabalho e Aplicativos
+   Programação Web I — Aula 03: Decisão em JavaScript
    Treino gamificado. Rosival Silva.
    ============================================================ */
 
-var STORE = "so_a03_v2";
-var HAB = {
-  H1:"Reconhecer a área de trabalho e a barra de tarefas",
-  H2:"Organizar arquivos, pastas e caminhos",
-  H3:"Identificar as partes de uma janela",
-  H4:"Usar as configurações do sistema",
-  H5:"Instalar e remover programas com segurança",
-  H6:"Usar os acessórios do sistema",
-  H7:"Aplicar atalhos de teclado"
+var STORE = "pwi_a03_v1";
+var GAME = {
+  eyebrow: "PWI · Aula 03",
+  titulo: "Decisão em JavaScript",
+  sub: "Meta da aula: 5 níveis. Depois, 2 níveis bônus e o Chefão, sobre if, else e else if em JavaScript.",
+  boot: "decidindo o caminho...",
+  meta: 5,
+  bossUnlock: 5
 };
+var HAB = {"H1": "Comparar valores (true ou false)", "H2": "O if: fazer só quando for verdade", "H3": "if e else: dois caminhos", "H4": "else if: vários caminhos, a ordem importa", "H5": "prompt e Number: ler números", "H6": "E, OU e NÃO (&&, ||, !)", "H7": "Erros comuns nas decisões"};
+var LEVELS = [{"id": 1, "nome": "Comparar dá true ou false", "glyph": "⚖️", "skill": "H1", "teoria": ["Toda decisão começa com uma pergunta que só tem duas respostas: <b>true<\/b> (verdadeiro) ou <b>false<\/b> (falso).", "Sinais: <b>&gt;<\/b> maior, <b>&lt;<\/b> menor, <b>&gt;=<\/b> maior ou igual, <b>&lt;=<\/b> menor ou igual, <b>===<\/b> igual, <b>!==<\/b> diferente.", "Cuidado: um <b>=<\/b> guarda um valor; três <b>===<\/b> comparam."], "qs": [{"t": "pick", "p": "O que aparece no console?", "rows": ["console.log(7 > 5);"], "opts": ["true", "false", "7", "5"], "ok": 0, "e": "7 é maior que 5: a comparação dá true."}, {"t": "type", "p": "5 >= 5 resulta em?", "ac": ["true", "verdadeiro", "v"], "e": "5 é igual a 5, e >= aceita o igual: true."}, {"t": "type", "p": "4 <= 3 resulta em?", "ac": ["false", "falso", "f"], "e": "4 não é menor nem igual a 3: false."}, {"t": "pick", "p": "Qual sinal COMPARA se dois valores são iguais?", "opts": ["===", "=", "+=", "=>"], "ok": 0, "e": "=== compara valor e tipo. Um = só guarda o valor."}, {"t": "multi", "p": "Marque as comparações que dão true.", "opts": ["10 > 3", "2 === 2", "5 < 1", "8 !== 8", "6 >= 6"], "ok": [0, 1, 4], "e": "10 > 3, 2 === 2 e 6 >= 6 são verdade."}, {"t": "slots", "p": "Ligue cada sinal ao que ele quer dizer.", "pairs": [[">", "maior que"], ["<", "menor que"], [">=", "maior ou igual"], ["!==", "diferente"]], "e": "> maior, < menor, >= maior ou igual, !== diferente."}, {"t": "hot", "rows": ["let idade = 20;", "let a = [[g|idade = 18]];", "let b = [[c|idade === 18]];"], "p": "Toque no trecho que COMPARA (e não guarda) um valor.", "ok": ["c"], "e": "idade === 18 compara. idade = 18 guardaria 18 na variável."}]}, {"id": 2, "nome": "O if: só se for verdade", "glyph": "🚦", "skill": "H2", "teoria": ["O <b>if<\/b> (se) faz um trecho do código acontecer <b>só quando a pergunta dá true<\/b>.", "O que acontece fica entre as chaves <b>{ }<\/b>. Se der false, o navegador pula esse trecho."], "qs": [{"t": "pick", "p": "O alert aparece?", "rows": ["let total = 120;", "if (total > 100) {", "  alert(\"Frete gratis\");", "}"], "opts": ["Sim, porque 120 > 100 é true", "Não, porque 120 > 100 é false", "Só se apertar F5", "Aparece duas vezes"], "ok": 0, "e": "120 > 100 dá true: o que está nas chaves acontece."}, {"t": "type", "p": "Com total = 80, quantos alerts aparecem? (escreva o número)", "rows": ["let total = 80;", "if (total > 100) {", "  alert(\"Frete gratis\");", "}"], "ac": ["0", "zero", "nenhum"], "e": "80 > 100 dá false: o navegador pula o trecho. Nenhum alert."}, {"t": "hot", "rows": ["let nota = 9;", "[[a|if]] (nota >= 6) {", "  alert(\"Passou\");", "}"], "p": "Toque na palavra que significa \"se\".", "ok": ["a"], "e": "if quer dizer se. No Portugol era se."}, {"t": "pick", "p": "O que fica entre as chaves { } do if?", "opts": ["O que acontece quando a condição é true", "O que acontece quando é false", "A condição", "O nome da página"], "ok": 0, "e": "As chaves guardam o que roda quando a pergunta dá true."}, {"t": "order", "mono": true, "p": "Monte o if na ordem certa.", "items": ["if (idade >= 16) {", "alert(\"Pode votar\");", "}"], "e": "Primeiro a pergunta, depois o que fazer, e fecha a chave."}, {"t": "type", "p": "O que o alert mostra?", "rows": ["let pontos = 50;", "if (pontos >= 50) {", "  alert(\"Nivel 2\");", "}"], "ac": ["nivel 2", "nivel2"], "e": "50 >= 50 é true (o igual vale): aparece Nivel 2."}, {"t": "multi", "p": "Com x = 10, marque as condições que fariam o alert aparecer.", "opts": ["x > 5", "x === 10", "x < 10", "x >= 10", "x > 10"], "ok": [0, 1, 3], "e": "10 > 5, 10 === 10 e 10 >= 10 são true. 10 < 10 e 10 > 10 são false."}]}, {"id": 3, "nome": "if e else: dois caminhos", "glyph": "🔀", "skill": "H3", "teoria": ["O <b>else<\/b> (senão) é o caminho de quando a pergunta dá <b>false<\/b>.", "Com if e else, <b>sempre<\/b> um dos dois caminhos acontece, nunca os dois.", "No Portugol: <b>se<\/b> / <b>senao<\/b>. No JavaScript: <b>if<\/b> / <b>else<\/b>."], "qs": [{"t": "pick", "p": "O que aparece?", "rows": ["let idade = 15;", "if (idade >= 18) {", "  alert(\"Maior de idade\");", "} else {", "  alert(\"Menor de idade\");", "}"], "opts": ["Menor de idade", "Maior de idade", "15", "Nada"], "ok": 0, "e": "15 >= 18 é false: vai para o else."}, {"t": "type", "p": "E com idade = 18, o que aparece?", "rows": ["let idade = 18;", "if (idade >= 18) {", "  alert(\"Maior de idade\");", "} else {", "  alert(\"Menor de idade\");", "}"], "ac": ["maior de idade", "maior"], "e": "18 >= 18 é true (a borda entra): Maior de idade."}, {"t": "hot", "rows": ["let idade = 20;", "if (idade >= 18) {", "  [[a|alert(\"Maior de idade\");]]", "} else {", "  [[b|alert(\"Menor de idade\");]]", "}"], "p": "Com idade = 20, toque na linha que roda.", "ok": ["a"], "e": "20 >= 18 é true: roda o alert do if."}, {"t": "pick", "p": "Quando o else roda?", "opts": ["Quando a condição do if é false", "Sempre", "Quando a condição é true", "Nunca"], "ok": 0, "e": "O else é o caminho do false."}, {"t": "type", "p": "No Portugol era senao. No JavaScript é...", "ac": ["else"], "e": "senao = else."}, {"t": "order", "mono": true, "p": "Monte o código na ordem certa.", "items": ["if (nota >= 6) {", "alert(\"Passou\");", "} else {", "alert(\"Estude mais\");", "}"], "e": "if com a pergunta, o caminho do true, else, o caminho do false, e fecha."}, {"t": "pick", "p": "O que aparece?", "rows": ["let n = 7;", "if (n % 2 === 0) {", "  alert(\"Par\");", "} else {", "  alert(\"Impar\");", "}"], "opts": ["Impar", "Par", "7", "0"], "ok": 0, "e": "7 % 2 é 1, e 1 === 0 é false: Impar."}]}, {"id": 4, "nome": "else if: vários caminhos", "glyph": "🪜", "skill": "H4", "teoria": ["Com mais de dois caminhos, encadeamos perguntas com <b>else if<\/b>.", "O navegador testa <b>de cima para baixo<\/b> e para na <b>primeira<\/b> pergunta verdadeira.", "A ordem importa: comece pela condição mais exigente (a nota mais alta)."], "qs": [{"t": "hot", "rows": ["let nota = 5;", "if (nota >= 6) {", "  [[a|alert(\"Aprovado\");]]", "} else if (nota >= 4) {", "  [[b|alert(\"Recuperacao\");]]", "} else {", "  [[c|alert(\"Reprovado\");]]", "}"], "p": "Com nota = 5, toque na linha que roda.", "ok": ["b"], "e": "5 >= 6 é false; 5 >= 4 é true: Recuperacao."}, {"t": "type", "p": "O que aparece?", "rows": ["let nota = 8;", "if (nota >= 6) {", "  alert(\"Aprovado\");", "} else if (nota >= 4) {", "  alert(\"Recuperacao\");", "} else {", "  alert(\"Reprovado\");", "}"], "ac": ["aprovado"], "e": "8 >= 6 é true logo na primeira pergunta."}, {"t": "type", "p": "O que aparece?", "rows": ["let nota = 4;", "if (nota >= 6) {", "  alert(\"Aprovado\");", "} else if (nota >= 4) {", "  alert(\"Recuperacao\");", "} else {", "  alert(\"Reprovado\");", "}"], "ac": ["recuperacao"], "e": "4 >= 6 é false; 4 >= 4 é true (o igual vale)."}, {"t": "type", "p": "O que aparece?", "rows": ["let nota = 2;", "if (nota >= 6) {", "  alert(\"Aprovado\");", "} else if (nota >= 4) {", "  alert(\"Recuperacao\");", "} else {", "  alert(\"Reprovado\");", "}"], "ac": ["reprovado"], "e": "2 não passa em nenhuma pergunta: vai para o else."}, {"t": "pick", "p": "Por que a ordem das perguntas importa?", "opts": ["O navegador para na primeira pergunta verdadeira", "Ele testa de baixo para cima", "Ele testa todas e escolhe a maior", "A ordem nunca importa"], "ok": 0, "e": "Achou a primeira true, as outras nem são testadas."}, {"t": "hot", "rows": ["let nota = 9;", "if [[bug|(nota >= 4)]] {", "  alert(\"Recuperacao\");", "} else if (nota >= 6) {", "  alert(\"Aprovado\");", "}"], "p": "A nota 9 mostra Recuperacao! Toque na condição que está no lugar errado.", "ok": ["bug"], "e": "9 >= 4 já é true, então o navegador para ali. A pergunta >= 6 deveria vir antes."}, {"t": "slots", "p": "Radar: ligue cada velocidade ao que aparece.", "rows": ["if (vel > 80) {", "  alert(\"Multa\");", "} else if (vel > 60) {", "  alert(\"Atencao\");", "} else {", "  alert(\"OK\");", "}"], "pairs": [["vel = 90", "Multa"], ["vel = 70", "Atencao"], ["vel = 40", "OK"]], "e": "90 > 80: Multa. 70 > 60: Atencao. 40: nenhuma, OK."}]}, {"id": 5, "nome": "prompt e Number", "glyph": "⌨️", "skill": "H5", "teoria": ["<b>prompt<\/b> abre uma caixa para a pessoa digitar. <b>alert<\/b> mostra uma mensagem.", "O prompt devolve <b>texto<\/b>, mesmo que a pessoa digite um número.", "<b>Number(prompt(...))<\/b> transforma o texto em número. Sem ele, \"18\" + 1 vira \"181\"."], "qs": [{"t": "pick", "p": "A pessoa digita 18 no prompt. O que ele devolve?", "opts": ["O texto \"18\"", "O número 18", "true", "Nada"], "ok": 0, "e": "O prompt sempre devolve texto."}, {"t": "pick", "p": "Para transformar texto em número, usamos:", "opts": ["Number(...)", "alert(...)", "text(...)", "if(...)"], "ok": 0, "e": "Number(\"18\") vira o número 18."}, {"t": "type", "p": "Sem Number! A pessoa digita 18. O que aparece?", "rows": ["let idade = prompt(\"Idade:\");", "alert(idade + 1);"], "ac": ["181"], "e": "Texto + 1 junta: \"18\" + 1 vira \"181\"."}, {"t": "type", "p": "Agora com Number. A pessoa digita 18. O que aparece?", "rows": ["let idade = Number(prompt(\"Idade:\"));", "alert(idade + 1);"], "ac": ["19"], "e": "Com Number, 18 + 1 soma: 19."}, {"t": "pick", "p": "A pessoa digita 18. O alert aparece?", "rows": ["let idade = prompt(\"Idade:\");", "if (idade === 18) {", "  alert(\"Brinde!\");", "}"], "opts": ["Não: o texto \"18\" não é igual ao número 18", "Sim, sempre", "Sim, porque 18 é 18", "A página fecha"], "ok": 0, "e": "=== compara valor E tipo. Texto não é número: false. Faltou o Number."}, {"t": "order", "mono": true, "p": "Monte o Verificador de Maioridade.", "items": ["let idade = Number(prompt(\"Idade:\"));", "if (idade >= 18) {", "alert(\"Maior de idade\");", "} else {", "alert(\"Menor de idade\");", "}"], "e": "Lê a idade, pergunta, caminho do true, else, caminho do false."}, {"t": "slots", "p": "Ligue cada comando ao que ele faz.", "pairs": [["prompt(...)", "abre caixa para digitar"], ["alert(...)", "mostra uma mensagem"], ["Number(...)", "transforma texto em número"], ["confirm(...)", "botões OK e Cancelar"]], "e": "prompt lê, alert mostra, Number converte, confirm pergunta sim ou não."}]}, {"id": 6, "nome": "E, OU e NÃO", "glyph": "🔗", "skill": "H6", "teoria": ["<b>&amp;&amp;<\/b> (e): true só quando <b>as duas<\/b> perguntas são verdade.", "<b>||<\/b> (ou): true quando <b>pelo menos uma<\/b> é verdade.", "<b>!<\/b> (não): inverte. !true vira false."], "qs": [{"t": "pick", "p": "&& significa:", "opts": ["e: as duas precisam ser verdade", "ou: basta uma", "não: inverte", "igual"], "ok": 0, "e": "&& é o e."}, {"t": "type", "p": "true && false resulta em?", "ac": ["false", "falso"], "e": "Com &&, basta uma false para dar false."}, {"t": "type", "p": "true || false resulta em?", "ac": ["true", "verdadeiro"], "e": "Com ||, basta uma true."}, {"t": "type", "p": "!true resulta em?", "ac": ["false", "falso"], "e": "O ! inverte: true vira false."}, {"t": "pick", "p": "O que aparece?", "rows": ["let idade = 13;", "let altura = 1.50;", "if (idade >= 12 && altura >= 1.40) {", "  alert(\"Pode brincar\");", "} else {", "  alert(\"Nao pode\");", "}"], "opts": ["Pode brincar", "Nao pode", "13", "Nada"], "ok": 0, "e": "13 >= 12 é true e 1.50 >= 1.40 é true: as duas verdade."}, {"t": "multi", "p": "Promoção: estudante OU professor paga meia. Marque quem paga meia.", "opts": ["é estudante, não é professor", "não é estudante, é professor", "não é estudante nem professor", "é estudante e é professor"], "ok": [0, 1, 3], "e": "Com ||, basta uma ser verdade. Só quem não é nenhum dos dois paga inteira."}, {"t": "hot", "rows": ["let temIngresso = true;", "let idade = 16;", "if (idade >= 14 [[a|&&]] temIngresso) {", "  alert(\"Entra no show\");", "}"], "p": "Toque no sinal que exige que AS DUAS condições sejam verdade.", "ok": ["a"], "e": "&& exige as duas."}]}, {"id": 7, "nome": "Erros comuns", "glyph": "🐞", "skill": "H7", "teoria": ["<b>if (x = 5)<\/b> guarda, não compara. Use <b>===<\/b>.", "Um <b>;<\/b> logo depois do <b>if (...)<\/b> encerra o if: o bloco roda sempre.", "Esqueceu o <b>Number<\/b>? O texto não é igual ao número."], "qs": [{"t": "hot", "rows": ["let senha = prompt(\"Senha:\");", "if [[bug|(senha = \"1234\")]] {", "  alert(\"Senha certa\");", "}"], "p": "Mostra sempre Senha certa. Toque no erro.", "ok": ["bug"], "e": "Um = guarda o valor. Para comparar: senha === \"1234\"."}, {"t": "hot", "rows": ["let saldo = 50;", "if (saldo > 100)[[bug|;]] {", "  alert(\"Pode comprar\");", "}"], "p": "O alert aparece com saldo 50. Toque no erro.", "ok": ["bug"], "e": "O ; encerra o if ali. O bloco vira código solto e roda sempre."}, {"t": "pick", "p": "O que acontece com um ; logo depois do if (...)?", "opts": ["O if termina ali e o bloco roda sempre", "Nada muda", "A página trava", "O else roda"], "ok": 0, "e": "O ; fecha o if vazio. As chaves passam a rodar sempre."}, {"t": "hot", "rows": ["let idade = [[bug|prompt(\"Idade:\")]];", "if (idade === 18) {", "  alert(\"Brinde!\");", "}"], "p": "Digitando 18, o brinde não aparece. Toque no que precisa de conserto.", "ok": ["bug"], "e": "Faltou o Number: Number(prompt(\"Idade:\"))."}, {"t": "pick", "p": "Qual está escrito certo em JavaScript?", "opts": ["if (x > 5) {", "if x > 5 {", "se (x > 5) {", "if (x > 5) then {"], "ok": 0, "e": "A pergunta vai entre parênteses e o bloco entre chaves."}, {"t": "multi", "p": "Marque os erros que fazem a decisão dar resultado errado.", "opts": ["usar = no lugar de ===", "esquecer o Number no prompt", "ordem errada no else if", "usar let para criar a variável"], "ok": [0, 1, 2], "e": "let está certo. Os outros três dão resultado errado."}, {"t": "type", "p": "Quais letras aparecem, na ordem?", "rows": ["let x = 3;", "if (x > 5) {", "  alert(\"A\");", "}", "alert(\"B\");"], "ac": ["b"], "e": "3 > 5 é false: pula o A. O alert B está fora do if e sempre aparece."}]}, {"id": 8, "nome": "Desafio final", "glyph": "🏆", "skill": "MIX", "boss": true, "timer": 35, "hearts": 3, "teoria": ["Vale tudo o que você treinou. Cada questão tem 35 segundos e você só tem 3 vidas.", "Terminando aqui, o relatório com as suas habilidades fica pronto para enviar ao professor."], "qs": [{"t": "type", "skill": "H4", "p": "O que aparece? (cuidado com a borda)", "rows": ["let nota = 6;", "if (nota >= 6) {", "  alert(\"Aprovado\");", "} else if (nota >= 4) {", "  alert(\"Recuperacao\");", "} else {", "  alert(\"Reprovado\");", "}"], "ac": ["aprovado"], "e": "6 >= 6 é true: Aprovado."}, {"t": "pick", "skill": "H3", "p": "Total de R$ 100. O que aparece?", "rows": ["let total = 100;", "if (total > 100) {", "  alert(\"Frete gratis\");", "} else {", "  alert(\"Paga frete\");", "}"], "opts": ["Paga frete", "Frete gratis", "As duas mensagens", "Nada"], "ok": 0, "e": "100 > 100 é false: a borda não entra."}, {"t": "type", "skill": "H6", "p": "(10 > 3) && (2 > 5) resulta em?", "ac": ["false", "falso"], "e": "10 > 3 é true, mas 2 > 5 é false. Com &&: false."}, {"t": "hot", "skill": "H3", "rows": ["let idade = 17;", "if (idade >= 18) {", "  [[a|alert(\"Maior de idade\");]]", "} else {", "  [[b|alert(\"Menor de idade\");]]", "}"], "p": "Com idade = 17, toque na linha que roda.", "ok": ["b"], "e": "17 >= 18 é false: roda o else."}, {"t": "order", "skill": "H3", "mono": true, "p": "Monte o Par ou Ímpar.", "items": ["let n = Number(prompt(\"Numero:\"));", "if (n % 2 === 0) {", "alert(\"Par\");", "} else {", "alert(\"Impar\");", "}"], "e": "Lê o número, pergunta se o resto é 0, Par, else, Impar."}, {"t": "type", "skill": "H5", "p": "Digitando 7, o que aparece?", "rows": ["let n = Number(prompt(\"Numero:\"));", "alert(n * 2);"], "ac": ["14"], "e": "Com Number, 7 * 2 = 14."}, {"t": "pick", "skill": "H4", "p": "Com vel = 80, o que aparece?", "rows": ["if (vel > 80) {", "  alert(\"Multa\");", "} else if (vel > 60) {", "  alert(\"Atencao\");", "} else {", "  alert(\"OK\");", "}"], "opts": ["Atencao", "Multa", "OK", "Nada"], "ok": 0, "e": "80 > 80 é false; 80 > 60 é true: Atencao."}, {"t": "multi", "skill": "H7", "p": "Marque o que é verdade.", "opts": ["O else roda quando a condição do if é false", "=== compara valor e tipo", "|| exige que as duas sejam verdade", "O prompt devolve número"], "ok": [0, 1], "e": "|| basta uma verdade; o prompt devolve texto."}]}];
 
-/* ---------- cenas ---------- */
-function sDesktop(){return '<div class="scene desktop" data-zone="wallpaper">'+
- '<div class="icons" data-zone="icons">'+
-   ['Este PC','Docs','Fotos','Lixeira'].map(function(n){return '<div class="ic"><span class="icbox"></span>'+n+'</div>';}).join('')+
- '</div>'+
- '<div class="taskbar" data-zone="taskbar">'+
-   '<button class="tb-start" data-zone="start">Iniciar</button>'+
-   '<div class="tb-apps" data-zone="apps"><i></i><i></i><i></i></div>'+
-   '<div class="tb-tray" data-zone="tray">WiFi · vol · 14:35</div>'+
- '</div></div>';}
-
-function sTaskbar(){return '<div class="scene"><div class="taskbar solo" data-zone="taskbar">'+
-   '<button class="tb-start" data-zone="start">Iniciar</button>'+
-   '<div class="tb-apps" data-zone="apps"><i></i><i></i><i></i></div>'+
-   '<div class="tb-tray" data-zone="tray">WiFi · vol · 14:35</div>'+
- '</div></div>';}
-
-function sScreen4(){return '<div class="scene screen4">'+
- '<div class="edge e-top" data-zone="top">borda de cima</div>'+
- '<div class="edge e-bottom" data-zone="bottom">borda de baixo</div>'+
- '<div class="edge e-left" data-zone="left"></div>'+
- '<div class="edge e-right" data-zone="right"></div>'+
- '<div class="mid" data-zone="meio">tela sem a barra de tarefas</div></div>';}
-
-function sWindow(){return '<div class="scene win">'+
- '<div class="titlebar" data-zone="titulo"><span class="nm">prova.docx — Bloco de Notas</span>'+
-   '<span class="wbtn" data-zone="min">–</span><span class="wbtn" data-zone="max">□</span><span class="wbtn" data-zone="fechar">✕</span></div>'+
- '<div class="address" data-zone="endereco">C:\\Users\\Aluno\\Documentos</div>'+
- '<div class="body"><div class="side" data-zone="lateral">Acesso rápido<br>Este PC<br>Documentos<br>Downloads</div>'+
- '<div class="content" data-zone="conteudo">'+
-   ['trabalho.docx','foto.jpg','lista.txt'].map(function(f){return '<div class="file"><b></b>'+f+'</div>';}).join('')+
- '</div></div>'+
- '<div class="status" data-zone="status">3 arquivos · 245 KB</div></div>';}
-
-function sTree(){return '<div class="scene tree">'+
- '<div class="lvl"><div class="fold root" data-zone="pc">Este PC</div></div><div class="link"></div>'+
- '<div class="lvl"><div class="fold" data-zone="c">C: (Local)</div><div class="fold" data-zone="documentos">Documentos</div><div class="fold" data-zone="downloads">Downloads</div></div>'+
- '<div class="link"></div>'+
- '<div class="lvl"><div class="fold" data-zone="trabalhos">Trabalhos</div><div class="fold" data-zone="escola">Escola</div><div class="fold" data-zone="fotos">Fotos 2025</div><div class="fold" data-zone="musicas">Músicas</div><div class="fold" data-zone="provas">Provas</div></div>'+
- '</div>';}
-
-var SCENES={desktop:sDesktop,taskbar:sTaskbar,screen4:sScreen4,win:sWindow,tree:sTree};
-
-/* ---------- banco de questões ----------
- t: hot | pick | multi | type | keys | order | slots
-------------------------------------------------- */
-var LEVELS=[
-{"id":1,"nome":"Área de trabalho","glyph":"🖥️","skill":"H1","teoria":["A área de trabalho (desktop) é a tela principal que aparece depois que você entra com a sua senha.","Nela ficam os <b>ícones de atalho<\/b>, a <b>área livre<\/b> para criar pastas e a <b>barra de tarefas<\/b>, sempre embaixo.","O papel de parede é só decoração: mudar a imagem não muda nada no funcionamento do PC."],"qs":[{"t":"hot","scene":"desktop","p":"Toque nos ícones de atalho.","ok":["icons"],"e":"Ícones de atalho abrem programas e pastas com dois cliques."},{"t":"hot","scene":"desktop","p":"Toque na barra de tarefas.","ok":["taskbar","start","apps","tray"],"e":"A barra de tarefas é a faixa de baixo, com Iniciar, programas abertos e relógio."},{"t":"type","p":"Maria ligou o PC e digitou a senha. Apareceu a tela com papel de parede, ícones e a barra embaixo. Como se chama essa tela?","ac":["area de trabalho","desktop","a area de trabalho","área de trabalho"],"dica":"Duas palavras… ou o nome em inglês.","e":"É a área de trabalho, também chamada de desktop."},{"t":"multi","p":"O que faz parte da área de trabalho? Marque as 3 certas.","opts":["Ícones de atalho","Papel de parede","Barra de tarefas","Placa-mãe","Fonte de energia","Cabo de rede"],"ok":[0,1,2],"e":"Placa-mãe, fonte e cabo são peças físicas (hardware). A área de trabalho é o que você vê na tela."},{"t":"hot","scene":"desktop","p":"Toque na área livre onde você pode criar uma pasta nova.","ok":["wallpaper"],"e":"O espaço vazio do papel de parede aceita clique direito > Novo > Pasta."},{"t":"slots","p":"Ligue cada parte à sua função.","pairs":[["Ícone de atalho","abre um programa"],["Papel de parede","só decoração"],["Barra de tarefas","mostra o relógio"]],"e":"Cada parte tem um papel: atalho abre, papel de parede enfeita, barra de tarefas informa."}]},
-{"id":2,"nome":"Barra de tarefas e menu Iniciar","glyph":"🧭","skill":"H1","teoria":["A barra de tarefas tem três regiões: o <b>botão Iniciar<\/b>, os <b>ícones dos programas abertos<\/b> e a <b>bandeja do sistema<\/b> (hora, data, WiFi, volume).","Para fixar um favorito: clique direito no ícone &gt; Fixar na barra de tarefas.","O menu Iniciar abre com a tecla <b>Win<\/b> e traz a lista de programas, a caixa de pesquisa e os botões de Configurações, conta e Desligar.","Se a barra sumir, leve o mouse até a borda de baixo da tela."],"qs":[{"t":"hot","scene":"taskbar","p":"Toque no botão que abre o menu Iniciar.","ok":["start"],"e":"O botão Iniciar fica na ponta esquerda da barra."},{"t":"hot","scene":"taskbar","p":"Toque na bandeja do sistema (relógio, WiFi e volume).","ok":["tray"],"e":"A bandeja fica na ponta direita e mostra o estado do computador."},{"t":"hot","scene":"taskbar","p":"Toque na área que mostra os programas que estão abertos agora.","ok":["apps"],"e":"Os ícones do meio são os programas em uso neste momento."},{"t":"keys","p":"Sem usar o mouse: qual tecla abre o menu Iniciar?","combo":["Win"],"e":"A tecla Win (com o logotipo do Windows) abre o menu Iniciar sozinha."},{"t":"order","p":"Coloque na ordem certa para fixar o Chrome na barra de tarefas.","items":["Encontrar o ícone do Chrome","Clicar com o botão direito no ícone","Escolher \"Fixar na barra de tarefas\"","O ícone continua lá mesmo com o programa fechado"],"e":"Clique direito no ícone > Fixar na barra de tarefas."},{"t":"multi","p":"O que aparece quando você abre o menu Iniciar? Marque as 3 certas.","opts":["Lista de programas instalados","Caixa de pesquisa","Botão Desligar","A BIOS do computador","A tela de login","O painel traseiro do gabinete"],"ok":[0,1,2],"e":"Programas, pesquisa e os botões de conta, Configurações e Desligar."},{"t":"hot","scene":"screen4","p":"A barra de tarefas sumiu. Para qual borda você leva o mouse?","ok":["bottom"],"e":"A barra fica escondida na borda de baixo e reaparece quando o mouse chega lá."},{"t":"order","p":"Lucas quer desligar o PC do jeito certo. Ordene os passos.","items":["Salvar e fechar os trabalhos abertos","Clicar no botão Iniciar","Clicar no ícone de energia","Escolher Desligar"],"e":"Desligar pelo menu Iniciar evita perder arquivos e corromper o sistema."}]},
-{"id":3,"nome":"Arquivos, pastas e caminhos","glyph":"🗂️","skill":"H2","teoria":["O gerenciador de arquivos (Explorador de Arquivos, no Windows) organiza documentos, fotos, músicas e pastas. Abre com <b>Win + E<\/b>.","<b>Pasta<\/b> é a gaveta que guarda arquivos. <b>Caminho<\/b> é o endereço completo, como C:\\Users\\Aluno\\prova.docx","Nunca apague as pastas do sistema: Windows, Program Files e System32."],"qs":[{"t":"keys","p":"Monte o atalho que abre o Explorador de Arquivos.","combo":["Win","E"],"e":"Win + E — o E vem de Explorer."},{"t":"hot","scene":"tree","p":"Toque na pasta onde ficaria o arquivo prova.docx da escola.","ok":["escola"],"e":"Documentos > Escola: é lá que ficam os arquivos das aulas."},{"t":"hot","scene":"tree","p":"Toque no disco local, onde o Windows está instalado.","ok":["c"],"e":"C: é a unidade principal do computador."},{"t":"order","p":"Monte o caminho completo até o arquivo da prova. Toque na ordem certa.","items":["C:","Users","Aluno","Documentos","Escola","prova.docx"],"extra":["Downloads","Fotos 2025","Program Files"],"mono":true,"e":"C:\\Users\\Aluno\\Documentos\\Escola\\prova.docx — do disco até o arquivo."},{"t":"type","p":"No caminho C:\\Users\\aluno\\Documentos\\Escola\\prova.docx, qual é o nome do arquivo?","ac":["prova.docx","prova docx","prova"],"dica":"É o último pedaço do caminho.","e":"prova.docx — o que vem antes são pastas; .docx é a extensão."},{"t":"multi","p":"Quais pastas você NUNCA deve apagar? Marque as 3.","opts":["Windows","Program Files","System32","Downloads","Fotos 2025","Trabalhos"],"ok":[0,1,2],"e":"Sem essas pastas o computador pode parar de funcionar."},{"t":"slots","p":"Ligue cada palavra ao seu significado.","pairs":[["Pasta","gaveta que guarda arquivos"],["Caminho","endereço completo"],["Explorador","programa que organiza tudo"]],"e":"Pasta guarda, caminho localiza, explorador mostra."},{"t":"pick","p":"Por que guardar em pastas é melhor do que deixar tudo espalhado na área de trabalho?","opts":["Você acha o arquivo em segundos e não perde trabalho","Deixa o computador mais rápido para jogos","Aumenta a memória RAM do PC","Apaga vírus automaticamente"],"ok":0,"e":"Organização economiza tempo e evita perder arquivos."}]},
-{"id":4,"nome":"A janela e suas partes","glyph":"🪟","skill":"H3","teoria":["Quase toda janela tem as mesmas partes: <b>barra de título<\/b> (com minimizar, maximizar e fechar), <b>barra de endereço<\/b>, <b>menu lateral<\/b>, <b>área de conteúdo<\/b> e <b>barra de status<\/b>.","Aprender isso serve para qualquer programa, no Windows ou no Linux.","<b>Alt + F4<\/b> fecha a janela da frente. <b>Ctrl + C<\/b> copia e <b>Ctrl + V<\/b> cola."],"qs":[{"t":"hot","scene":"win","p":"Toque na barra de título.","ok":["titulo"],"e":"A barra de título mostra o nome do arquivo e do programa."},{"t":"hot","scene":"win","p":"João quer fechar sem salvar. Toque no botão certo.","ok":["fechar"],"e":"O X fecha a janela; o programa pergunta se você quer salvar."},{"t":"hot","scene":"win","p":"Toque na barra de endereço, que mostra onde você está.","ok":["endereco"],"e":"O endereço é o caminho da pasta aberta."},{"t":"hot","scene":"win","p":"Toque na área de conteúdo, onde aparecem os arquivos.","ok":["conteudo"],"e":"É o miolo da janela: arquivos, texto ou imagens."},{"t":"hot","scene":"win","p":"Toque na barra de status, que mostra quantos arquivos e o tamanho.","ok":["status"],"e":"A barra de status fica embaixo e resume o que está na janela."},{"t":"keys","p":"Monte o atalho de teclado que fecha a janela da frente.","combo":["Alt","F4"],"e":"Alt + F4 fecha o programa que está em uso."},{"t":"keys","p":"João escreveu um texto e quer copiar. Monte o atalho.","combo":["Ctrl","C"],"e":"Ctrl + C copia a seleção para a memória."},{"t":"keys","p":"Agora ele quer colar em outro lugar. Monte o atalho.","combo":["Ctrl","V"],"e":"Ctrl + V cola o que foi copiado."}]},
-{"id":5,"nome":"Configurações do sistema","glyph":"⚙️","skill":"H4","teoria":["Para mudar como o computador funciona, use as <b>Configurações<\/b> (novo) ou o <b>Painel de Controle<\/b> (antigo).","Caminho rápido: clique direito no botão Iniciar &gt; Configurações — ou <b>Win + I<\/b>.","Categorias: Sistema, Dispositivos, Rede e Internet, Personalização, Contas e Aplicativos.","No Linux é parecido: Configurações do Sistema (System Settings)."],"qs":[{"t":"keys","p":"Monte o atalho que abre as Configurações.","combo":["Win","I"],"e":"Win + I abre direto as Configurações."},{"t":"pick","p":"Qual é o caminho rápido pelo mouse para abrir as Configurações?","opts":["Clique direito no botão Iniciar > Configurações","Clique duplo no papel de parede","Apertar o botão de ligar duas vezes","Abrir o navegador e pesquisar"],"ok":0,"e":"Clique direito no Iniciar mostra um menu com Configurações."},{"t":"slots","p":"Em qual categoria você resolve cada coisa?","pairs":[["Personalização","papel de parede e cores"],["Dispositivos","mouse e impressora"],["Contas","foto e senha"],["Aplicativos","instalar e remover"]],"e":"Cada categoria junta ajustes parecidos."},{"t":"pick","p":"A tela está escura demais e o som muito baixo. Qual categoria você abre?","opts":["Sistema","Contas","Rede e Internet","Aplicativos"],"ok":0,"e":"Sistema cuida de tela, som e energia."},{"t":"type","p":"No Linux, o lugar equivalente às Configurações se chama Configurações do ______.","ac":["sistema","system","configuracoes do sistema","system settings"],"dica":"É o mesmo nome do que está na capa da nossa apostila.","e":"Configurações do Sistema (System Settings)."},{"t":"pick","p":"O WiFi da escola não conecta. Onde você procura primeiro?","opts":["Rede e Internet","Personalização","Contas","Sistema"],"ok":0,"e":"Rede e Internet reúne WiFi, cabo e conexões."}]},
-{"id":6,"nome":"Programas e acessórios","glyph":"📦","skill":"H5","teoria":["Instalar: baixe o instalador no <b>site oficial<\/b>, clique duplo no arquivo <b>.exe<\/b> ou <b>.msi<\/b> e siga Aceitar &gt; Próximo &gt; Instalar.","Remover: Configurações &gt; Aplicativos &gt; escolher o programa &gt; Desinstalar.","Acessório é um programa pequeno que já vem instalado, para tarefas rápidas. Não precisa baixar nada.","Calculadora (digite <b>calc<\/b>), Bloco de Notas (<b>notepad<\/b>), navegador, Paint, Ferramenta de Captura e o Explorador de Arquivos."],"qs":[{"skill":"H5","t":"order","p":"Ordene a instalação de um programa.","items":["Baixar o instalador no site oficial","Clicar duas vezes no arquivo .exe","Seguir Aceitar > Próximo > Instalar","Abrir pelo ícone no menu Iniciar"],"e":"Site oficial primeiro; o ícone só aparece no fim."},{"skill":"H5","t":"pick","p":"Seguro ou arriscado? — Baixar o Chrome em google.com/chrome.","opts":["Seguro","Arriscado"],"ok":0,"e":"Site oficial é o caminho seguro."},{"skill":"H5","t":"type","p":"Qual é a extensão mais comum do arquivo instalador no Windows?","ac":[".exe","exe","exe ou msi",".msi","msi"],"dica":"Três letras depois do ponto.","e":".exe (e também .msi)."},{"skill":"H5","t":"pick","p":"Por que não vale baixar o instalador de qualquer site?","opts":["O arquivo pode vir alterado, com vírus junto","Fica mais lento para baixar","O Windows cobra uma taxa","O programa vem em outro idioma"],"ok":0,"e":"Sites não oficiais costumam empacotar vírus e propaganda no instalador."},{"skill":"H6","t":"slots","p":"Ligue cada acessório ao que ele faz.","pairs":[["Calculadora","fazer contas"],["Bloco de Notas","texto simples"],["Paint","desenhar e editar imagem"],["Navegador","abrir sites"]],"e":"Todos já vêm prontos no sistema."},{"skill":"H6","t":"type","p":"O que você digita na pesquisa do menu Iniciar para abrir a calculadora?","ac":["calc","calculadora"],"dica":"Quatro letras.","e":"calc abre a Calculadora."},{"skill":"H6","t":"keys","p":"Qual tecla tira uma foto da tela inteira?","combo":["PrtSc"],"e":"Print Screen (PrtSc) copia a tela toda."}]},
-{"id":7,"nome":"Atalhos de teclado","glyph":"⌨️","skill":"H7","timer":25,"teoria":["Atalhos economizam tempo em tarefas repetidas. Os principais:","Win · Win+D · Win+E · Win+I · Alt+Tab · Ctrl+C · Ctrl+V · Ctrl+X · Ctrl+Z · Ctrl+A · Ctrl+Shift+Esc · PrtSc","Neste nível cada atalho tem tempo. Responda pelo teclado da tela."],"qs":[{"t":"keys","p":"Mostrar a área de trabalho, minimizando tudo.","combo":["Win","D"],"e":"Win + D — D de Desktop."},{"t":"keys","p":"Trocar entre os programas abertos.","combo":["Alt","Tab"],"e":"Alt + Tab alterna as janelas."},{"t":"keys","p":"Desfazer a última ação.","combo":["Ctrl","Z"],"e":"Ctrl + Z volta atrás."},{"t":"keys","p":"Recortar (mover) o texto ou arquivo selecionado.","combo":["Ctrl","X"],"e":"Ctrl + X recorta; Ctrl + V solta no destino."},{"t":"keys","p":"O PC travou. Abrir o Gerenciador de Tarefas.","combo":["Ctrl","Shift","Esc"],"e":"Ctrl + Shift + Esc abre direto o Gerenciador de Tarefas."},{"t":"keys","p":"Selecionar tudo o que está na janela.","combo":["Ctrl","A"],"e":"Ctrl + A seleciona tudo."},{"t":"keys","p":"Abrir as Configurações.","combo":["Win","I"],"e":"Win + I."},{"t":"keys","p":"Abrir o Explorador de Arquivos.","combo":["Win","E"],"e":"Win + E."}]},
-{"id":8,"nome":"Desafio final","glyph":"🏆","skill":"MIX","boss":true,"timer":35,"teoria":["Vale tudo o que você treinou. Cada questão tem 35 segundos e só 3 vidas.","Terminando aqui, o relatório com as suas habilidades fica pronto para enviar ao professor."],"hearts":3,"qs":[{"t":"type","skill":"H1","p":"Maria entrou com a senha e viu a tela com ícones, papel de parede e a barra embaixo. Nome dessa tela?","ac":["area de trabalho","desktop","área de trabalho"],"e":"Área de trabalho (desktop)."},{"t":"hot","skill":"H1","scene":"desktop","p":"Toque na parte da tela que mostra a hora e o WiFi.","ok":["tray"],"e":"Bandeja do sistema, na direita da barra de tarefas."},{"t":"keys","skill":"H1","p":"Abrir o menu Iniciar sem o mouse.","combo":["Win"],"e":"Tecla Win."},{"t":"order","skill":"H2","p":"Monte o caminho até a foto guardada em Documentos.","items":["C:","Users","Aluno","Documentos","Fotos 2025","festa.jpg"],"extra":["Escola","System32"],"mono":true,"e":"Do disco até o arquivo, pasta por pasta."},{"t":"hot","skill":"H3","scene":"win","p":"Toque na parte que mostra o nome do arquivo aberto.","ok":["titulo"],"e":"Barra de título."},{"t":"keys","skill":"H3","p":"Copiar o texto selecionado.","combo":["Ctrl","C"],"e":"Ctrl + C."},{"t":"pick","skill":"H5","p":"A professora pediu para remover o Edge. Qual caminho está certo?","opts":["Configurações > Aplicativos > Desinstalar","Apagar a pasta dele em Program Files","Arrastar o ícone para a Lixeira","Desligar o PC e ligar de novo"],"ok":0,"e":"Só o desinstalador oficial remove tudo direito."},{"t":"keys","skill":"H7","p":"O programa travou. Abrir o Gerenciador de Tarefas.","combo":["Ctrl","Shift","Esc"],"e":"Ctrl + Shift + Esc."},{"t":"keys","skill":"H7","p":"Ver a área de trabalho num instante.","combo":["Win","D"],"e":"Win + D."},{"t":"multi","skill":"H2","p":"Marque as 3 pastas que não podem ser apagadas.","opts":["System32","Windows","Program Files","Downloads","Trabalhos","Músicas"],"ok":[0,1,2],"e":"São as pastas do próprio sistema."}]}
-];
-
-var KEYS=["Ctrl","Win","Alt","Shift","Tab","Esc","PrtSc","F4","A","C","D","E","I","V","X","Z"];
+/* ---------- cena de código ---------- */
+function codeRow(n, raw){
+  var re=/\[\[([^|]+)\|([^\]]+)\]\]/g;
+  var out="",last=0,m;
+  while((m=re.exec(raw))){
+    out+= raw.slice(last,m.index).length? '<span class="cplain">'+esc(raw.slice(last,m.index))+'</span>':'';
+    out+= '<span class="ctok" data-zone="'+m[1]+'">'+esc(m[2])+'</span>';
+    last=re.lastIndex;
+  }
+  var rest=raw.slice(last);
+  if(rest.length)out+= '<span class="cplain">'+esc(rest)+'</span>';
+  return '<div class="cline"><span class="cno">'+(n!=null?n:'')+'</span><span class="ccode">'+out+'</span></div>';
+}
+function sCode(rows){
+  return '<div class="scene code">'+rows.map(function(l,i){
+    if(Array.isArray(l))return codeRow(l[0],l[1]);
+    return codeRow(i+1,l);
+  }).join('')+'</div>';
+}
 
 /* ---------- estado ---------- */
 var S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};
@@ -328,7 +246,7 @@ function $(s,c){return (c||document).querySelector(s);}
 function el(h){var d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
-function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9. ]/g," ").replace(/\s+/g," ").trim();}
+function norm(s){return String(s).toLowerCase().replace(/,/g,".").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9. ]/g," ").replace(/\s+/g," ").trim();}
 function limpaResp(v){
   v=norm(v);var r=/^(aparece|apareceria|imprime|imprimiria|imprimiu|mostra|escreve|sera|seria|resulta em|resultado|o resultado e|o resultado seria|a resposta e|resposta|e|eh|fica|vai imprimir|vai aparecer|o|a|um|uma)\s+/;
   var ant;do{ant=v;v=v.replace(r,"");}while(v!==ant&&v.length>1);
@@ -348,6 +266,7 @@ function secaoNivel(i,lv){
 }
 function totalEstrelas(){var t=0;for(var k in S.niveis)t+=S.niveis[k].estrelas||0;return t;}
 function concluidos(){var n=0;for(var k in S.niveis)if(S.niveis[k].estrelas>0)n++;return n;}
+function nRegulares(){return LEVELS.filter(function(l){return !l.boss;}).length;}
 function desbloqueado(i){
   if(i===0||S.liberarTudo)return true;
   var lv=LEVELS[i];
@@ -356,7 +275,6 @@ function desbloqueado(i){
 }
 function fmtTempo(ms){var s=Math.round(ms/1000);var m=Math.floor(s/60);return m+" min "+(s%60)+"s";}
 
-/* tempo de estudo e saídas da página */
 var tick=null;
 function iniciarRelogio(){
   if(tick)return;
@@ -366,33 +284,27 @@ document.addEventListener("visibilitychange",function(){
   if(document.hidden&&jogo){S.saidas=(S.saidas||0)+1;save();}
 });
 
-/* ============================================================
-   TELAS
-   ============================================================ */
+/* ============================================================ TELAS ============================================================ */
 var app=document.getElementById("app");
 var jogo=null;
 
-function topo(extra){
-  var e=extra||"";
-  return '<div class="topbar">'+e+'</div>';
-}
+function topo(extra){return '<div class="topbar">'+(extra||"")+'</div>';}
 
-/* --- início --- */
 function telaInicio(){
   jogo=null;
   var temProg=!!S.nome;
+  var totalNv=LEVELS.length;
   app.innerHTML=
    '<div style="height:14px"></div>'+
    '<div class="boot"><div class="screen">'+
-     '<div class="bootline mono">carregando o sistema…</div>'+
-     '<div class="lg"><b>SO · Aula 03</b></div>'+
-     '<div class="tb"><span></span><span></span><span></span><span class="clk mono">14:35</span></div>'+
+     '<div class="bootline mono">'+esc(GAME.boot)+'<span class="cursor"></span></div>'+
+     '<div class="lg"><b>'+GAME.eyebrow+'</b></div>'+
    '</div></div>'+
-   '<h1>Área de trabalho e aplicativos</h1>'+
-   '<p class="sub">Nove níveis de treino antes da atividade avaliativa. Dá para parar no meio e continuar depois — o progresso fica salvo neste aparelho.</p>'+
+   '<h1>'+GAME.titulo+'</h1>'+
+   '<p class="sub">'+GAME.sub+' Dá para parar no meio e continuar depois — o progresso fica salvo neste aparelho.</p>'+
    (temProg?
      '<div class="card"><h3>Continuar como '+esc(S.nome)+'</h3>'+
-      '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de '+LEVELS.length+' níveis · '+S.xp+' XP</p>'+
+      '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de '+totalNv+' níveis · '+S.xp+' XP</p>'+
       '<button class="btn" id="go">Continuar</button>'+
       '<button class="btn ghost small" id="trocar">Trocar de aluno</button></div>'
      :
@@ -421,18 +333,17 @@ function telaInicio(){
   }
 }
 
-/* --- mapa --- */
 function telaMapa(){
   jogo=null;iniciarRelogio();
-  var feitos=concluidos();
+  var feitos=concluidos(),totalNv=LEVELS.length,totalEst=totalNv*3;
   var h=topo(
     '<div class="grow"><b style="font-size:15px">'+esc(S.nome.split(" ")[0])+'</b>'+
-    '<div class="bar" style="margin-top:5px"><i style="width:'+Math.round(feitos/LEVELS.length*100)+'%"></i></div></div>'+
+    '<div class="bar" style="margin-top:5px"><i style="width:'+Math.round(feitos/totalNv*100)+'%"></i></div></div>'+
     '<span class="pill xp">★ '+S.xp+' XP</span>'+
     '<button class="iconbtn" id="rep" title="Relatório">📋</button>'+
     '<button class="iconbtn" id="cfg" title="Área do professor">⚙️</button>')+
-   '<h2>Trilha da Aula 03</h2>'+
-   '<p class="sub" style="margin-bottom:14px">'+feitos+' de '+LEVELS.length+' níveis concluídos · '+totalEstrelas()+' de '+(LEVELS.length*3)+' estrelas</p>'+
+   '<h2>'+GAME.titulo+'</h2>'+
+   '<p class="sub" style="margin-bottom:14px">'+feitos+' de '+totalNv+' níveis concluídos · '+totalEstrelas()+' de '+totalEst+' estrelas</p>'+
    '<div class="metabox">🎯 Meta da aula: <b>'+metaTxt()+'</b>'+(metaOk()?' · agora é bônus ou Chefão!':'')+'</div>'+
    '<div class="trail">';
 
@@ -457,7 +368,6 @@ function telaMapa(){
   $("#cfg").onclick=telaConfig;
   window.scrollTo(0,0);
 }
-
 
 /* --- area do professor (senha) --- */
 function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
@@ -494,7 +404,6 @@ function telaConfig(){
   window.scrollTo(0,0);
 }
 
-/* --- teoria rápida --- */
 function telaTeoria(lv){
   var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">'+esc(lv.nome)+'</b></div>')+
    '<div class="card"><h2>'+lv.glyph+' Antes de jogar</h2><ul class="theory" style="padding-left:20px;margin:0">'+
@@ -507,9 +416,7 @@ function telaTeoria(lv){
   window.scrollTo(0,0);
 }
 
-/* ============================================================
-   MOTOR DO NÍVEL
-   ============================================================ */
+/* ============================================================ MOTOR DO NÍVEL ============================================================ */
 function iniciarNivel(lv){
   limparVistos(lv);
   jogo={lv:lv,fila:shuffle(lv.qs),idx:0,vidas:(lv.hearts||5),total:lv.qs.length,
@@ -521,7 +428,6 @@ function regHab(q,acertou){
   if(!jogo.hab[s])jogo.hab[s]={c:0,t:0};
   jogo.hab[s].t++;if(acertou)jogo.hab[s].c++;
 }
-
 function proxima(){
   if(jogo.idx>=jogo.fila.length){fimNivel(true);return;}
   render(jogo.fila[jogo.idx]);
@@ -567,8 +473,8 @@ function ligarConferir(on){var b=$("#conf");if(b)b.disabled=!on;}
 
 var RENDER={
   hot:function(q,area){
-    area.innerHTML=SCENES[q.scene]();
-    area.insertBefore(el('<p class="sub">Toque direto na tela abaixo.</p>'),area.firstChild);
+    area.innerHTML=sCode(q.rows);
+    area.insertBefore(el('<p class="sub">Toque no trecho certo do código.</p>'),area.firstChild);
     area.addEventListener("click",function(ev){
       var z=ev.target.closest("[data-zone]");if(!z)return;
       var ok=q.ok.indexOf(z.dataset.zone)>=0;
@@ -612,53 +518,33 @@ var RENDER={
     });
     setTimeout(function(){inp.focus();},120);
   },
-  keys:function(q,area,acao){
-    area.appendChild(el('<p class="sub">Toque nas teclas para montar o atalho.</p>'));
-    var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
-    var bank=el('<div class="chips"></div>');area.appendChild(bank);
-    var esc2=el('<button class="btn ghost small" style="margin-bottom:10px">Limpar</button>');
-    var atual=[];
-    function pintar(){
-      tray.innerHTML=atual.map(function(k){return '<span class="chip key sel">'+k+'</span>';}).join('<span style="align-self:center">+</span>');
-      ligarConferir(atual.length>0);
-    }
-    shuffle(KEYS).forEach(function(k){
-      var b=el('<button class="chip key">'+k+'</button>');
-      b.onclick=function(){ if(atual.indexOf(k)<0){atual.push(k);pintar();} };
-      bank.appendChild(b);
-    });
-    esc2.onclick=function(){atual=[];pintar();};
-    area.appendChild(esc2);
-    botaoConferir(acao,function(){
-      var a=atual.slice().sort().join("+"),b=q.combo.slice().sort().join("+");
-      julgar(q,a===b,a===b?null:"O certo é "+q.combo.join(" + ")+".");
-    });
-  },
   order:function(q,area,acao){
     area.appendChild(el('<p class="sub">Toque na ordem certa. Toque de novo em cima para tirar.</p>'));
     var tray=el('<div class="tray" id="tray"></div>');area.appendChild(tray);
     var bank=el('<div class="chips"></div>');area.appendChild(bank);
-    var todos=q.items.concat(q.extra||[]);
-    var montado=[],bots={};
-    function pintar(){
+    var todos=shuffle(q.items.concat(q.extra||[]));
+    var montado=[]; // {text, btn}
+    todos.forEach(function(it){
+      var b=el('<button class="chip'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
+      b.onclick=function(){
+        if(b.classList.contains("used")||montado.length>=q.items.length)return;
+        montado.push({text:it,btn:b});b.classList.add("used");pintarTray();
+      };
+      bank.appendChild(b);
+    });
+    function pintarTray(){
       tray.innerHTML="";
-      montado.forEach(function(it,pos){
-        var c=el('<button class="chip sel'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
-        c.onclick=function(){montado.splice(pos,1);bots[it].classList.remove("used");pintar();};
+      montado.forEach(function(m,pos){
+        var c=el('<button class="chip sel'+(q.mono?" mono":"")+'">'+esc(m.text)+'</button>');
+        c.onclick=function(){ montado.splice(pos,1); m.btn.classList.remove("used"); pintarTray(); };
         tray.appendChild(c);
       });
       ligarConferir(montado.length===q.items.length);
     }
-    shuffle(todos).forEach(function(it){
-      var b=el('<button class="chip'+(q.mono?" mono":"")+'">'+esc(it)+'</button>');
-      bots[it]=b;
-      b.onclick=function(){ if(montado.length>=q.items.length)return; montado.push(it);b.classList.add("used");pintar(); };
-      bank.appendChild(b);
-    });
-    pintar();
     botaoConferir(acao,function(){
-      var ok=montado.length===q.items.length&&montado.every(function(v,i){return v===q.items[i];});
-      julgar(q,ok,ok?null:"A ordem certa é: "+q.items.join(q.mono?" \\ ":" → "));
+      var vals=montado.map(function(m){return m.text;});
+      var ok=vals.length===q.items.length&&vals.every(function(v,i){return v===q.items[i];});
+      julgar(q,ok,ok?null:"A ordem certa é: "+q.items.join(q.mono?"  ":" → "));
     });
   },
   slots:function(q,area,acao){
@@ -698,7 +584,6 @@ var RENDER={
 };
 function shuffleIdx(q){var a=[];for(var i=0;i<q.opts.length;i++)a.push(i);return shuffle(a);}
 
-/* --- julgamento e feedback --- */
 function julgar(q,ok,msg){
   if(!jogo||jogo.travado)return;          /* uma resposta por questão: ignora toques extras */
   jogo.travado=true;document.body.classList.add("travado");
@@ -720,14 +605,13 @@ function julgar(q,ok,msg){
     if(!ok){
       if(jogo.vidas<=0){fimNivel(false);return;}
       var copia={};for(var k in q)copia[k]=q[k];copia._rep=true;copia._vista=true;
-      jogo.fila.push(copia);           // repete a questão errada no fim
+      jogo.fila.push(copia);
     }
     jogo.idx++;proxima();
   };
   bc.focus();
 }
 
-/* --- fim do nível --- */
 function fimNivel(venceu){
   var lv=jogo.lv;
   var metaAntes=metaOk();
@@ -766,9 +650,7 @@ function fimNivel(venceu){
 }
 function limparVistos(lv){lv.qs.forEach(function(q){delete q._vista;});}
 
-/* ============================================================
-   RELATÓRIO
-   ============================================================ */
+/* ============================================================ RELATÓRIO ============================================================ */
 function agregarHab(){
   var r={};
   Object.keys(HAB).forEach(function(h){r[h]={c:0,t:0};});
@@ -779,30 +661,30 @@ function agregarHab(){
   return r;
 }
 function codigo(){
-  var base=S.nome+"|"+S.xp+"|"+concluidos()+"|"+totalEstrelas()+"|"+(new Date().toISOString().slice(0,10));
+  var base=S.nome+"|"+S.xp+"|"+concluidos()+"|"+totalEstrelas()+"|"+GAME.eyebrow+"|"+(new Date().toISOString().slice(0,10));
   var h=5381;for(var i=0;i<base.length;i++){h=((h<<5)+h+base.charCodeAt(i))>>>0;}
   return h.toString(36).toUpperCase().slice(0,6).padStart(6,"X");
 }
 function medalha(){
-  var f=concluidos(),e=totalEstrelas();
-  if(f>=9&&e>=25)return ["🏆","Administrador do sistema"];
-  if(f>=9)return ["🥇","Técnico em treinamento"];
-  if(f>=6)return ["🥈","Usuário avançado"];
-  if(f>=3)return ["🥉","Usuário em formação"];
+  var f=concluidos(),e=totalEstrelas(),totalNv=LEVELS.length;
+  if(f>=totalNv&&e>=totalNv*3-2)return ["🏆","Arquiteto(a) de decisões"];
+  if(f>=totalNv)return ["🥇","Nenhum caminho errado"];
+  if(f>=Math.ceil(totalNv*0.6))return ["🥈","Decidindo em treino"];
+  if(f>=Math.ceil(totalNv*0.3))return ["🥉","Estagiário(a) do if"];
   return ["🧩","Começando agora"];
 }
 
 function telaRelatorio(){
   if(!S.nome){telaInicio();return;}
-  var hab=agregarHab(),med=medalha(),fim=concluidos()>=9;
+  var hab=agregarHab(),med=medalha(),totalNv=LEVELS.length,fim=concluidos()>=totalNv;
   var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Relatório</b></div>');
   h+='<div class="medal"><span class="m">'+med[0]+'</span><div><b>'+med[1]+'</b><div class="sub">'+esc(S.nome)+(S.turma?' · '+esc(S.turma):'')+'</div></div></div>';
-  if(!fim)h+='<div class="warn">Relatório parcial: faltam '+(9-concluidos())+' nível(is). Dá para continuar em casa e gerar de novo.</div>';
+  if(!fim)h+='<div class="warn">Relatório parcial: faltam '+(totalNv-concluidos())+' nível(is). Dá para continuar em casa e gerar de novo.</div>';
 
   h+='<div class="card"><h3>Resumo</h3>'+
      kv("Meta da aula",metaTxt())+
-     kv("Níveis concluídos",concluidos()+" de "+LEVELS.length)+
-     kv("Estrelas",totalEstrelas()+" de 27")+
+     kv("Níveis concluídos",concluidos()+" de "+totalNv)+
+     kv("Estrelas",totalEstrelas()+" de "+(totalNv*3))+
      kv("XP",S.xp)+
      kv("Tempo de estudo",fmtTempo(S.tempo||0))+
      kv("Sessões",(S.sessoes||1))+
@@ -815,14 +697,14 @@ function telaRelatorio(){
   Object.keys(HAB).forEach(function(k){
     var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
     var cor=!d.t?"var(--line)":p>=75?"var(--ok)":p>=50?"var(--gold)":"var(--bad)";
-    h+='<div class="skill"><div class="hd"><span>'+k+" · "+HAB[k]+'</span><i>'+(d.t?p+"%":"—")+'</i></div>'+
+    h+='<div class="skill"><div class="hd"><span>'+esc(HAB[k])+'</span><i>'+(d.t?p+"%":"—")+'</i></div>'+
        '<div class="bar"><i style="width:'+p+'%;background:'+cor+'"></i></div></div>';
   });
   h+='</div>';
 
   var fracos=Object.keys(HAB).filter(function(k){var d=hab[k];return d.t&&d.c/d.t<0.75;});
   h+='<div class="card"><h3>O que revisar antes da prova</h3>'+
-      (fracos.length? '<ul style="padding-left:20px;margin:0">'+fracos.map(function(k){return "<li>"+HAB[k]+"</li>";}).join("")+'</ul>'
+      (fracos.length? '<ul style="padding-left:20px;margin:0">'+fracos.map(function(k){return "<li>"+esc(HAB[k])+"</li>";}).join("")+'</ul>'
        : '<p class="sub" style="margin:0">'+(concluidos()?"Nada pendente até aqui. Refaça os níveis de menos estrelas para fixar.":"Jogue pelo menos um nível para o relatório mostrar as habilidades.")+'</p>')+
      '</div>';
 
@@ -843,15 +725,15 @@ function telaRelatorio(){
 }
 function kv(a,b){return '<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';}
 
-/* --- relatório em PNG --- */
 function gerarPNG(hab,med){
+  var totalNv=LEVELS.length;
   var W=900,H=1282,c=document.createElement("canvas");c.width=W;c.height=H;
   var x=c.getContext("2d");
   var F='"Segoe UI",Roboto,system-ui,sans-serif';
   x.fillStyle="#ffffff";x.fillRect(0,0,W,H);
   x.fillStyle="#15697f";x.fillRect(0,0,W,120);
-  x.fillStyle="#ffffff";x.font="700 34px "+F;x.fillText("Sistemas Operacionais — Aula 03",48,60);
-  x.font="400 20px "+F;x.fillText("Área de trabalho e aplicativos · relatório de treino",48,94);
+  x.fillStyle="#ffffff";x.font="700 30px "+F;x.fillText(GAME.eyebrow,48,58);
+  x.font="400 19px "+F;x.fillText(GAME.titulo.replace(/<[^>]+>/g,"")+" · relatório de treino",48,92);
 
   var y=170;
   x.fillStyle="#0f2230";x.font="700 30px "+F;x.fillText(S.nome,48,y);y+=34;
@@ -869,8 +751,8 @@ function gerarPNG(hab,med){
   }
   x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Resumo",48,y);y+=34;
   linha("Meta da aula",metaTxt());
-  linha("Níveis concluídos",concluidos()+" de "+LEVELS.length);
-  linha("Estrelas",totalEstrelas()+" de 27");
+  linha("Níveis concluídos",concluidos()+" de "+totalNv);
+  linha("Estrelas",totalEstrelas()+" de "+(totalNv*3));
   linha("XP acumulado",S.xp);
   linha("Tempo de estudo",fmtTempo(S.tempo||0));
   linha("Sessões",(S.sessoes||1));
@@ -880,15 +762,15 @@ function gerarPNG(hab,med){
   x.fillStyle="#0f2230";x.font="700 22px "+F;x.fillText("Habilidades avaliadas",48,y);y+=34;
   Object.keys(HAB).forEach(function(k){
     var d=hab[k],p=d.t?Math.round(d.c/d.t*100):0;
-    x.fillStyle="#0f2230";x.font="400 17px "+F;
-    var txt=k+" · "+HAB[k];
-    x.fillText(txt.length>62?txt.slice(0,60)+"…":txt,48,y);
+    x.fillStyle="#0f2230";x.font="400 16px "+F;
+    var txt=HAB[k];
+    x.fillText(txt.length>66?txt.slice(0,64)+"…":txt,48,y);
     x.textAlign="right";x.font="700 17px "+F;x.fillText(d.t?p+"%":"—",W-48,y);x.textAlign="left";
     y+=12;
     x.fillStyle="#e2eaf0";x.fillRect(48,y,W-96,12);
     x.fillStyle=!d.t?"#c6d4de":p>=75?"#1f8a4c":p>=50?"#e0900a":"#c23b4d";
     x.fillRect(48,y,(W-96)*p/100,12);
-    y+=40;
+    y+=38;
   });
 
   y+=10;
@@ -903,7 +785,7 @@ function gerarPNG(hab,med){
     c.toBlob(function(b){
       if(!b){saida.appendChild(c);return;}
       var u=URL.createObjectURL(b),a=document.createElement("a");
-      a.href=u;a.download="relatorio-SO-aula03-"+norm(S.nome).replace(/ /g,"-")+".png";
+      a.href=u;a.download="relatorio-"+STORE+"-"+norm(S.nome).replace(/ /g,"-")+".png";
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(function(){URL.revokeObjectURL(u);},4000);
       saida.appendChild(el('<div class="note" style="margin-top:12px">Se o download não abrir, use a imagem abaixo: segure o dedo sobre ela para salvar.</div>'));

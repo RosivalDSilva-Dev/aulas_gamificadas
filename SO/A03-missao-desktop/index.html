@@ -55,6 +55,8 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 .xpbar{height:16px;background:#fff;border:2px solid var(--line);border-radius:5px;overflow:hidden}
 .xpbar>i{display:block;height:100%;background:var(--yel);border-right:2px solid var(--line)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin:14px 0}
+.tag{font-size:11px;font-weight:700;letter-spacing:.05em;color:#555;margin-bottom:4px}
+.metabox{background:#fff6d6;border:2px solid #e0b100;border-radius:8px;padding:8px 12px;margin:10px 0}
 .pcard{text-align:left;font:inherit;color:inherit;background:#fff;border:2px solid var(--line);border-radius:8px;padding:12px 14px;box-shadow:4px 4px 0 var(--line);cursor:pointer}
 .pcard:hover{background:#fffbe8}
 .pcard .ic{font-size:28px}
@@ -694,6 +696,10 @@ const matchKeys=(r)=>{
 const orderCopy=orderC('Prática do Bloco de Notas: coloque em ordem os passos para <b>duplicar um texto</b>.',['Selecionar o texto (Ctrl + A)','Copiar (Ctrl + C)','Clicar onde quer colar','Colar (Ctrl + V)'],70);
 
 /* ================= FASES ================= */
+/* meta da aula: as 5 primeiras fases valem a nota; 6 e 7 sao bonus; o Chefao libera com a meta */
+const META=5;
+const metaFases=()=>PH.slice(0,META).filter(p=>S.phases[p.id]&&S.phases[p.id].done).length;
+const metaTxt=()=>metaFases()>=META?'concluída ✔':metaFases()+' de '+META+' fases';
 const PH=[
  {id:'desk',icon:'🖥️',title:'Fase 1 · Área de Trabalho',short:'Desktop, barra de tarefas e Menu Iniciar',badge:'Explorador do Desktop',ch:[clickDesktop,clickDesktop,bucketDesk,labelStart,orderPin]},
  {id:'files',icon:'📁',title:'Fase 2 · Arquivos e Pastas',short:'Explorador, caminhos e cuidados',badge:'Arquivista',ch:[pathBuild,treeFind,multiSys,clozePasta,pathBuild]},
@@ -702,7 +708,7 @@ const PH=[
  {id:'inst',icon:'📦',title:'Fase 5 · Instalar e Remover',short:'Do jeito certo e seguro',badge:'Instalador Seguro',ch:[orderInstall,spotSite,orderRemove,multiRemove,clozeInst]},
  {id:'acc',icon:'🧰',title:'Fase 6 · Acessórios',short:'Calculadora, Bloco de Notas e cia.',badge:'Faz-Tudo',ch:[matchAcc,typeStart,keysC(['prtsc','explorer']),multiAcc,clozeAcc]},
  {id:'keys',icon:'⌨️',title:'Fase 7 · Atalhos de Teclado',short:'Win, Alt+Tab, Ctrl+C/V/X/Z…',badge:'Mestre do Atalho',ch:[keysC(),keysC(),keysC(),matchKeys,orderCopy]},
- {id:'boss',boss:true,icon:'👾',title:'CHEFÃO · Manutenção do Laboratório',short:'7 desafios misturados, tempo apertado. Libera ao concluir 5 fases.',badge:'Chefão Derrotado',ch:[]}
+ {id:'boss',boss:true,icon:'👾',title:'CHEFÃO · Manutenção do Laboratório',short:'7 desafios misturados, tempo apertado. Libera ao concluir a meta (fases 1 a 5).',badge:'Chefão Derrotado',ch:[]}
 ];
 
 /* ================= TELAS ================= */
@@ -748,10 +754,11 @@ function showMap(){
   const bl=badgesList();
   const cards=PH.map(p=>{
     const st=S.phases[p.id];
-    const locked=p.boss&&doneCount(true)<5&&!S.liberarTudo;
+    const locked=p.boss&&metaFases()<META&&!S.liberarTudo;
+    const idx=PH.indexOf(p);
     const b=h('button',{class:'pcard'+(st&&st.done?' done':'')+(locked?' locked':'')+(p.boss?' boss':''),disabled:locked?'disabled':null,onclick:()=>play(p.id)},
-      h('div',{class:'ic'},locked?'🔒':p.icon),h('h3',{},p.title),h('div',{class:'small'},p.short),
-      h('div',{class:'stars'},st&&st.done?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.xp+' XP':(locked?'Complete 5 fases para liberar':'Ainda não jogada')));
+      h('div',{class:'tag'},p.boss?'🏆 CHEFÃO':(idx<META?'🎯 META DA AULA':'⭐ BÔNUS')),h('div',{class:'ic'},locked?'🔒':p.icon),h('h3',{},p.title),h('div',{class:'small'},p.short),
+      h('div',{class:'stars'},st&&st.done?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.xp+' XP':(locked?'Conclua a meta (fases 1 a 5)':'Ainda não jogada')));
     return b;
   });
   mount('Missão Desktop.exe — '+S.name,h('div',{},
@@ -759,6 +766,7 @@ function showMap(){
       h('div',{},h('div',{class:'small'},'Aluno'),h('h1',{style:'font-size:28px'},S.name)),
       h('div',{class:'lvl'},h('div',{class:'px'},'Nível: '+lv.name),h('div',{class:'xpbar'},h('i',{style:'width:'+pct+'%'})),h('div',{class:'small'},tx+' XP'+(lv.next?' · próximo nível em '+lv.next+' XP':' · nível máximo!')))),
     bl.length?h('div',{class:'badges'},bl.map(x=>h('span',{class:'badge'},x.i+' '+x.t))):h('p',{class:'small'},'Nenhuma medalha ainda. Escolha uma fase para começar.'),
+    h('div',{class:'metabox'},'🎯 Meta da aula: ',h('b',{},metaTxt()),metaFases()>=META?' · agora é bônus ou Chefão!':''),
     h('div',{class:'grid'},cards),
     h('div',{class:'actions'},
       h('button',{class:'btn warn',onclick:showCard},'📸 Cartão de progresso (enviar print)'),
@@ -872,7 +880,7 @@ function showCard(){
   const code=verCode(S.name,tx,nph,lv2);
   const bl=badgesList();
   const rows=PH.map(p=>{const st=S.phases[p.id];return h('tr',{},h('td',{},p.icon+' '+p.title.replace(/^Fase \d · /,'')),h('td',{},st&&st.done?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars):'—'),h('td',{},st&&st.done?st.xp:'—'),h('td',{},S.attempts[p.id]||0));});
-  const summary='Missão Desktop (Aula 03) — '+S.name+(S.turma?' ('+S.turma+')':'')+' | Nível: '+lv.name+' | XP: '+tx+' | Fases: '+nph+'/'+PH.length+' | Acertos: '+acc+'% | Saídas da página: '+lv2+' | Código: '+code;
+  const summary='Missão Desktop (Aula 03) — '+S.name+(S.turma?' ('+S.turma+')':'')+' | Meta: '+metaTxt()+' | Nível: '+lv.name+' | XP: '+tx+' | Fases: '+nph+'/'+PH.length+' | Acertos: '+acc+'% | Saídas da página: '+lv2+' | Código: '+code;
   mount('Missão Desktop.exe — Cartão de progresso',h('div',{},
     h('div',{class:'cardp'},
       h('div',{class:'small'},'Sistemas Operacionais · Aula 03 · Área de Trabalho e Aplicativos'),
@@ -881,6 +889,7 @@ function showCard(){
       h('div',{class:'crow'},
         h('div',{class:'stat'},'Nível',h('b',{},lv.name)),
         h('div',{class:'stat'},'XP total',h('b',{},tx)),
+        h('div',{class:'stat'},'Meta da aula',h('b',{style:'font-size:17px'},metaTxt())),
         h('div',{class:'stat'},'Fases concluídas',h('b',{},nph+' / '+PH.length)),
         h('div',{class:'stat'},'Acertos',h('b',{},acc+'%')),
         h('div',{class:'stat'},'Tempo de jogo',h('b',{style:'font-size:17px'},fmtTime(S.stats.seconds))),
