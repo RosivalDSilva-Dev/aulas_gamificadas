@@ -86,6 +86,10 @@ def patch(h):
                  'function render(q){\n  if(cron){clearInterval(cron);cron=null;}\n  var lv=jogo.lv;\n'
                  '  jogo.travado=false;document.body.classList.remove("travado");\n'
                  '  var velho=document.querySelector(".feed");if(velho)velho.remove();\n', 'render')
+    # codigo (rows) aparece em todas as questoes, nao so nas de "tocar no trecho"
+    if 'q.rows&&q.t!=="hot"' not in h:
+        h = sub1(h, "  h+='<h2 style=\"margin-bottom:12px\">'+esc(q.p)+'</h2>';\n",
+                 "  h+='<h2 style=\"margin-bottom:12px\">'+esc(q.p)+'</h2>';\n  if(q.rows&&q.t!==\"hot\")h+=sCode(q.rows);\n", 'rows no enunciado')
     # respostas digitadas: aceita "imprime 5", "o resultado e 5" etc.
     if 'function limpaResp' not in h and 'function norm(s)' in h:
         i = h.index('\n', h.index('function norm(s)')) + 1
