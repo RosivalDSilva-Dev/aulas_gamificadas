@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1b7a45">
+<meta name="theme-color" content="#9f1d1d">
 <title>Missão Desktop — Revisão de Sistemas Operacionais (Aula 03)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --wall:#1f6b44;--wall2:#195b39;--chrome:#e6e9f0;--paper:#f7f8fb;--ink:#16213e;--dim:#56607f;
-  --blue:#1b7a45;--blueD:#12582f;--yel:#ffd23f;--coral:#ff6b4a;--good:#23a664;--bad:#e0483b;--line:#16213e;
+  --wall:#8a1b1b;--wall2:#771515;--chrome:#e6e9f0;--paper:#f7f8fb;--ink:#16213e;--dim:#56607f;
+  --blue:#9f1d1d;--blueD:#761414;--yel:#ffd23f;--coral:#ff6b4a;--good:#23a664;--bad:#c77700;--line:#16213e;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -26,7 +26,7 @@ body{
 h1,h2,h3{font-family:'Pixelify Sans','Courier New',monospace;margin:0}
 
 /* janela-moldura do jogo */
-.frame{background:var(--chrome);border:2px solid var(--line);border-radius:8px;box-shadow:7px 7px 0 #07241499;overflow:hidden}
+.frame{background:var(--chrome);border:2px solid var(--line);border-radius:8px;box-shadow:7px 7px 0 #3a0a0a99;overflow:hidden}
 .tbar{display:flex;justify-content:space-between;align-items:center;background:var(--blue);color:#fff;padding:7px 12px;font-family:'Pixelify Sans',monospace;font-weight:700;font-size:16px;border-bottom:2px solid var(--line)}
 .tbar .wb2{display:flex;gap:5px}
 .tbar .wb2 i{width:16px;height:16px;background:#ffffff33;border:1.5px solid #fff;border-radius:3px;display:block}
@@ -76,7 +76,7 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 .who b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .who span{font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:560px){.who{order:3;flex:1 1 100%}}
-.rodape{max-width:940px;margin:0 auto;padding:6px 12px calc(26px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:#e4f3ea}
+.rodape{max-width:940px;margin:0 auto;padding:6px 12px calc(26px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:#fbe3df}
 .hud-r{display:flex;gap:14px;align-items:center;font-weight:700}
 .dots{display:flex;gap:6px;margin:12px 0}
 .dot{flex:1;height:10px;background:#fff;border:2px solid var(--line);border-radius:4px}
@@ -91,7 +91,7 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 .stage,.chbox{-webkit-user-select:none;user-select:none}
 .frozen{pointer-events:none}
 .fb{margin-top:14px;padding:12px 14px;border:2px solid var(--line);border-radius:8px;box-shadow:4px 4px 0 var(--line)}
-.fb.ok{background:#d6f3e2}.fb.bad{background:#ffe0da}
+.fb.ok{background:#d6f3e2}.fb.bad{background:#fff1dc}
 .fb-h{font-weight:700;font-size:18px;font-family:'Pixelify Sans',monospace}
 .fb-b{margin:4px 0 10px}
 
@@ -99,7 +99,7 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 .chip{display:inline-block;background:var(--yel);color:#2b2200;border:2px solid var(--line);box-shadow:2px 2px 0 var(--line);padding:7px 11px;border-radius:6px;font-weight:600;font-size:15px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .chip.sel{outline:3px solid var(--coral);outline-offset:1px}
 .chip.dragging{opacity:.35}
-.chip.ok{background:#a8e6c1}.chip.bad{background:#ffb4aa}
+.chip.ok{background:#a8e6c1}.chip.bad{background:#ffd9a8}
 .chip.locked{cursor:default}
 .ghost{position:fixed;z-index:999;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:5px 5px 0 #0007}
 .dz{border-radius:6px}
@@ -123,8 +123,8 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 /* multi */
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
 .tile{font:inherit;font-weight:600;text-align:left;background:#fff;border:2px solid var(--line);border-radius:6px;padding:11px 12px;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
-.tile.on{background:#cfeedd;box-shadow:none;transform:translate(2px,2px)}
-.tile.ok{background:#a8e6c1}.tile.bad{background:#ffb4aa}
+.tile.on{background:#f6d5d0;box-shadow:none;transform:translate(2px,2px)}
+.tile.ok{background:#a8e6c1}.tile.bad{background:#ffd9a8}
 
 /* simulações do sistema */
 .mock{background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:6px;overflow:hidden;-webkit-user-select:none;user-select:none}
@@ -169,20 +169,20 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 .node.open>.kids{display:block}
 .node.open>.fold .car{transform:rotate(90deg)}
 .car{display:inline-block;transition:transform .15s;margin-right:4px}
-.file.ok{background:#a8e6c1}.file.bad{background:#ffb4aa}
+.file.ok{background:#a8e6c1}.file.bad{background:#ffd9a8}
 .cfg{max-width:540px;margin:0 auto;padding:12px}
 .cfg-h{font-weight:700;margin-bottom:8px}
 .cfg-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .cfg-t{background:#fff;border:2px solid #b8c0e2;border-radius:8px;padding:12px 6px;text-align:center;font-size:13px;font-weight:700;cursor:pointer}
 .cfg-t i{display:block;font-style:normal;font-size:24px;margin-bottom:4px}
-.cfg-t.ok{background:#a8e6c1;border-color:var(--good)}.cfg-t.bad{background:#ffb4aa;border-color:var(--bad)}
+.cfg-t.ok{background:#a8e6c1;border-color:var(--good)}.cfg-t.bad{background:#ffd9a8;border-color:var(--bad)}
 .serp{max-width:580px;margin:0 auto;display:grid;gap:8px}
 .urlbar{background:#fff;border:1px solid #b8c0e2;border-radius:20px;padding:6px 12px;font-size:13px;margin:8px}
 .res{background:#fff;border:2px solid #cdd3ee;border-radius:8px;padding:9px 12px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .res .u{color:#1a7f37;font-size:12px;font-family:ui-monospace,Menlo,monospace}
 .res .tt2{color:#1a0dab;font-weight:700}
 .res.ad{background:#fff3b0;border:2px dashed #d9a400}
-.res.ok{background:#a8e6c1;border-color:var(--good)}.res.bad{background:#ffb4aa;border-color:var(--bad)}
+.res.ok{background:#a8e6c1;border-color:var(--good)}.res.bad{background:#ffd9a8;border-color:var(--bad)}
 
 /* teclado virtual */
 .combo{background:#0d1530;border:2px solid var(--line);color:#7ff0ff;border-radius:6px;padding:12px;text-align:center;font-family:'Pixelify Sans',monospace;font-size:22px;min-height:54px;margin-bottom:10px}
@@ -275,7 +275,7 @@ function sfx(t){
 }
 function confetti(){
   const c=h('div',{class:'confetti'});
-  for(let i=0;i<50;i++){const p=h('i');p.style.left=Math.random()*100+'%';p.style.background=['#ffd23f','#1b7a45','#ff6b4a','#23a664'][i%4];p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.6+Math.random()*1.4+'s';c.append(p);}
+  for(let i=0;i<50;i++){const p=h('i');p.style.left=Math.random()*100+'%';p.style.background=['#ffd23f','#9f1d1d','#ff6b4a','#23a664'][i%4];p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.6+Math.random()*1.4+'s';c.append(p);}
   document.body.append(c);setTimeout(()=>c.remove(),3600);
 }
 
@@ -722,7 +722,7 @@ const PH=[
 function showLogin(){
   const name=h('input',{type:'text',id:'nm',placeholder:'Ex.: Maria Souza',autocomplete:'off','aria-label':'Nome completo'});
   const turma=h('input',{type:'text',id:'tm',placeholder:'Ex.: 2º Info A',autocomplete:'off','aria-label':'Turma'});
-  const err=h('div',{class:'small',style:'color:#e0483b;min-height:20px'});
+  const err=h('div',{class:'small',style:'color:#945700;min-height:20px'});
   const go=()=>{
     const n=name.value.trim().replace(/\s+/g,' ');
     if(n.length<3){err.textContent='Digite seu nome completo para começar.';return;}
@@ -918,7 +918,7 @@ function libBox(){
   if(S.liberarTudo)return h('div',{class:'prompt'},'🔓 Todas as fases (inclusive o Chefão) estão liberadas neste aparelho. ',
     h('button',{class:'btn sm',onclick:()=>{S.liberarTudo=false;persist();showProf();}},'Bloquear de novo'));
   const pw=h('input',{type:'password',id:'pw',autocomplete:'off',placeholder:'Senha do professor'});
-  const err=h('div',{class:'small',style:'color:#e0483b;min-height:20px'});
+  const err=h('div',{class:'small',style:'color:#945700;min-height:20px'});
   const go=()=>{if(String(h53(pw.value))===SENHA_PROF){S.liberarTudo=true;persist();showMap();}else{err.textContent='Senha incorreta.';pw.value='';pw.focus();}};
   pw.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
   return h('div',{class:'prompt'},h('b',{},'🔒 Liberar todas as fases'),h('p',{class:'small'},'Libera o Chefão neste aparelho sem precisar concluir 5 fases.'),
