@@ -22,7 +22,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 - O progresso fica salvo no navegador do aluno. Todas as aulas estão no mesmo site (rosivaldsilva-dev.github.io), então o progresso continua ao trocar de link.
 
 ## Padrão visual (todas as aulas, atuais e futuras)
-- **Cor da disciplina:** POO azul · Programação Web (PWI) laranja · Sistemas Operacionais (SO) verde · Lógica (LP) roxo. A cor vale para o topo, botões, barra de progresso, tela de abertura e fundo, no modo claro e no escuro. A disciplina é descoberta pelo nome da pasta (`POO/`, `PWI/`, `SO/`, `LP/`).
+- **Cor da disciplina** (a mesma dos HTML e PDFs do projeto Curso Técnico em Informática): POO verde `#0b6b3a` · Programação Web (PWI) roxo `#5b3a8c` · Sistemas Operacionais (SO) vermelho `#9f1d1d` · Lógica (LP) azul `#274a9c`. Vale para o topo, botões, barra de progresso, tela de abertura e fundo, no modo claro e no escuro. Em SO o "errou" é laranja, para não confundir com o vermelho do tema, e o acerto continua verde. A disciplina é descoberta pelo nome da pasta (`POO/`, `PWI/`, `SO/`, `LP/`).
 - **Rodapé:** "Rosival Silva · 2026" em todas as telas do jogo (abertura, trilha, teoria, questões e relatório). A página inicial também mostra o nome e o ano, no alto e no rodapé.
 - **Topo durante o nível:** nome do aluno e turma, nível atual (com "Chefão" ou "Bônus" quando for o caso), barra de progresso e vidas (mais o cronômetro no Chefão).
 - Para mudar uma cor ou o ano, edite `CORES`, `AUTOR` e `ANO` em `Ferramentas/padroniza_motor.py` e rode a ferramenta de novo nas aulas.

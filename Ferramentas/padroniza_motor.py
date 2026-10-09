@@ -4,7 +4,7 @@ Padroniza o motor das aulas gamificadas (trilha com niveis/estrelas).
 - trava de uma resposta por questao (clique duplo nao pula questao nem tira vida 2x)
 - barra de progresso so avanca no acerto
 - area do professor com senha para liberar todas as fases
-- cor tema da disciplina (POO azul, PWI laranja, SO verde, LP roxo), pela pasta da aula
+- cor tema da disciplina (POO verde, PWI roxo, SO vermelho, LP azul: as cores dos HTML do projeto), pela pasta da aula
 - topo do jogo com nome, turma e nivel atual (mantendo vidas e cronometro)
 - rodape "Rosival Silva · ano" em todas as telas
 """
@@ -180,19 +180,21 @@ def meta(h):
 # durante o nivel, o topo mostra nome, turma e nivel atual, alem da barra de progresso e das vidas.
 AUTOR = 'Rosival Silva'
 ANO = '2026'
-CORES = {  # chave = pasta da aula
-    'POO': dict(nome='P.O.O / Java', pri='#2563c4', d='#1a4a96', l='#dbe7fa', bg='#e6eef9', s2='#f2f6fc', line='#c3d3ea',
-                b1='#2a5ca8', b2='#14305e', b3='#0b1a35', bfg='#a9c8f5', tok='#5b93e8', tokbg='rgba(91,147,232,.25)',
-                D=dict(bg='#0b1526', s='#122038', s2='#0e1a2e', ink='#e8eef8', ink2='#a3b5d0', line='#25395a', pri='#3f7fdc', d='#2d62b3', l='#14294d')),
-    'PWI': dict(nome='Programação Web', pri='#b85f00', d='#8a4500', l='#fcebd2', bg='#f6eee3', s2='#fbf6ef', line='#e3d3bd',
-                b1='#9a5208', b2='#4d2a06', b3='#241303', bfg='#ffcb8a', tok='#f0a24a', tokbg='rgba(240,162,74,.25)',
-                D=dict(bg='#1b130a', s='#281c10', s2='#21170d', ink='#f6ede2', ink2='#c8b49b', line='#4a3720', pri='#c9731a', d='#a05a10', l='#3b2711')),
-    'SO':  dict(nome='Sistemas Operacionais', pri='#1b7a45', d='#12582f', l='#d6efe0', bg='#e5f1e9', s2='#f1f8f3', line='#bfd9c8',
-                b1='#1f6b44', b2='#0f3724', b3='#08190f', bfg='#9be3b9', tok='#4cc07f', tokbg='rgba(76,192,127,.25)',
-                D=dict(bg='#0a1a12', s='#112619', s2='#0d1f15', ink='#e6f4ec', ink2='#9cbba9', line='#234634', pri='#2f9e60', d='#1f7745', l='#123022')),
-    'LP':  dict(nome='Lógica de Programação', pri='#6d3fc0', d='#4e2a92', l='#e9e0f8', bg='#eee9f7', s2='#f6f3fb', line='#d3c8e8',
-                b1='#5a3a9e', b2='#2c1a54', b3='#150c2b', bfg='#cdb8f5', tok='#a98af0', tokbg='rgba(169,138,240,.25)',
-                D=dict(bg='#130d22', s='#1c1432', s2='#170f2a', ink='#eee8fa', ink2='#b4a6d0', line='#3a2c5e', pri='#8b5fe0', d='#6a42b8', l='#2a1d4d')),
+CORES = {  # chave = pasta da aula. Cores = as dos HTML das aulas do projeto "Curso Tecnico em Informatica"
+    'POO': dict(nome='P.O.O / Java', pri='#0b6b3a', d='#07502a', l='#e6f4ec', bg='#e9f1ec', s2='#f3f8f5', line='#c4d8cb',
+                b1='#157a47', b2='#0b3d24', b3='#06200f', bfg='#a8e6c1', tok='#4cc07f', tokbg='rgba(76,192,127,.25)',
+                D=dict(bg='#0a1a12', s='#112619', s2='#0d1f15', ink='#e6f4ec', ink2='#9cbba9', line='#234634', pri='#1f8f55', d='#146b3f', l='#123022')),
+    'PWI': dict(nome='Programação Web', pri='#5b3a8c', d='#432a6a', l='#ece6f5', bg='#eeeaf4', s2='#f6f3fa', line='#d4cbe3',
+                b1='#6a45a3', b2='#2f1d4e', b3='#170e29', bfg='#d3c0f5', tok='#a98af0', tokbg='rgba(169,138,240,.25)',
+                D=dict(bg='#150f20', s='#1e1630', s2='#19122a', ink='#eee8fa', ink2='#b4a6d0', line='#3a2c5e', pri='#8761c9', d='#6a45a3', l='#2a1d4d')),
+    'SO':  dict(nome='Sistemas Operacionais', pri='#9f1d1d', d='#761414', l='#fbe9e7', bg='#f4e9e7', s2='#faf3f2', line='#e3c8c4',
+                b1='#a42525', b2='#4d0f0f', b3='#250707', bfg='#ffb3a8', tok='#f07a6e', tokbg='rgba(240,122,110,.25)',
+                # no tema vermelho o "errou" vira laranja (regra do projeto), para nao confundir com a cor da disciplina
+                bad=dict(bad='#c77700', d='#945700', l='#fff1dc', D_bad='#f0a030', D_d='#c77f10', D_l='#3a2610'),
+                D=dict(bg='#1c0e0e', s='#2a1515', s2='#221111', ink='#f8eceb', ink2='#cfaeaa', line='#4d2a2a', pri='#c23b3b', d='#9a2a2a', l='#3d1818')),
+    'LP':  dict(nome='Lógica de Programação', pri='#274a9c', d='#1c3777', l='#e3e9f7', bg='#e8ecf6', s2='#f2f5fb', line='#c5cfe8',
+                b1='#2f56b3', b2='#14285a', b3='#0a1330', bfg='#b5c8f5', tok='#6f93e8', tokbg='rgba(111,147,232,.25)',
+                D=dict(bg='#0b1226', s='#121c38', s2='#0e1730', ink='#e8eef9', ink2='#a3b2d3', line='#25355e', pri='#4a72d6', d='#3558ad', l='#14264f')),
 }
 ALIAS_DISC = {'LOGICA': 'LP', 'LÓGICA': 'LP', 'PROGWEB': 'PWI'}
 
@@ -234,12 +236,17 @@ TOPO_NOVO = """  var h=topoJogo('<div class="trow"><button class="iconbtn" id="s
 def bloco_tema(disc):
     c = CORES[disc]
     D = c['D']
+    bad_l = bad_d = ''
+    if 'bad' in c:
+        b = c['bad']
+        bad_l = ';--bad:%s;--bad-d:%s;--bad-l:%s' % (b['bad'], b['d'], b['l'])
+        bad_d = ';--bad:%s;--bad-d:%s;--bad-l:%s' % (b['D_bad'], b['D_d'], b['D_l'])
     return (TEMA_INI + '\n'
         ':root{--bg:%(bg)s;--surface-2:%(s2)s;--line:%(line)s;--primary:%(pri)s;--primary-d:%(d)s;--primary-l:%(l)s;\n'
-        '  --boot1:%(b1)s;--boot2:%(b2)s;--boot3:%(b3)s;--bootfg:%(bfg)s;--tok:%(tok)s;--tokbg:%(tokbg)s}\n' % c +
+        '  --boot1:%(b1)s;--boot2:%(b2)s;--boot3:%(b3)s;--bootfg:%(bfg)s;--tok:%(tok)s;--tokbg:%(tokbg)s;--hp:#c23b4d' % c + bad_l + '}\n' +
         '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){\n'
         '  --bg:%(bg)s;--surface:%(s)s;--surface-2:%(s2)s;--ink:%(ink)s;--ink-2:%(ink2)s;--line:%(line)s;\n'
-        '  --primary:%(pri)s;--primary-d:%(d)s;--primary-l:%(l)s}}\n' % D +
+        '  --primary:%(pri)s;--primary-d:%(d)s;--primary-l:%(l)s;--hp:#f0697c' % D + bad_d + '}}\n' +
         TEMA_FIM)
 
 
@@ -263,6 +270,7 @@ def tema(h, disc):
     h = h.replace('color:#8fd4e8', 'color:var(--bootfg)').replace('background:#8fd4e8', 'background:var(--bootfg)')
     h = h.replace('background:#061019', 'background:var(--boot3)').replace('background:#2a5f75', 'background:var(--tok)')
     h = h.replace('dotted #3aa8c4', 'dotted var(--tok)').replace('rgba(58,168,196,.22)', 'var(--tokbg)')
+    h = h.replace('.pill.hp{color:var(--bad);border-color:var(--bad)}', '.pill.hp{color:var(--hp);border-color:var(--hp)}')
     h = h.replace('.bar > i{display:block;height:100%;background:var(--ok);', '.bar > i{display:block;height:100%;background:var(--primary);')
     h = h.replace('padding:10px 14px;background:var(--surface);border-bottom:2px solid var(--line);',
                   'padding:10px 14px;background:var(--surface);border-bottom:3px solid var(--primary);')
