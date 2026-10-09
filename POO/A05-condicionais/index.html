@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563c4">
 <title>Desvios Condicionais</title>
 <meta name="description" content="Treino interativo de if, else, else if e switch em Java: condições booleanas, cadeias de decisão, operadores lógicos e os erros mais comuns em provas.">
 <style>
@@ -41,7 +42,7 @@ button{font:inherit;color:inherit}
 .shell{max-width:560px;margin:0 auto;min-height:100%;padding:0 14px 40px}
 .topbar{
   position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -14px 14px;
-  padding:10px 14px;background:var(--surface);border-bottom:2px solid var(--line);
+  padding:10px 14px;background:var(--surface);border-bottom:3px solid var(--primary);
   display:flex;align-items:center;gap:10px;
 }
 .topbar .grow{flex:1;min-width:0}
@@ -50,7 +51,7 @@ button{font:inherit;color:inherit}
 .pill.xp{color:var(--gold);border-color:var(--gold)}
 .pill.hp{color:var(--bad);border-color:var(--bad)}
 .bar{height:12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
-.bar > i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+.bar > i{display:block;height:100%;background:var(--primary);transition:width .35s ease}
 .iconbtn{background:none;border:0;padding:6px;border-radius:9px;cursor:pointer;color:var(--ink-2);font-size:20px;line-height:1}
 .iconbtn:hover{background:var(--surface-2)}
 
@@ -83,11 +84,11 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 /* ---------- boot ---------- */
 .boot{border:2px solid var(--line);border-radius:var(--r);overflow:hidden;background:#0a1620;margin-bottom:16px}
 .boot .screen{aspect-ratio:16/9;position:relative;background:
-  radial-gradient(120% 90% at 70% 15%,#1d4e63 0%,#0d2231 55%,#081520 100%);}
-.boot .bootline{position:absolute;left:16px;top:16px;color:#8fd4e8;font-size:12px;opacity:0}
+  radial-gradient(120% 90% at 70% 15%,var(--boot1) 0%,var(--boot2) 55%,var(--boot3) 100%);}
+.boot .bootline{position:absolute;left:16px;top:16px;color:var(--bootfg);font-size:12px;opacity:0}
 .boot .lg{position:absolute;inset:0;display:grid;place-items:center;opacity:0;padding:0 20px;text-align:center}
 .boot .lg b{color:#eaf6fb;font-size:clamp(18px,5.6vw,27px);letter-spacing:-.02em;line-height:1.25}
-.boot .cursor{display:inline-block;width:9px;height:1.1em;background:#8fd4e8;vertical-align:-2px;margin-left:2px;
+.boot .cursor{display:inline-block;width:9px;height:1.1em;background:var(--bootfg);vertical-align:-2px;margin-left:2px;
   animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
 @keyframes fadein{to{opacity:1}}
@@ -121,8 +122,8 @@ label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
 .scene.code .cno{width:18px;flex:0 0 18px;text-align:right;color:#4f7186;user-select:none}
 .scene.code .ccode{white-space:pre-wrap;word-break:break-word}
 .scene.code .cplain{color:#c7dbe6}
-.scene.code .ctok{cursor:pointer;border-radius:4px;padding:1px 2px;border-bottom:2px dotted #3aa8c4}
-.scene.code .ctok:hover,.scene.code .ctok:active{background:rgba(58,168,196,.22)}
+.scene.code .ctok{cursor:pointer;border-radius:4px;padding:1px 2px;border-bottom:2px dotted var(--tok)}
+.scene.code .ctok:hover,.scene.code .ctok:active{background:var(--tokbg)}
 .zone-hit{animation:shake .3s}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
@@ -191,10 +192,26 @@ canvas{max-width:100%;height:auto;border:2px solid var(--line);border-radius:var
 
 .secao{font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);margin:16px 4px 6px}
 .metabox{background:var(--gold-l);border:1.5px solid var(--gold);border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:15px}
+
+.topbar.col{flex-direction:column;align-items:stretch;gap:8px}
+.topbar .trow{display:flex;align-items:center;gap:10px}
+.topbar .info{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.topbar .info b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .info span{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rodape{max-width:560px;margin:8px auto 0;padding:14px 14px calc(22px + env(safe-area-inset-bottom,0px));
+  text-align:center;font-size:13px;color:var(--ink-2);border-top:1px solid var(--line)}
+/* TEMA-INI */
+:root{--bg:#e6eef9;--surface-2:#f2f6fc;--line:#c3d3ea;--primary:#2563c4;--primary-d:#1a4a96;--primary-l:#dbe7fa;
+  --boot1:#2a5ca8;--boot2:#14305e;--boot3:#0b1a35;--bootfg:#a9c8f5;--tok:#5b93e8;--tokbg:rgba(91,147,232,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1526;--surface:#122038;--surface-2:#0e1a2e;--ink:#e8eef8;--ink-2:#a3b5d0;--line:#25395a;
+  --primary:#3f7fdc;--primary-d:#2d62b3;--primary-l:#14294d}}
+/* TEMA-FIM */
 </style>
 </head>
 <body>
 <div class="shell" id="app"></div>
+<footer class="rodape">Rosival Silva · 2026</footer>
 
 <script>
 "use strict";
@@ -289,6 +306,13 @@ document.addEventListener("visibilitychange",function(){
 var app=document.getElementById("app");
 var jogo=null;
 
+function topoJogo(extra){return '<div class="topbar col">'+extra+'</div>';}
+function infoJogador(lv){
+  var i=LEVELS.indexOf(lv);
+  var quem=(S.nome||"Aluno")+(S.turma?" · "+S.turma:"");
+  var tipo="Nível "+(i+1)+(lv.boss?" · Chefão":(typeof META!=="undefined"&&i>=META?" · Bônus":""));
+  return '<b>'+esc(quem)+'</b><span>'+esc(tipo)+' — '+esc(lv.nome)+'</span>';
+}
 function topo(extra){return '<div class="topbar">'+(extra||"")+'</div>';}
 
 function telaInicio(){
@@ -442,10 +466,11 @@ function render(q){
   var velho=document.querySelector(".feed");if(velho)velho.remove();
   var prog=Math.round(jogo.respondidas/jogo.total*100);
   var vidas="";for(var i=0;i<jogo.vidas;i++)vidas+="♥";
-  var h=topo('<button class="iconbtn" id="sair">✕</button>'+
-     '<div class="grow"><div class="bar"><i style="width:'+Math.min(100,prog)+'%"></i></div></div>'+
+  var h=topoJogo('<div class="trow"><button class="iconbtn" id="sair">✕</button>'+
+     '<div class="grow info">'+infoJogador(lv)+'</div>'+
      (lv.timer?'<span class="pill timer" id="cron">'+lv.timer+'s</span>':'')+
-     '<span class="pill hp">'+vidas+'</span>');
+     '<span class="pill hp">'+vidas+'</span></div>'+
+     '<div class="bar"><i style="width:'+Math.min(100,prog)+'%"></i></div>');
 
   h+='<h2 style="margin-bottom:12px">'+esc(q.p)+'</h2>';
   if(q.rows&&q.t!=="hot")h+=sCode(q.rows);
