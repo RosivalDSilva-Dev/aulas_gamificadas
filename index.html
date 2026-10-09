@@ -3,18 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2b3a67">
 <title>Aulas Gamificadas</title>
 <style>
 :root{--bg:#f6f7fb;--card:#fff;--ink:#1d2433;--ink2:#5b6475;--line:#e3e6ee}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
 main{max-width:760px;margin:0 auto;padding:28px 16px 40px}
+.autor{font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--ink2);margin:0 0 6px}
 h1{font-size:28px;margin:0 0 4px}
 .sub{color:var(--ink2);margin:0 0 24px}
 h2{font-size:18px;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
-h2 i{width:12px;height:12px;border-radius:3px;display:inline-block}
+h2 i{width:12px;height:12px;border-radius:3px;display:inline-block;background:var(--c)}
+.poo{--c:#2563c4}.pwi{--c:#b85f00}.so{--c:#1b7a45}.lp{--c:#6d3fc0}
 a.card{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:8px 0;color:inherit;text-decoration:none}
-a.card:hover{border-color:#9aa3b5}
+a.card{border-left:6px solid var(--c)}
+a.card:hover{border-color:var(--c)}
 a.card b{display:block}
 a.card span{color:var(--ink2);font-size:14px}
 a.card em{font-style:normal;color:var(--ink2);font-size:22px}
@@ -23,20 +27,30 @@ footer{color:var(--ink2);font-size:13px;margin-top:36px;border-top:1px solid var
 </head>
 <body>
 <main>
+<p class="autor">Rosival Silva · 2026</p>
 <h1>Aulas Gamificadas</h1>
 <p class="sub">Curso Técnico em Informática · escolha a disciplina e a aula. Em cada aula: 5 níveis de meta, 2 de bônus e o Chefão.</p>
 
-<h2><i style="background:#3b82f6"></i>P.O.O / Java</h2>
+<section class="poo">
+<h2><i></i>P.O.O / Java</h2>
 <a class="card" href="POO/A04-operadores/"><div><b>Aula 04 · Operadores e Expressões</b><span>Aritméticos, módulo, atribuição, relacionais e lógicos</span></div><em>›</em></a>
 <a class="card" href="POO/A05-condicionais/"><div><b>Aula 05 · Desvios Condicionais</b><span>if, else, else if e switch</span></div><em>›</em></a>
 
-<h2><i style="background:#f59e0b"></i>Programação Web</h2>
+</section>
+
+<section class="pwi">
+<h2><i></i>Programação Web</h2>
 <a class="card" href="PWI/A01-javascript/"><div><b>Aula 01 · Introdução ao JavaScript</b><span>Client-side, variáveis, operadores, alert e prompt</span></div><em>›</em></a>
 <a class="card" href="PWI/A03-decisao/"><div><b>Aula 03 · Decisão em JavaScript</b><span>if, else, else if, prompt e Number, e / ou / não</span></div><em>›</em></a>
 
-<h2><i style="background:#22c55e"></i>Sistemas Operacionais</h2>
+</section>
+
+<section class="so">
+<h2><i></i>Sistemas Operacionais</h2>
 <a class="card" href="SO/A03-treino-prova/"><div><b>Aula 03 · Treino antes da prova</b><span>Área de trabalho, arquivos, janelas e atalhos</span></div><em>›</em></a>
 <a class="card" href="SO/A03-missao-desktop/"><div><b>Aula 03 · Missão Desktop</b><span>Revisão em fases, com Chefão no final</span></div><em>›</em></a>
+
+</section>
 
 <footer><span>Rosival Silva</span><span>2026</span></footer>
 </main>

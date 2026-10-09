@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1b7a45">
 <title>Missão Desktop — Revisão de Sistemas Operacionais (Aula 03)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --wall:#2a7f86;--wall2:#236c72;--chrome:#e6e9f0;--paper:#f7f8fb;--ink:#16213e;--dim:#56607f;
-  --blue:#2f4fa3;--blueD:#1d3277;--yel:#ffd23f;--coral:#ff6b4a;--good:#23a664;--bad:#e0483b;--line:#16213e;
+  --wall:#1f6b44;--wall2:#195b39;--chrome:#e6e9f0;--paper:#f7f8fb;--ink:#16213e;--dim:#56607f;
+  --blue:#1b7a45;--blueD:#12582f;--yel:#ffd23f;--coral:#ff6b4a;--good:#23a664;--bad:#e0483b;--line:#16213e;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -25,7 +26,7 @@ body{
 h1,h2,h3{font-family:'Pixelify Sans','Courier New',monospace;margin:0}
 
 /* janela-moldura do jogo */
-.frame{background:var(--chrome);border:2px solid var(--line);border-radius:8px;box-shadow:7px 7px 0 #0b2b2f99;overflow:hidden}
+.frame{background:var(--chrome);border:2px solid var(--line);border-radius:8px;box-shadow:7px 7px 0 #07241499;overflow:hidden}
 .tbar{display:flex;justify-content:space-between;align-items:center;background:var(--blue);color:#fff;padding:7px 12px;font-family:'Pixelify Sans',monospace;font-weight:700;font-size:16px;border-bottom:2px solid var(--line)}
 .tbar .wb2{display:flex;gap:5px}
 .tbar .wb2 i{width:16px;height:16px;background:#ffffff33;border:1.5px solid #fff;border-radius:3px;display:block}
@@ -71,6 +72,11 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 /* jogo */
 .hud{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .hud-t{font-size:18px}
+.who{display:flex;flex-direction:column;line-height:1.25;min-width:0;flex:1}
+.who b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:560px){.who{order:3;flex:1 1 100%}}
+.rodape{max-width:940px;margin:0 auto;padding:6px 12px calc(26px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:#e4f3ea}
 .hud-r{display:flex;gap:14px;align-items:center;font-weight:700}
 .dots{display:flex;gap:6px;margin:12px 0}
 .dot{flex:1;height:10px;background:#fff;border:2px solid var(--line);border-radius:4px}
@@ -117,7 +123,7 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 /* multi */
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
 .tile{font:inherit;font-weight:600;text-align:left;background:#fff;border:2px solid var(--line);border-radius:6px;padding:11px 12px;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
-.tile.on{background:#cfe0ff;box-shadow:none;transform:translate(2px,2px)}
+.tile.on{background:#cfeedd;box-shadow:none;transform:translate(2px,2px)}
 .tile.ok{background:#a8e6c1}.tile.bad{background:#ffb4aa}
 
 /* simulações do sistema */
@@ -207,6 +213,7 @@ input[type=text],.sm-input{font:inherit;padding:10px 12px;border:2px solid var(-
 </head>
 <body>
 <div id="app"></div>
+<footer class="rodape">Rosival Silva · 2026</footer>
 <script>
 (()=>{
 'use strict';
@@ -268,7 +275,7 @@ function sfx(t){
 }
 function confetti(){
   const c=h('div',{class:'confetti'});
-  for(let i=0;i<50;i++){const p=h('i');p.style.left=Math.random()*100+'%';p.style.background=['#ffd23f','#2f4fa3','#ff6b4a','#23a664'][i%4];p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.6+Math.random()*1.4+'s';c.append(p);}
+  for(let i=0;i<50;i++){const p=h('i');p.style.left=Math.random()*100+'%';p.style.background=['#ffd23f','#1b7a45','#ff6b4a','#23a664'][i%4];p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.6+Math.random()*1.4+'s';c.append(p);}
   document.body.append(c);setTimeout(()=>c.remove(),3600);
 }
 
@@ -795,7 +802,7 @@ function play(id){
   run.dots=list.map(()=>h('span',{class:'dot'}));
   const hud=h('div',{class:'hud'},
     h('button',{class:'btn sm',onclick:()=>{if(confirm('Sair da fase? O progresso desta tentativa será perdido.')){stopTimer();showMap();}}},'← Mapa'),
-    h('div',{class:'hud-t px'},ph.icon+' '+ph.title),
+    h('div',{class:'who'},h('b',{},S.name+(S.turma?' · '+S.turma:'')),h('span',{},ph.icon+' '+ph.title+' · Nível: '+level(totalXP()).name)),
     h('div',{class:'hud-r'},run.hE,run.xE,run.cE));
   mount('Missão Desktop.exe — '+ph.title,h('div',{},hud,h('div',{class:'dots'},run.dots),run.stage));
   updHud();nextChallenge();
