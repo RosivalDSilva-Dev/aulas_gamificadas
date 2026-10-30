@@ -7,6 +7,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 | Disciplina | Aula | Link |
 |---|---|---|
 | LP | Extra · Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E01-fluxogramas/ |
+| LP | Extra 2 · Do fluxograma ao código (código↔desenho, esqueleto de arrastar, completar, executar e laboratório) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E02-fluxograma-codigo/ |
 | POO | 04 · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A04-operadores/ |
 | POO | 05 · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A05-condicionais/ |
 | PWI | 01 · Introdução ao JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A01-javascript/ |
@@ -35,7 +36,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 4. Acrescente um cartão no `index.html` da raiz, dentro da seção da disciplina (`<section class="poo|pwi|so|lp">`), para herdar a cor.
 5. Aula com motor próprio (como a Missão Desktop) não passa pela ferramenta: aplique à mão a cor, o rodapé e o topo com nome, turma e nível.
 
-Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
+Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas` e `LP/E02-fluxograma-codigo`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
 - `fluxo` em qualquer questão (`pick`, `type`, `multi`): mostra um fluxograma no enunciado. Nós `{"i","k","t","x","r"}` (`k` = `inicio`, `fim`, `entrada`, `saida`, `proc`, `decisao`; `h:"t"` esconde o texto, `h:"f"` esconde a forma) e setas `[de, para, "rótulo", "rota"]`.
 - `k` em um `pick`: mostra só a figura, sem texto, e pergunta o nome.
 - `figura`: escolher entre quatro figuras (opções `entrada`, `saida`, `proc`, `decisao`).
@@ -45,3 +46,10 @@ Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas`, o motor desenh
 - `cola` (no nível) e `@@cola:saida,entrada,scanner@@` (na teoria): quadro de equivalências Portugol / Java / JavaScript, recolhível durante as questões.
 
 Cuidados nos dados: em respostas digitadas (`type`), use palavras ou números (símbolos como `===` são ignorados na correção); em `slots` e `order`, não repita textos; dentro do texto, escreva `<\/script>` em vez de `</script>`.
+
+Tipos novos da `LP/E02-fluxograma-codigo` (o `LP/E02` é gerado a partir do motor da E01):
+- `qflux`: o aluno vê o código e escolhe, entre 3 desenhos, o fluxograma que o representa.
+- `esq`: esqueleto do fluxograma com espaços vazios; o aluno **arrasta ou toca** a figura certa em cada espaço.
+- `compl`: fluxograma pronto e código com lacunas `{0}`, `{1}`...; o aluno arrasta ou toca a peça em cada lacuna.
+- `exec`: o marcador percorre o fluxograma; o aluno responde Sim/Não nas decisões e o novo valor nos processamentos (tabela de variáveis e "tela" do programa).
+- `missao`: cartão de laboratório com fluxograma, modelo de código para copiar, link do Portugol Web Studio (portugol.dev) ou do OneCompiler (Java) e um valor de teste calculado do nome do aluno; ele digita o que o programa mostrou.
