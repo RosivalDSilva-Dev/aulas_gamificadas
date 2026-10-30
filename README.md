@@ -6,6 +6,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 
 | Disciplina | Aula | Link |
 |---|---|---|
+| LP | Extra · Fluxogramas (as figuras, se/senão, enquanto e para) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E01-fluxogramas/ |
 | POO | 04 · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A04-operadores/ |
 | POO | 05 · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A05-condicionais/ |
 | PWI | 01 · Introdução ao JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A01-javascript/ |
@@ -33,5 +34,13 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 3. Rode `python Ferramentas/padroniza_motor.py DISCIPLINA/Axx-tema/index.html` para garantir o padrão (trava de clique duplo, senha do professor, meta, **cor da disciplina, topo com nome/turma/nível e rodapé**). Pode rodar de novo sem estragar.
 4. Acrescente um cartão no `index.html` da raiz, dentro da seção da disciplina (`<section class="poo|pwi|so|lp">`), para herdar a cor.
 5. Aula com motor próprio (como a Missão Desktop) não passa pela ferramenta: aplique à mão a cor, o rodapé e o topo com nome, turma e nível.
+
+Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
+- `fluxo` em qualquer questão (`pick`, `type`, `multi`): mostra um fluxograma no enunciado. Nós `{"i","k","t","x","r"}` (`k` = `inicio`, `fim`, `entrada`, `saida`, `proc`, `decisao`; `h:"t"` esconde o texto, `h:"f"` esconde a forma) e setas `[de, para, "rótulo", "rota"]`.
+- `k` em um `pick`: mostra só a figura, sem texto, e pergunta o nome.
+- `figura`: escolher entre quatro figuras (opções `entrada`, `saida`, `proc`, `decisao`).
+- `slots` com `"fig": true`: liga figuras a nomes.
+- `montar`: ordenar figuras para montar o fluxograma.
+- `hotf`: tocar na figura certa dentro do fluxograma.
 
 Cuidados nos dados: em respostas digitadas (`type`), use palavras ou números (símbolos como `===` são ignorados na correção); em `slots` e `order`, não repita textos; dentro do texto, escreva `<\/script>` em vez de `</script>`.

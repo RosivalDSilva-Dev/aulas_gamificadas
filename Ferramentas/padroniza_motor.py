@@ -290,6 +290,12 @@ def tema(h, disc):
     h = re.sub(r'<footer class="rodape">.*?</footer>\n?', '', h, flags=re.S)
     h = sub1(h, '<div class="shell" id="app"></div>\n',
              '<div class="shell" id="app"></div>\n<footer class="rodape">%s · %s</footer>\n' % (AUTOR, ANO), 'rodape')
+    # 6) imagem do relatorio (PNG que o aluno envia): cor da disciplina e "nome · ano" no rodape
+    if 'function gerarPNG(' in h:
+        h = re.sub(r'var COR_TEMA="[^"]*";\n', '', h)
+        h = h.replace('x.fillStyle="#15697f"', 'x.fillStyle=COR_TEMA')
+        h = sub1(h, 'function gerarPNG(', 'var COR_TEMA="%s";\nfunction gerarPNG(' % c['pri'], 'cor do relatorio')
+        h = re.sub(r'x\.fillText\("[^"]*",W-70,y\+62\)', 'x.fillText("%s · %s",W-70,y+62)' % (AUTOR, ANO), h)
     return h
 
 
