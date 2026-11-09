@@ -6,7 +6,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 
 | Disciplina | Aula | Link |
 |---|---|---|
-| LP | Extra · Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E01-fluxogramas/ |
+| LP | Extra 1· Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E01-fluxogramas/ |
 | LP | Extra 2 · Do fluxograma ao código (código↔desenho, esqueleto de arrastar, completar, executar e laboratório) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E02-fluxograma-codigo/ |
 | POO | 04 · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A04-operadores/ |
 | POO | 05 · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A05-condicionais/ |
