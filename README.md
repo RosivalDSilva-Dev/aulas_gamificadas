@@ -2,17 +2,20 @@
 
 Rosival Silva · 2026. Página inicial: https://rosivaldsilva-dev.github.io/aulas_gamificadas/
 
-Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
+Cada aula fica em `DISCIPLINA/DISC_Gam_Mod_NN/index.html` (NN = número do módulo, o mesmo da apostila `DISC_Ap_Mod_NN`; aulas extras: `DISC_Gam_Extra_NN`) e tem o próprio link. Os endereços antigos (`A05-condicionais` etc.) redirecionam para os novos.
 
 | Disciplina | Aula | Link |
 |---|---|---|
-| LP | Extra 1· Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E01-fluxogramas/ |
-| LP | Extra 2 · Do fluxograma ao código (código↔desenho, esqueleto de arrastar, completar, executar e laboratório) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/E02-fluxograma-codigo/ |
-| POO | 04 · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A04-operadores/ |
-| POO | 05 · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/A05-condicionais/ |
-| PWI | 01 · Introdução ao JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A01-javascript/ |
-| PWI | 03 · Decisão em JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A03-decisao/ |
-| SO | 03 · Treino antes da prova | https://rosivaldsilva-dev.github.io/aulas_gamificadas/SO/A03-treino-prova/ |
+| LP | Mód. III · Laço PARA | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Mod_03/ |
+| LP | Extra 01 · Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Extra_01/ |
+| LP | Extra 02 · Do fluxograma ao código (código↔desenho, esqueleto de arrastar, completar, executar e laboratório) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Extra_02/ |
+| POO | Mód. IV · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/POO_Gam_Mod_04/ |
+| POO | Mód. V · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/POO_Gam_Mod_05/ |
+| POO | Mód. VI · Laços de Repetição | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/POO_Gam_Mod_06/ |
+| PWI | Mód. I · Introdução ao JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/PWI_Gam_Mod_01/ |
+| PWI | Mód. III · Decisão em JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/PWI_Gam_Mod_03/ |
+| SO | Mód. III · Treino antes da prova | https://rosivaldsilva-dev.github.io/aulas_gamificadas/SO/SO_Gam_Mod_03/ |
+| SO | Mód. IV · Máquina Virtual | https://rosivaldsilva-dev.github.io/aulas_gamificadas/SO/SO_Gam_Mod_04/ |
 
 ## Padrão de todas as aulas
 - **Estrutura (1 aula de 50 min):** 5 níveis de **meta** (~7 questões cada, valem a nota) + 3 níveis **bônus** (paralelo Portugol/Java/JavaScript, Entrada com `Scanner` e ache o erro) + **Chefão** (~11 questões, libera quando a meta termina). Cerca de 75 questões.
@@ -29,13 +32,13 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 - Para mudar uma cor ou o ano, edite `CORES`, `AUTOR` e `ANO` em `Ferramentas/padroniza_motor.py` e rode a ferramenta de novo nas aulas.
 
 ## Aula nova
-1. Copie o `index.html` de uma aula da mesma disciplina para `DISCIPLINA/Axx-tema/`.
+1. Copie o `index.html` de uma aula da mesma disciplina para `DISCIPLINA/DISC_Gam_Mod_NN/`.
 2. Troque os dados: `STORE`, `GAME`, `HAB` (habilidades) e `LEVELS` (9 níveis: 5 meta, 3 bônus e o Chefão com `"boss": true`).
-3. Rode `python Ferramentas/padroniza_motor.py DISCIPLINA/Axx-tema/index.html` para garantir o padrão (trava de clique duplo, senha do professor, meta, **cor da disciplina, topo com nome/turma/nível e rodapé**). Pode rodar de novo sem estragar.
+3. Rode `python Ferramentas/padroniza_motor.py DISCIPLINA/DISC_Gam_Mod_NN/index.html` para garantir o padrão (trava de clique duplo, senha do professor, meta, **cor da disciplina, topo com nome/turma/nível e rodapé**). Pode rodar de novo sem estragar.
 4. Acrescente um cartão no `index.html` da raiz, dentro da seção da disciplina (`<section class="poo|pwi|so|lp">`), para herdar a cor.
 5. Aula com motor próprio não passa pela ferramenta: aplique à mão a cor, o rodapé e o topo com nome, turma e nível.
 
-Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas` e `LP/E02-fluxograma-codigo`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
+Tipos de questão com fluxograma (usados em `LP/LP_Gam_Extra_01` e `LP/LP_Gam_Extra_02`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
 - `fluxo` em qualquer questão (`pick`, `type`, `multi`): mostra um fluxograma no enunciado. Nós `{"i","k","t","x","r"}` (`k` = `inicio`, `fim`, `entrada`, `saida`, `proc`, `decisao`; `h:"t"` esconde o texto, `h:"f"` esconde a forma) e setas `[de, para, "rótulo", "rota"]`.
 - `k` em um `pick`: mostra só a figura, sem texto, e pergunta o nome.
 - `figura`: escolher entre quatro figuras (opções `entrada`, `saida`, `proc`, `decisao`).
@@ -46,7 +49,7 @@ Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas` e `LP/E02-fluxo
 
 Cuidados nos dados: em respostas digitadas (`type`), use palavras ou números (símbolos como `===` são ignorados na correção); em `slots` e `order`, não repita textos; dentro do texto, escreva `<\/script>` em vez de `</script>`.
 
-Tipos novos da `LP/E02-fluxograma-codigo` (o `LP/E02` é gerado a partir do motor da E01):
+Tipos novos da `LP/LP_Gam_Extra_02` (gerada a partir do motor da Extra 01):
 - `qflux`: o aluno vê o código e escolhe, entre 3 desenhos, o fluxograma que o representa.
 - `esq`: esqueleto do fluxograma com espaços vazios; o aluno **arrasta ou toca** a figura certa em cada espaço.
 - `compl`: fluxograma pronto e código com lacunas `{0}`, `{1}`...; o aluno arrasta ou toca a peça em cada lacuna.
