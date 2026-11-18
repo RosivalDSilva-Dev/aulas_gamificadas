@@ -13,7 +13,6 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 | PWI | 01 · Introdução ao JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A01-javascript/ |
 | PWI | 03 · Decisão em JavaScript | https://rosivaldsilva-dev.github.io/aulas_gamificadas/PWI/A03-decisao/ |
 | SO | 03 · Treino antes da prova | https://rosivaldsilva-dev.github.io/aulas_gamificadas/SO/A03-treino-prova/ |
-| SO | 03 · Missão Desktop | https://rosivaldsilva-dev.github.io/aulas_gamificadas/SO/A03-missao-desktop/ |
 
 ## Padrão de todas as aulas
 - **Estrutura (1 aula de 50 min):** 5 níveis de **meta** (~7 questões cada, valem a nota) + 3 níveis **bônus** (paralelo Portugol/Java/JavaScript, Entrada com `Scanner` e ache o erro) + **Chefão** (~11 questões, libera quando a meta termina). Cerca de 75 questões.
@@ -34,7 +33,7 @@ Cada aula fica em `DISCIPLINA/Axx-tema/index.html` e tem o próprio link:
 2. Troque os dados: `STORE`, `GAME`, `HAB` (habilidades) e `LEVELS` (9 níveis: 5 meta, 3 bônus e o Chefão com `"boss": true`).
 3. Rode `python Ferramentas/padroniza_motor.py DISCIPLINA/Axx-tema/index.html` para garantir o padrão (trava de clique duplo, senha do professor, meta, **cor da disciplina, topo com nome/turma/nível e rodapé**). Pode rodar de novo sem estragar.
 4. Acrescente um cartão no `index.html` da raiz, dentro da seção da disciplina (`<section class="poo|pwi|so|lp">`), para herdar a cor.
-5. Aula com motor próprio (como a Missão Desktop) não passa pela ferramenta: aplique à mão a cor, o rodapé e o topo com nome, turma e nível.
+5. Aula com motor próprio não passa pela ferramenta: aplique à mão a cor, o rodapé e o topo com nome, turma e nível.
 
 Tipos de questão com fluxograma (usados em `LP/E01-fluxogramas` e `LP/E02-fluxograma-codigo`, o motor desenha as figuras no padrão "Formas de Fluxograma", uma cor só para todas):
 - `fluxo` em qualquer questão (`pick`, `type`, `multi`): mostra um fluxograma no enunciado. Nós `{"i","k","t","x","r"}` (`k` = `inicio`, `fim`, `entrada`, `saida`, `proc`, `decisao`; `h:"t"` esconde o texto, `h:"f"` esconde a forma) e setas `[de, para, "rótulo", "rota"]`.
