@@ -1,4 +1,4 @@
-"""Uso: python Ferramentas/padroniza_motor.py POO/A06-tema/index.html
+"""Uso: python Ferramentas/padroniza_motor.py POO/POO_Gam_Mod_07/index.html
 
 Padroniza o motor das aulas gamificadas (trilha com niveis/estrelas).
 - trava de uma resposta por questao (clique duplo nao pula questao nem tira vida 2x)
@@ -251,7 +251,7 @@ def bloco_tema(disc):
 
 
 def disciplina_da_pasta(caminho):
-    """Descobre a disciplina pela pasta: POO/A05-xxx/index.html -> POO."""
+    """Descobre a disciplina pela pasta: POO/POO_Gam_Mod_05/index.html -> POO."""
     import os
     partes = os.path.normpath(caminho).split(os.sep)
     for parte in reversed(partes[:-1]):
