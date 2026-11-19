@@ -8,6 +8,7 @@ Cada aula fica em `DISCIPLINA/DISC_Gam_Mod_NN/index.html` (NN = número do módu
 |---|---|---|
 | LP | Mód. III · Laço PARA | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Mod_03/ |
 | LP | Extra 01 · Fluxogramas (as figuras, se/senão, enquanto e para; paralelo Portugol, Java e JavaScript com Scanner) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Extra_01/ |
+| LP | Extra 01 · versão ae (Fluxogramas: passo a passo — 3 níveis de meta, 2 bônus e o Desafio final; errar não tira vida) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Extra_01_ae/ |
 | LP | Extra 02 · Do fluxograma ao código (código↔desenho, esqueleto de arrastar, completar, executar e laboratório) | https://rosivaldsilva-dev.github.io/aulas_gamificadas/LP/LP_Gam_Extra_02/ |
 | POO | Mód. IV · Operadores e Expressões | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/POO_Gam_Mod_04/ |
 | POO | Mód. V · Desvios Condicionais | https://rosivaldsilva-dev.github.io/aulas_gamificadas/POO/POO_Gam_Mod_05/ |
