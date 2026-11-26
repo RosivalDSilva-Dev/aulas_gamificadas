@@ -28,6 +28,7 @@ Cada aula fica em `DISCIPLINA/DISC_Gam_Mod_NN/index.html` (NN = número do módu
   - **Ordem fixa:** as questões vêm na ordem do gabarito (Q1, Q2... aparece no alto da questão) e as alternativas ficam sempre no mesmo lugar, com as letras a), b), c)...
   - **👁 Ver resposta:** botão em cada questão que mostra a resposta e a explicação (e marca o trecho certo nas questões de tocar).
   - **Sem cronômetro:** tira o tempo dos níveis cronometrados (o 7 e o Chefão, na maioria das aulas).
+  - **▶ Passo a passo:** nas questões de laço (para, enquanto, faça-enquanto, for, while e do-while), um botão abre a demonstração em tela cheia: a linha do código acende, o fluxograma mostra o caminho percorrido, a memória e o teste de mesa vão sendo preenchidos e a tela mostra a saída. Anterior/Próximo (ou as setas do teclado) e modo automático. Os passos saem de executar o código da questão (`Ferramentas/passo_a_passo.js`); questões com código incompleto ou erro de propósito ficam sem o botão.
   - **📄 Gabarito da aula:** todas as questões de todos os níveis, na ordem fixa, com a resposta e a explicação; o botão 🖨 imprime ou salva em PDF.
 - O progresso fica salvo no navegador do aluno. Todas as aulas estão no mesmo site (rosivaldsilva-dev.github.io), então o progresso continua ao trocar de link.
 
