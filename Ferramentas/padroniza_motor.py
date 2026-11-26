@@ -346,7 +346,10 @@ g.gab-ok path,g.gab-ok rect,g.gab-ok polygon,g.gab-ok ellipse{stroke:var(--ok)!i
 .gabmont{display:flex;flex-direction:column;align-items:center;gap:2px;margin:6px 0}
 .chkrow{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:15px;cursor:pointer}
 .chkrow input{width:20px;height:20px;margin-top:2px;flex:none}
-@media print{.topbar,.rodape,.noprint,.profbar{display:none!important}body{background:#fff}.card{border:1px solid #bbb}}
+@media print{.topbar,.rodape,.noprint,.profbar,.pp-ov{display:none!important}body{background:#fff}.card{border:1px solid #bbb}}
+.profbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.gabpp{width:auto;margin:8px 0 0;padding:8px 14px}
+""" + open(__import__('os').path.join(__import__('os').path.dirname(__file__), 'passo_a_passo.css'), encoding='utf-8').read() + """/* PROF-CSS-FIM */
 """
 
 PROF_JS = r'''/* PROF-INI: modo professor (projetor): ordem fixa, ver resposta, sem cronometro e gabarito */
@@ -427,11 +430,14 @@ function marcaZonas(box,q){
 function barraProf(q){
   if(!profOk())return "";
   return '<div class="profbar"><span>📽 Q'+(q._n||"?")+' de '+jogo.lv.qs.length+(modoFixo()?'':' · ordem embaralhada')+'</span>'+
-    (PROF.ver?'<button class="btn ghost small" id="verResp" type="button">👁 Ver resposta</button>':'')+'</div>';
+    '<span class="profbtns">'+(PROF.ver&&PASSO.preparar(q)?'<button class="btn ghost small" id="passoBtn" type="button">▶ Passo a passo</button>':'')+
+    (PROF.ver?'<button class="btn ghost small" id="verResp" type="button">👁 Ver resposta</button>':'')+'</span></div>';
 }
 function ligaProf(q,area){
   if(!profOk())return;
   if(modoFixo()&&q.t==="pick")Array.prototype.forEach.call(area.querySelectorAll(".opt .mark"),function(m,i){m.textContent=LETRAS[i];});
+  var pb=$("#passoBtn");
+  if(pb)pb.onclick=function(){PASSO.abrir(q,"Q"+(q._n||"?")+" · Nível "+(LEVELS.indexOf(jogo.lv)+1)+" · "+jogo.lv.nome,gabResp(q,jogo.lv.id));};
   var b=$("#verResp");if(!b)return;
   b.onclick=function(){
     if(b._ab)return;b._ab=true;b.disabled=true;
@@ -454,7 +460,8 @@ function telaGabarito(){
        (lv.timer?'<p class="sub" style="margin:0 4px 8px">⏱ No jogo dos alunos: '+lv.timer+' s por questão.</p>':'');
     lv.qs.forEach(function(q,j){
       h+='<div class="card gabq" data-l="'+i+'" data-q="'+j+'"><span class="gabn">Q'+(j+1)+'</span><b>'+esc(q.p)+'</b>'+gabVisual(q,false,lv.id)+
-         '<div class="gabresp">✔ '+esc(gabResp(q,lv.id))+'</div>'+(q.e?'<p class="sub" style="margin:6px 0 0">'+esc(q.e)+'</p>':'')+'</div>';
+         '<div class="gabresp">✔ '+esc(gabResp(q,lv.id))+'</div>'+
+         (PASSO.preparar(q)?'<button class="btn ghost small noprint gabpp" data-pl="'+i+'" data-pq="'+j+'" type="button">▶ Passo a passo</button>':'')+(q.e?'<p class="sub" style="margin:6px 0 0">'+esc(q.e)+'</p>':'')+'</div>';
     });
     h+='</div>';
   });
@@ -462,12 +469,15 @@ function telaGabarito(){
   app.innerHTML=h;
   Array.prototype.forEach.call(app.querySelectorAll(".gabq"),function(c){marcaZonas(c,LEVELS[+c.getAttribute("data-l")].qs[+c.getAttribute("data-q")]);});
   Array.prototype.forEach.call(app.querySelectorAll("[data-ir]"),function(b){b.onclick=function(){var a=document.getElementById("gab"+b.getAttribute("data-ir"));if(a)a.scrollIntoView({behavior:"smooth"});};});
+  Array.prototype.forEach.call(app.querySelectorAll(".gabpp"),function(b){b.onclick=function(){
+    var lv=LEVELS[+b.getAttribute("data-pl")],q=lv.qs[+b.getAttribute("data-pq")];
+    PASSO.abrir(q,"Q"+(+b.getAttribute("data-pq")+1)+" · Nível "+(+b.getAttribute("data-pl")+1)+" · "+lv.nome,gabResp(q,lv.id));};});
   $("#volta").onclick=$("#volta2").onclick=telaConfig;
   $("#imp").onclick=function(){window.print();};
   window.scrollTo(0,0);
 }
 /* PROF-FIM */
-'''
+'''.replace('/* PROF-FIM */', open(__import__('os').path.join(__import__('os').path.dirname(__file__), 'passo_a_passo.js'), encoding='utf-8').read() + '/* PROF-FIM */')
 
 CFG_PROF = r'''/* --- area do professor (senha) --- */
 function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
@@ -529,6 +539,10 @@ function telaConfig(){
 
 def professor(h):
     """Modo professor. Pode rodar de novo: so acrescenta o que falta."""
+    # blocos do modo professor sempre atualizados para a versao atual da ferramenta
+    h, n = re.subn(r'/\* PROF-CSS \*/\n.*?(?:/\* PROF-CSS-FIM \*/\n|@media print\{\.topbar,\.rodape,\.noprint,\.profbar\{display:none!important\}body\{background:#fff\}\.card\{border:1px solid #bbb\}\}\n)',
+                   lambda m: PROF_CSS, h, count=1, flags=re.S)
+    h, n = re.subn(r'/\* PROF-INI.*?/\* PROF-FIM \*/\n', lambda m: PROF_JS, h, count=1, flags=re.S)
     if '/* PROF-CSS */' not in h:
         if TEMA_INI in h:
             h = sub1(h, TEMA_INI, PROF_CSS + TEMA_INI, 'css prof')
