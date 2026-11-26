@@ -23,6 +23,7 @@ Cada aula fica em `DISCIPLINA/DISC_Gam_Mod_NN/index.html` (NN = número do módu
   Base: relatórios de 25/09/2026, com ~22 min de jogo efetivo por aula e a mediana dos alunos em 5 a 6 níveis.
 - **Relatório:** mostra "Meta da aula: concluída ✔" ou "x de 5 níveis". É o número que vale para a nota.
 - **Uma resposta por questão:** clique duplo ou toque repetido é ignorado (não pula questão, não tira vida duas vezes).
+- **Turma obrigatória:** o aluno escolhe a turma numa lista (2º1 a 2º4, na variável `TURMAS`); sem turma o jogo não começa. Quem já tinha progresso salvo sem turma escolhe ao continuar.
 - **Área do professor (⚙️):** a senha do professor libera todas as fases naquele aparelho (uso com aluno: as respostas continuam escondidas). A senha não fica escrita no código (só um hash dela).
 - **Modo professor (projetor):** na mesma Área do professor, a senha liga o modo professor, que vale para todas as aulas do aparelho até ser desligado e abre todos os níveis. Opções (todas ligadas ao ativar):
   - **Ordem fixa:** as questões vêm na ordem do gabarito (Q1, Q2... aparece no alto da questão) e as alternativas ficam sempre no mesmo lugar, com as letras a), b), c)...

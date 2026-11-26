@@ -289,6 +289,9 @@ body.pp-aberto{overflow:hidden}
 @media (max-width:1100px){.pp-grade{grid-template-columns:1fr 1fr}.pp-fx{grid-row:span 2}}
 @media (max-width:720px){.pp-grade{grid-template-columns:1fr}.pp-tx{font-size:17px}.pp-resp{display:none}}
 /* PROF-CSS-FIM */
+/* TURMA-CSS */
+select.tm{width:100%;padding:13px 14px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:17px;font-family:inherit;cursor:pointer}
+select.tm:focus{border-color:var(--primary);outline:none}
 /* TEMA-INI */
 :root{--bg:#e9f1ec;--surface-2:#f3f8f5;--line:#c4d8cb;--primary:#0b6b3a;--primary-d:#07502a;--primary-l:#e6f4ec;
   --boot1:#157a47;--boot2:#0b3d24;--boot3:#06200f;--bootfg:#a8e6c1;--tok:#4cc07f;--tokbg:rgba(76,192,127,.25);--hp:#c23b4d}
@@ -404,6 +407,11 @@ function infoJogador(lv){
 }
 function topo(extra){return '<div class="topbar">'+(extra||"")+'</div>';}
 
+/* TURMA-INI: turma obrigatoria */
+var TURMAS=["2º1","2º2","2º3","2º4"];
+function turmaOk(){return TURMAS.indexOf(S.turma)>=0;}
+function selTurma(v){return '<select id="tm" class="tm"><option value="">Escolha a sua turma</option>'+TURMAS.map(function(t){return '<option'+(t===v?' selected':'')+'>'+t+'</option>';}).join("")+'</select>';}
+/* TURMA-FIM */
 function telaInicio(){
   jogo=null;
   var temProg=!!S.nome;
@@ -419,6 +427,7 @@ function telaInicio(){
    (temProg?
      '<div class="card"><h3>Continuar como '+esc(S.nome)+'</h3>'+
       '<p class="sub" style="margin-bottom:10px">'+concluidos()+' de '+totalNv+' níveis · '+S.xp+' XP</p>'+
+      (turmaOk()?'':'<label class="f" for="tm">Turma (obrigatório)</label>'+selTurma("")+'<div style="height:12px"></div>')+
       '<button class="btn" id="go">Continuar</button>'+
       '<button class="btn ghost small" id="trocar">Trocar de aluno</button></div>'
      :
@@ -427,13 +436,15 @@ function telaInicio(){
       '<input type="text" id="nm" autocomplete="name" placeholder="Nome e sobrenome">'+
       '<div style="height:10px"></div>'+
       '<label class="f" for="tm">Turma</label>'+
-      '<input type="text" id="tm" placeholder="Ex.: 2º ano — Informática">'+
+      selTurma("")+
       '<div style="height:14px"></div>'+
       '<button class="btn" id="start">Começar</button></div>')+
    '<div class="note">O relatório final registra o seu nome, o tempo de estudo e quantas vezes a página foi deixada de lado durante as questões. Resolva sozinho: o objetivo é chegar na prova sabendo.</div>';
 
   if(temProg){
-    $("#go").onclick=function(){S.sessoes=(S.sessoes||0)+1;save();telaMapa();};
+    $("#go").onclick=function(){
+      if(!turmaOk()){var t=$("#tm").value;if(!t){alert("Escolha a sua turma.");$("#tm").focus();return;}S.turma=t;}
+      S.sessoes=(S.sessoes||0)+1;save();telaMapa();};
     $("#trocar").onclick=function(){
       if(confirm("Isto apaga o progresso salvo neste aparelho. Continuar?")){
         S={nome:"",turma:"",xp:0,niveis:{},saidas:0,tempo:0,inicio:null,sessoes:0,liberarTudo:false};save();telaInicio();
@@ -442,6 +453,7 @@ function telaInicio(){
     $("#start").onclick=function(){
       var n=$("#nm").value.trim(),t=$("#tm").value.trim();
       if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}
+      if(!t){alert("Escolha a sua turma.");$("#tm").focus();return;}
       S.nome=n;S.turma=t;S.inicio=Date.now();S.sessoes=1;save();telaMapa();
     };
   }

@@ -8,6 +8,7 @@ Padroniza o motor das aulas gamificadas (trilha com niveis/estrelas).
 - topo do jogo com nome, turma e nivel atual (mantendo vidas e cronometro)
 - rodape "Rosival Silva · ano" em todas as telas
 - modo professor (projetor), ligado com a senha: ordem fixa, botao "Ver resposta", sem cronometro e gabarito
+- turma obrigatoria (lista fixa de turmas), inclusive para quem ja tinha progresso salvo sem turma
 """
 import sys, re, json
 
@@ -580,13 +581,51 @@ def professor(h):
     return h
 
 
+# ---------------------------------------------------------------- TURMA OBRIGATORIA
+# Padrao (2026-11): a turma e escolhida numa lista fixa (TURMAS) e e obrigatoria para todos.
+# Quem ja tinha progresso salvo sem turma (ou com turma digitada a mao) escolhe a turma ao continuar.
+TURMA_CSS = """/* TURMA-CSS */
+select.tm{width:100%;padding:13px 14px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:17px;font-family:inherit;cursor:pointer}
+select.tm:focus{border-color:var(--primary);outline:none}
+"""
+TURMA_JS = """/* TURMA-INI: turma obrigatoria */
+var TURMAS=["2º1","2º2","2º3","2º4"];
+function turmaOk(){return TURMAS.indexOf(S.turma)>=0;}
+function selTurma(v){return '<select id="tm" class="tm"><option value="">Escolha a sua turma</option>'+TURMAS.map(function(t){return '<option'+(t===v?' selected':'')+'>'+t+'</option>';}).join("")+'</select>';}
+/* TURMA-FIM */
+"""
+
+
+def turma(h):
+    """Turma obrigatoria. Pode rodar de novo: so acrescenta o que falta."""
+    if '/* TURMA-CSS */' in h:
+        return h
+    if TEMA_INI in h:
+        h = sub1(h, TEMA_INI, TURMA_CSS + TEMA_INI, 'css turma')
+    else:
+        h = sub1(h, '</style>', TURMA_CSS + '</style>', 'css turma')
+    h = sub1(h, 'function telaInicio(){', TURMA_JS + 'function telaInicio(){', 'js turma')
+    h = sub1(h, """'<input type="text" id="tm" placeholder="Ex.: 2º ano — Informática">'+""", "selTurma(\"\")+", 'campo turma')
+    h = sub1(h, """if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}""",
+             """if(n.length<3){alert("Escreva o seu nome completo para o relatório sair certo.");return;}
+      if(!t){alert("Escolha a sua turma.");$("#tm").focus();return;}""", 'valida turma')
+    h = sub1(h, """'<button class="btn" id="go">Continuar</button>'+""",
+             """(turmaOk()?'':'<label class="f" for="tm">Turma (obrigatório)</label>'+selTurma("")+'<div style="height:12px"></div>')+
+      '<button class="btn" id="go">Continuar</button>'+""", 'turma ao continuar')
+    h = sub1(h, """$("#go").onclick=function(){S.sessoes=(S.sessoes||0)+1;save();telaMapa();};""",
+             """$("#go").onclick=function(){
+      if(!turmaOk()){var t=$("#tm").value;if(!t){alert("Escolha a sua turma.");$("#tm").focus();return;}S.turma=t;}
+      S.sessoes=(S.sessoes||0)+1;save();telaMapa();};""", 'continuar com turma')
+    return h
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         s = open(a, encoding='utf-8').read().replace('\r\n', '\n')
         if 'function julgar(q,ok,msg)' not in s:
             print('pulado (motor diferente, ajuste a mao):', a)
             continue
-        h = professor(meta(patch(s)))
+        h = turma(professor(meta(patch(s))))
         disc = disciplina_da_pasta(a)
         if disc:
             h = tema(h, disc)
