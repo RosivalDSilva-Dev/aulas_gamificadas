@@ -7,6 +7,7 @@ Padroniza o motor das aulas gamificadas (trilha com niveis/estrelas).
 - cor tema da disciplina (POO verde, PWI roxo, SO vermelho, LP azul: as cores dos HTML do projeto), pela pasta da aula
 - topo do jogo com nome, turma e nivel atual (mantendo vidas e cronometro)
 - rodape "Rosival Silva · ano" em todas as telas
+- modo professor (projetor), ligado com a senha: ordem fixa, botao "Ver resposta", sem cronometro e gabarito
 """
 import sys, re, json
 
@@ -324,13 +325,254 @@ def confere(h, nome):
         nome, len(L), min(5, len(regs)), max(0, len(regs) - 5), len(L) - len(regs), sum(len(l['qs']) for l in L)))
 
 
+# ---------------------------------------------------------------- MODO PROFESSOR (PROJETOR)
+# Padrao (2026-11): na Area do professor, a senha libera as fases (uso com aluno) OU liga o modo professor
+# (uso no projetor). O modo professor vale para todas as aulas do aparelho (fica no localStorage do site) e traz:
+# ordem fixa (questoes na ordem do gabarito e alternativas sempre no mesmo lugar), botao "Ver resposta",
+# opcao de tirar o cronometro e o gabarito completo da aula (com impressao).
+PROF_CSS = """/* PROF-CSS */
+.profbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--gold-l);border:1.5px dashed var(--gold);border-radius:10px;padding:6px 10px;margin:0 0 10px;font-weight:700;font-size:14px}
+.profbar .btn{width:auto;margin:0;padding:8px 12px}
+.profbox{background:var(--gold-l);border:1.5px dashed var(--gold);border-radius:12px;padding:8px 12px;margin:0 0 12px;font-size:14.5px;font-weight:700}
+.gabbox{background:var(--ok-l);border:2px solid var(--ok);border-radius:12px;padding:10px 12px;margin:10px 0;font-size:16px}
+.gab-ok{outline:3px solid var(--ok);outline-offset:2px;border-radius:6px;background:var(--ok-l)}
+g.gab-ok path,g.gab-ok rect,g.gab-ok polygon,g.gab-ok ellipse{stroke:var(--ok)!important;stroke-width:4px!important}
+.gabq{break-inside:avoid;page-break-inside:avoid}
+.gabn{display:inline-block;font-weight:800;color:var(--primary);margin-right:6px}
+.gabresp{margin-top:8px;font-weight:700;color:var(--ok-d);background:var(--ok-l);border-radius:8px;padding:6px 10px}
+.gabops{margin:8px 0 0 22px;padding:0}.gabops li{margin:2px 0}.gabops li.ok{font-weight:800;color:var(--ok-d)}
+.gabnav{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.gabnav .chip{min-width:44px}
+.gablv h2{margin:18px 4px 8px}
+.gabmont{display:flex;flex-direction:column;align-items:center;gap:2px;margin:6px 0}
+.chkrow{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:15px;cursor:pointer}
+.chkrow input{width:20px;height:20px;margin-top:2px;flex:none}
+@media print{.topbar,.rodape,.noprint,.profbar{display:none!important}body{background:#fff}.card{border:1px solid #bbb}}
+"""
+
+PROF_JS = r'''/* PROF-INI: modo professor (projetor): ordem fixa, ver resposta, sem cronometro e gabarito */
+var PROF_KEY="aulas_gamificadas_prof";
+var PROF=(function(){try{return JSON.parse(localStorage.getItem(PROF_KEY))||{};}catch(e){return {};}})();
+function salvaProf(){try{if(PROF.ok)localStorage.setItem(PROF_KEY,JSON.stringify(PROF));else localStorage.removeItem(PROF_KEY);}catch(e){}}
+function profOk(){return !!PROF.ok;}
+function modoFixo(){return profOk()&&!!PROF.fixo;}
+function timerOn(lv){return !!lv.timer&&!(profOk()&&PROF.semTimer);}
+var SEMENTE=null;
+function sementeDe(lvid,q){return (h53(String(lvid)+"|"+q.p)%4294967296)>>>0;}
+function semear(q){SEMENTE=modoFixo()?sementeDe(jogo.lv.id,q):null;}
+function sorteio(){
+  if(SEMENTE===null)return Math.random();
+  SEMENTE=(SEMENTE+0x6D2B79F5)>>>0;var t=SEMENTE;
+  t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+function filaNivel(lv){lv.qs.forEach(function(q,i){q._n=i+1;});return modoFixo()?lv.qs.slice():shuffle(lv.qs);}
+function ordemOps(lvid,q){var s=SEMENTE;SEMENTE=sementeDe(lvid,q);var o=shuffleIdx(q);SEMENTE=s;return o;}
+var LETRAS="abcdefghij";
+var NOMEFIG={inicio:"Início",fim:"Fim",entrada:"Entrada",saida:"Saída",proc:"Processamento",decisao:"Decisão"};
+var ZONAS={icons:"Ícones de atalho",taskbar:"Barra de tarefas",start:"Botão Iniciar",apps:"Programas abertos (meio da barra)",
+  tray:"Bandeja do sistema (relógio e WiFi)",wallpaper:"Área livre do papel de parede",bottom:"Borda de baixo da tela",
+  escola:"Pasta Escola",c:"Disco local (C:)",titulo:"Barra de título",fechar:"Botão fechar (X)",endereco:"Barra de endereço",
+  conteudo:"Área de conteúdo",status:"Barra de status"};
+function zonasCodigo(rows){var m={};(rows||[]).forEach(function(l){var s=Array.isArray(l)?l[1]:l,re=/\[\[([^|]+)\|([^\]]+)\]\]/g,x;while((x=re.exec(s)))m[x[1]]=x[2];});return m;}
+function noFluxo(fx,id){var n=null;((fx&&fx.n)||[]).forEach(function(d){if(d.i===id)n=d;});return n;}
+function txtFig(d){var t=String(d.t||"").replace(/\n/g," ");return (NOMEFIG[d.k]||d.k)+(t&&d.k!=="inicio"&&d.k!=="fim"?" “"+t+"”":"");}
+function gabResp(q,lvid){
+  var t=q.t;
+  if(t==="pick"){var o=ordemOps(lvid,q);return LETRAS[o.indexOf(q.ok)]+") "+q.opts[q.ok];}
+  if(t==="multi"){var o2=ordemOps(lvid,q);return q.ok.map(function(i){return LETRAS[o2.indexOf(i)]+") "+q.opts[i];}).join(" · ");}
+  if(t==="type")return q.ac[0];
+  if(t==="order")return q.items.map(function(s,i){return (i+1)+") "+s;}).join("   ");
+  if(t==="slots")return q.pairs.map(function(p){return p[0]+" → "+p[1];}).join(" · ");
+  if(t==="keys")return (q.combo||[]).join(" + ");
+  if(t==="figura")return NOMEFIG[q.opts[q.ok]]||q.opts[q.ok];
+  if(t==="montar")return q.items.map(function(it){return txtFig({k:it[0],t:it[1]});}).join(" → ");
+  if(t==="hot"){
+    if(q.rows){var z=zonasCodigo(q.rows);return q.ok.map(function(k){return z[k]||k;}).join(" · ");}
+    if(q.ok.indexOf("taskbar")>=0)return "Barra de tarefas (qualquer parte dela)";
+    return q.ok.map(function(k){return ZONAS[k]||k;}).join(" · ");
+  }
+  if(t==="hotf")return q.ok.map(function(k){var d=noFluxo(q.fluxo,k);return d?txtFig(d):k;}).join(" · ");
+  if(t==="esq")return (q.holes||[]).map(function(k){var d=noFluxo(q.fx,k);return d?txtFig(d):k;}).join(" · ");
+  if(t==="compl")return (q.resp||[]).map(function(r,i){return "lacuna "+(i+1)+": "+r;}).join(" · ");
+  if(t==="qflux")return "o desenho abaixo";
+  if(t==="exec")return "siga o fluxograma com "+Object.keys(q.entradas||{}).map(function(k){return k+" = "+q.entradas[k];}).join(", ");
+  if(t==="missao")return "o valor de teste muda com o nome do aluno; veja o modelo";
+  if(q.ac)return q.ac[0];
+  return "veja a explicação";
+}
+function gabVisual(q,live,lvid){
+  var h="",F=typeof sFluxo==="function",M=typeof miniForma==="function";
+  if(!live){
+    if(q.rows&&q.t!=="qflux")h+=sCode(q.rows);
+    if(q.scene&&typeof SCENES!=="undefined"&&SCENES[q.scene])h+=SCENES[q.scene]();
+    if(F&&q.fluxo)h+=sFluxo(q.fluxo,{zonas:true,max:340});
+    if(M&&q.k)h+='<div style="text-align:center">'+miniForma(q.k,q.txt||"",160)+'</div>';
+    if(q.t==="pick"||q.t==="multi"){
+      var ok=q.t==="pick"?[q.ok]:q.ok;
+      h+='<ol type="a" class="gabops">'+ordemOps(lvid,q).map(function(i){return '<li'+(ok.indexOf(i)>=0?' class="ok"':'')+'>'+esc(q.opts[i])+(ok.indexOf(i)>=0?' ✔':'')+'</li>';}).join("")+'</ol>';
+    }
+  }
+  if(q.t==="qflux"){if(!live&&q.rows)h+=sCode(q.rows);if(F)h+=sFluxo(q.flows[q.ok],{max:340});}
+  if(F&&q.fx&&(q.t==="esq"||!live))h+=sFluxo(q.fx,{max:340});
+  if(q.t==="compl"&&q.code)h+=sCode(q.code.map(function(l){return l.replace(/\{(\d+)\}/g,function(m,i){return q.resp[+i];});}));
+  if(q.t==="missao"&&q.modelo&&!live)h+=sCode(q.modelo);
+  if(M&&q.t==="figura")h+='<div style="text-align:center">'+miniForma(q.opts[q.ok],q.txt||"",160)+'</div>';
+  if(M&&q.t==="montar")h+='<div class="gabmont">'+q.items.map(function(it){return miniForma(it[0],it[1],150);}).join('<span class="dn">↓</span>')+'</div>';
+  return h;
+}
+function marcaZonas(box,q){
+  if((q.t!=="hot"&&q.t!=="hotf")||!q.ok)return;
+  Array.prototype.forEach.call(box.querySelectorAll("[data-zone]"),function(z){if(q.ok.indexOf(z.getAttribute("data-zone"))>=0)z.classList.add("gab-ok");});
+}
+function barraProf(q){
+  if(!profOk())return "";
+  return '<div class="profbar"><span>📽 Q'+(q._n||"?")+' de '+jogo.lv.qs.length+(modoFixo()?'':' · ordem embaralhada')+'</span>'+
+    (PROF.ver?'<button class="btn ghost small" id="verResp" type="button">👁 Ver resposta</button>':'')+'</div>';
+}
+function ligaProf(q,area){
+  if(!profOk())return;
+  if(modoFixo()&&q.t==="pick")Array.prototype.forEach.call(area.querySelectorAll(".opt .mark"),function(m,i){m.textContent=LETRAS[i];});
+  var b=$("#verResp");if(!b)return;
+  b.onclick=function(){
+    if(b._ab)return;b._ab=true;b.disabled=true;
+    marcaZonas(app,q);
+    var box=el('<div class="gabbox"><b>✔ Resposta:</b> '+esc(gabResp(q,jogo.lv.id))+gabVisual(q,true,jogo.lv.id)+
+      (q.e?'<p class="sub" style="margin:6px 0 0">'+esc(q.e)+'</p>':'')+'</div>');
+    var ac=$("#acao");ac.parentNode.insertBefore(box,ac);
+  };
+}
+function telaGabarito(){
+  jogo=null;if(cron){clearInterval(cron);cron=null;}
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Gabarito do professor</b></div>'+
+     '<button class="iconbtn" id="imp" title="Imprimir ou salvar em PDF">🖨</button>');
+  var G=(typeof GAME!=="undefined"&&GAME)||{};
+  h+='<div class="card"><h2 style="margin:0">📄 '+esc(G.titulo?(G.eyebrow?G.eyebrow+" · ":"")+G.titulo:document.title)+'</h2>'+
+     '<p class="sub">Gabarito do professor. A ordem é a do jogo com a <b>ordem fixa</b> ligada: Q1, Q2... e as alternativas a), b), c)... na mesma posição da tela.</p>'+
+     '<div class="gabnav noprint">'+LEVELS.map(function(lv,i){return '<button class="chip" data-ir="'+i+'">Nível '+(i+1)+(lv.boss?' 🏆':'')+'</button>';}).join("")+'</div></div>';
+  LEVELS.forEach(function(lv,i){
+    h+='<div class="gablv" id="gab'+i+'"><h2>'+(lv.glyph||"")+' Nível '+(i+1)+(lv.boss?' · Chefão':(i>=META?' · Bônus':''))+' — '+esc(lv.nome)+'</h2>'+
+       (lv.timer?'<p class="sub" style="margin:0 4px 8px">⏱ No jogo dos alunos: '+lv.timer+' s por questão.</p>':'');
+    lv.qs.forEach(function(q,j){
+      h+='<div class="card gabq" data-l="'+i+'" data-q="'+j+'"><span class="gabn">Q'+(j+1)+'</span><b>'+esc(q.p)+'</b>'+gabVisual(q,false,lv.id)+
+         '<div class="gabresp">✔ '+esc(gabResp(q,lv.id))+'</div>'+(q.e?'<p class="sub" style="margin:6px 0 0">'+esc(q.e)+'</p>':'')+'</div>';
+    });
+    h+='</div>';
+  });
+  h+='<button class="btn noprint" id="volta2">Voltar para a Área do professor</button>';
+  app.innerHTML=h;
+  Array.prototype.forEach.call(app.querySelectorAll(".gabq"),function(c){marcaZonas(c,LEVELS[+c.getAttribute("data-l")].qs[+c.getAttribute("data-q")]);});
+  Array.prototype.forEach.call(app.querySelectorAll("[data-ir]"),function(b){b.onclick=function(){var a=document.getElementById("gab"+b.getAttribute("data-ir"));if(a)a.scrollIntoView({behavior:"smooth"});};});
+  $("#volta").onclick=$("#volta2").onclick=telaConfig;
+  $("#imp").onclick=function(){window.print();};
+  window.scrollTo(0,0);
+}
+/* PROF-FIM */
+'''
+
+CFG_PROF = r'''/* --- area do professor (senha) --- */
+function h53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+var SENHA_PROF="__HASH__";
+/* PROF-CFG */
+function chkProf(k,t){return '<label class="chkrow"><input type="checkbox" data-prof="'+k+'"'+(PROF[k]?' checked':'')+'><span>'+t+'</span></label>';}
+function telaConfig(){
+  jogo=null;if(cron){clearInterval(cron);cron=null;}
+  var h=topo('<button class="iconbtn" id="volta">←</button><div class="grow"><b style="font-size:15px">Área do professor</b></div>');
+  if(!profOk()){
+    h+='<div class="card"><h3>🔒 Senha do professor</h3>'+
+       '<div class="pwrow"><input type="password" id="pw" autocomplete="off" placeholder="Senha do professor"></div>'+
+       '<div class="pwerr" id="pwerr"></div>'+
+       (!S.liberarTudo?'<button class="btn" id="lib">🔓 Liberar todas as fases</button>'+
+         '<p class="sub" style="margin:-4px 0 12px">Para um aluno que precisa pular fases. As respostas continuam escondidas.</p>':'')+
+       '<button class="btn ghost" id="ativa">📽 Ligar o modo professor (projetor)</button>'+
+       '<p class="sub" style="margin:-4px 0 0">Ordem fixa, botão de ver a resposta, sem cronômetro e gabarito. Use só no seu computador ou no do projetor, nunca no de aluno.</p></div>';
+  }
+  if(S.liberarTudo){
+    h+='<div class="card"><h3>🔓 Todas as fases liberadas</h3>'+
+       '<p class="sub">Neste aparelho, todos os níveis desta trilha (inclusive o desafio final) estão abertos.</p>'+
+       '<button class="btn ghost small" id="trancar">Bloquear de novo</button></div>';
+  }
+  if(profOk()){
+    h+='<div class="card"><h3>📽 Modo professor ligado</h3>'+
+       '<p class="sub">Vale para todas as aulas gamificadas neste aparelho, até você desligar. Todos os níveis ficam abertos.</p>'+
+       chkProf("fixo","<b>Ordem fixa:</b> as questões vêm na ordem do gabarito (Q1, Q2...) e as alternativas não mudam de lugar.")+
+       chkProf("ver","<b>Botão 👁 Ver resposta</b> em cada questão.")+
+       chkProf("semTimer","<b>Sem cronômetro</b> nos níveis com tempo (como o Chefão).")+
+       '<button class="btn" id="gab">📄 Abrir o gabarito desta aula</button>'+
+       '<button class="btn ghost small" id="desliga">Desligar o modo professor</button></div>';
+  }
+  h+='<button class="btn ghost" id="volta2">Voltar para a trilha</button>';
+  app.innerHTML=h;
+  $("#volta").onclick=$("#volta2").onclick=telaMapa;
+  if($("#trancar"))$("#trancar").onclick=function(){S.liberarTudo=false;save();telaConfig();};
+  if(profOk()){
+    Array.prototype.forEach.call(app.querySelectorAll("[data-prof]"),function(c){
+      c.onchange=function(){PROF[c.getAttribute("data-prof")]=c.checked;salvaProf();};
+    });
+    $("#gab").onclick=telaGabarito;
+    $("#desliga").onclick=function(){PROF={};salvaProf();telaConfig();};
+  }
+  var pw=$("#pw");
+  if(pw){
+    var confere=function(){
+      if(String(h53(pw.value))===SENHA_PROF)return true;
+      $("#pwerr").textContent="Senha incorreta.";pw.value="";pw.focus();return false;
+    };
+    if($("#lib"))$("#lib").onclick=function(){if(confere()){S.liberarTudo=true;save();telaMapa();}};
+    $("#ativa").onclick=function(){if(confere()){PROF={ok:true,fixo:true,ver:true,semTimer:true};salvaProf();telaConfig();}};
+    pw.addEventListener("keydown",function(e){if(e.key==="Enter"){var b=$("#lib")||$("#ativa");b.click();}});
+    setTimeout(function(){pw.focus();},100);
+  }
+  window.scrollTo(0,0);
+}
+'''.replace('__HASH__', SENHA_HASH)
+
+
+def professor(h):
+    """Modo professor. Pode rodar de novo: so acrescenta o que falta."""
+    if '/* PROF-CSS */' not in h:
+        if TEMA_INI in h:
+            h = sub1(h, TEMA_INI, PROF_CSS + TEMA_INI, 'css prof')
+        else:
+            h = sub1(h, '</style>', PROF_CSS + '</style>', 'css prof')
+    if 'PROF-CFG' not in h:
+        h, n = re.subn(r'/\* --- area do professor \(senha\) --- \*/\n.*?\nfunction telaConfig\(\)\{.*?\n\}\n',
+                       lambda m: CFG_PROF, h, count=1, flags=re.S)
+        assert n == 1, 'telaConfig'
+    if 'PROF-INI' not in h:
+        h = sub1(h, '/* --- area do professor (senha) --- */', PROF_JS + '/* --- area do professor (senha) --- */', 'prof js')
+    if 'Math.floor(sorteio()*(i+1))' not in h:
+        h = sub1(h, 'var j=Math.floor(Math.random()*(i+1));', 'var j=Math.floor(sorteio()*(i+1));', 'shuffle')
+    if 'fila:filaNivel(lv)' not in h:
+        h = sub1(h, 'fila:shuffle(lv.qs)', 'fila:filaNivel(lv)', 'fila')
+    if '  semear(q);\n' not in h:
+        h = sub1(h, '  var velho=document.querySelector(".feed");if(velho)velho.remove();\n',
+                 '  var velho=document.querySelector(".feed");if(velho)velho.remove();\n  semear(q);\n', 'semear')
+    h = h.replace("(lv.timer?'<span class=\"pill timer\"", "(timerOn(lv)?'<span class=\"pill timer\"")
+    h = h.replace('  if(lv.timer){\n', '  if(timerOn(lv)){\n')
+    assert "(timerOn(lv)?'<span" in h and '  if(timerOn(lv)){\n' in h, 'timer'
+    if 'h+=barraProf(q);' not in h:
+        h = sub1(h, "  h+='<h2 style=\"margin-bottom:12px\">'+esc(q.p)+'</h2>';\n",
+                 "  h+=barraProf(q);\n  h+='<h2 style=\"margin-bottom:12px\">'+esc(q.p)+'</h2>';\n", 'barra prof')
+    if 'ligaProf(q,area);' not in h:
+        h = sub1(h, '  RENDER[q.t](q,area,acao);\n', '  RENDER[q.t](q,area,acao);\n  ligaProf(q,area);\n', 'liga prof')
+    h = h.replace('if(i===0||S.liberarTudo)return true;', 'if(i===0||S.liberarTudo||profOk())return true;')
+    assert 'S.liberarTudo||profOk())return true' in h, 'desbloqueado prof'
+    if 'class="profbox"' not in h:
+        h = sub1(h, """   '<div class="metabox">🎯 Meta da aula: <b>'""",
+                 """   (profOk()?'<div class="profbox">📽 Modo professor ligado neste aparelho · ⚙️ para mudar ou abrir o gabarito</div>':'')+\n   '<div class="metabox">🎯 Meta da aula: <b>'""", 'aviso mapa')
+    if 'kv("Modo professor"' not in h:
+        h = sub1(h, '(S.liberarTudo?kv("Fases liberadas pelo professor","sim"):"")+',
+                 '(S.liberarTudo?kv("Fases liberadas pelo professor","sim"):"")+(profOk()?kv("Modo professor","ligado neste aparelho"):"")+', 'kv prof')
+    return h
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         s = open(a, encoding='utf-8').read().replace('\r\n', '\n')
         if 'function julgar(q,ok,msg)' not in s:
             print('pulado (motor diferente, ajuste a mao):', a)
             continue
-        h = meta(patch(s))
+        h = professor(meta(patch(s)))
         disc = disciplina_da_pasta(a)
         if disc:
             h = tema(h, disc)
